@@ -20,7 +20,7 @@ export function TicketListPage() {
     <PageContainer>
       <PageHeader />
 
-      <div className="flex items-center justify-between">
+      <div className="sm:self-start">
         <Tabs
           value={filter}
           onChange={setFilter}

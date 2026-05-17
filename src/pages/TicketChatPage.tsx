@@ -1,18 +1,27 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { PageContainer } from '../components/PageContainer';
 import { PageHeader } from '../components/PageHeader';
 import { ChatBubble, ChatHeaderBar } from '../components/Chat';
 import { Button } from '../components/Button';
-import { Field, TextArea } from '../components/FormControls';
-import { Check, Plus } from '../icons';
+import { Label } from '../components/Label';
+import { Select } from '../components/FormControls';
 import { sampleConversation, tickets } from '../data/mock';
+import { adminTickets, adminStateMap, type AdminState } from '../data/adminMock';
 import { useState } from 'react';
+import { RichEditor } from '../components/RichEditor';
+import { AttachmentsUploader } from '../components/AttachmentsUploader';
 
 export function TicketChatPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const isAdmin = searchParams.get('admin') === '1';
+
   const ticket = tickets.find((t) => t.id === id) ?? tickets[0];
+  const adminTicket = isAdmin ? adminTickets.find((t) => t.id === (id ?? ticket.id)) : null;
+
   const [messages, setMessages] = useState(sampleConversation);
   const [draft, setDraft] = useState('');
+  const [ticketState, setTicketState] = useState<AdminState | undefined>(adminTicket?.state);
 
   function send() {
     if (!draft.trim()) return;
@@ -30,11 +39,36 @@ export function TicketChatPage() {
     setDraft('');
   }
 
+  const stateInfo = ticketState ? adminStateMap[ticketState] : null;
+
   return (
     <PageContainer>
       <PageHeader title={ticket.title} subtitle="گفتگو با تیم پشتیبانی" />
 
-      <section className="rounded-3xl border border-line bg-white p-6 flex flex-col gap-4">
+      {isAdmin && adminTicket && ticketState && stateInfo && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-line bg-white px-4 sm:px-5 py-3 gap-3 sm:gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[12px] font-medium text-ink-500">وضعیت:</span>
+            <Label color={stateInfo.color}>{stateInfo.label}</Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[12px] text-ink-500 shrink-0">تغییر وضعیت:</span>
+            <Select
+              value={ticketState}
+              onChange={(e) => setTicketState(e.target.value as AdminState)}
+              className="!w-full sm:!w-auto sm:min-w-[160px] !h-8 !text-[12px]"
+            >
+              <option value="unreviewed">بررسی نشده</option>
+              <option value="reviewing">درحال بررسی</option>
+              <option value="pending">در انتظار پاسخ</option>
+              <option value="closed">بسته شده</option>
+              <option value="spam">اسپم</option>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      <section className="rounded-3xl border border-line bg-white p-4 sm:p-6 flex flex-col gap-4">
         <ChatHeaderBar
           id={ticket.id}
           date={ticket.date}
@@ -43,7 +77,7 @@ export function TicketChatPage() {
           status="پاسخ پشتیبان"
         />
 
-        <div className="flex flex-col gap-3 max-h-[320px] overflow-auto thin-scroll p-2">
+        <div className="flex flex-col gap-3 max-h-[320px] overflow-auto thin-scroll p-1">
           {messages.map((m) => (
             <ChatBubble key={m.id} msg={m} />
           ))}
@@ -51,29 +85,18 @@ export function TicketChatPage() {
 
         <div className="h-px bg-line" />
 
-        <Field label="پیام تیکت">
-          <TextArea
-            placeholder="پاسخ خود را بنویسید..."
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-          />
-        </Field>
-
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 text-[11px]">
-            <span className="text-brand">SVG, PNG, JPG or GIF</span>
-            <span className="text-ink-500">پسوند های مجاز</span>
-          </div>
-          <Button variant="gray" size="sm" leadingIcon={<Plus size={14} />}>
-            افزودن فایل
-          </Button>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت</span>
+          <RichEditor placeholder="مشکل خود را با جزئیات کامل توضیح دهید..." />
         </div>
+
+        <AttachmentsUploader />
 
         <div className="h-px bg-line" />
 
-        <div className="flex justify-end">
-          <Button variant="primary" size="md" leadingIcon={<Check size={16} />} onClick={send}>
-            ثبت تیکت
+        <div className="flex">
+          <Button variant="primary" size="md" onClick={send}>
+            ثبت پیام
           </Button>
         </div>
       </section>
