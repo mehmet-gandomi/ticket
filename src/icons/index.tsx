@@ -139,7 +139,26 @@ export const Dislike = ({ size, ...p }: IconProps) => (
 
 export const AlignRight = ({ size, ...p }: IconProps) => (
   <svg {...base(size)} {...p}>
-    <path d="M3 6h18M7 12h14M3 18h18M7 24" />
+    <path d="M3 6h18M9 12h12M3 18h18" />
+  </svg>
+);
+
+export const AlignCenter = ({ size, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M3 6h18M6 12h12M3 18h18" />
+  </svg>
+);
+
+export const AlignLeft = ({ size, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M3 6h18M3 12h12M3 18h18" />
+  </svg>
+);
+
+export const Link = ({ size, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
   </svg>
 );
 

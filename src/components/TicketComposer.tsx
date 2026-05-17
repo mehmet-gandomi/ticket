@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Field, Input, Select, TextArea } from './FormControls';
 import { Button } from './Button';
-import { Monitor, Plus, Close, Check, Bold, Italic, AlignRight } from '../icons';
+import { Plus, Close, Check, Bold, Italic, AlignRight, AlignCenter, AlignLeft, Link, ListIcon, MessageText } from '../icons';
 import { ticketSubjects } from '../data/mock';
 
 interface TicketComposerProps {
@@ -32,6 +32,50 @@ export function TicketComposer({
   const [subject, setSubject] = useState(defaultSubject);
   const [title, setTitle] = useState(defaultTitle);
   const [message, setMessage] = useState(defaultMessage);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  function wrapSelection(before: string, after = before) {
+    const el = textareaRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = message.slice(start, end);
+    const next = message.slice(0, start) + before + selected + after + message.slice(end);
+    setMessage(next);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(start + before.length, end + before.length);
+    });
+  }
+
+  function insertAtLineStart(prefix: string) {
+    const el = textareaRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const lineStart = message.lastIndexOf('\n', start - 1) + 1;
+    const next = message.slice(0, lineStart) + prefix + message.slice(lineStart);
+    setMessage(next);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(start + prefix.length, start + prefix.length);
+    });
+  }
+
+  function insertLink() {
+    const el = textareaRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = message.slice(start, end) || 'متن لینک';
+    const snippet = `[${selected}](url)`;
+    const next = message.slice(0, start) + snippet + message.slice(end);
+    setMessage(next);
+    requestAnimationFrame(() => {
+      el.focus();
+      const urlStart = start + selected.length + 3;
+      el.setSelectionRange(urlStart, urlStart + 3);
+    });
+  }
 
   return (
     <section className="rounded-3xl border border-line bg-white p-6 flex flex-col gap-4 w-full max-w-[583px]">
@@ -57,26 +101,40 @@ export function TicketComposer({
       )}
 
       {/* rich text toolbar + textarea */}
-      <div className="flex items-center justify-end gap-3">
-        <div className="flex items-center gap-1 rounded-xl border border-line bg-white px-2 h-10 text-ink-500">
-          <button className="size-8 grid place-items-center rounded-md hover:bg-surface-50">
+      <div className="flex items-center justify-end">
+        <div className="flex items-center gap-0.5 rounded-xl border border-line bg-white px-2 h-10 text-ink-500">
+          <button type="button" onClick={() => wrapSelection('**')} className="size-8 grid place-items-center rounded-md hover:bg-surface-50" title="Bold">
             <Bold size={16} />
           </button>
-          <button className="size-8 grid place-items-center rounded-md hover:bg-surface-50">
+          <button type="button" onClick={() => wrapSelection('*')} className="size-8 grid place-items-center rounded-md hover:bg-surface-50" title="Italic">
             <Italic size={16} />
           </button>
-          <span className="w-px h-4 bg-line" />
-          <button className="size-8 grid place-items-center rounded-md hover:bg-surface-50">
+          <span className="w-px h-4 bg-line mx-1" />
+          <button type="button" onClick={insertLink} className="size-8 grid place-items-center rounded-md hover:bg-surface-50" title="Link">
+            <Link size={16} />
+          </button>
+          <button type="button" onClick={() => insertAtLineStart('- ')} className="size-8 grid place-items-center rounded-md hover:bg-surface-50" title="List">
+            <ListIcon size={16} />
+          </button>
+          <button type="button" onClick={() => insertAtLineStart('> ')} className="size-8 grid place-items-center rounded-md hover:bg-surface-50" title="Quote">
+            <MessageText size={16} />
+          </button>
+          <span className="w-px h-4 bg-line mx-1" />
+          <button type="button" onClick={() => wrapSelection('‏', '')} className="size-8 grid place-items-center rounded-md hover:bg-surface-50" title="Align Right">
             <AlignRight size={16} />
           </button>
+          <button type="button" className="size-8 grid place-items-center rounded-md hover:bg-surface-50" title="Align Center">
+            <AlignCenter size={16} />
+          </button>
+          <button type="button" className="size-8 grid place-items-center rounded-md hover:bg-surface-50" title="Align Left">
+            <AlignLeft size={16} />
+          </button>
         </div>
-        <Button variant="primary" size="md" leadingIcon={<Monitor size={16} />}>
-          پیش نمایش
-        </Button>
       </div>
 
       <Field label="پیام تیکت">
         <TextArea
+          ref={textareaRef}
           placeholder="مشکل خود را با جزئیات کامل توضیح دهید..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}

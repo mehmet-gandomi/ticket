@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 export function Field({
   label,
@@ -30,17 +30,16 @@ export function Input({
   );
 }
 
-export function TextArea({
-  className = '',
-  ...rest
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      className={`min-h-[200px] w-full rounded-xl border border-line bg-white p-4 text-[13px] leading-7 text-ink-900 placeholder:text-ink-400 focus:border-brand focus:shadow-focus focus:outline-none transition resize-none ${className}`}
-      {...rest}
-    />
-  );
-}
+export const TextArea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement> & { className?: string }
+>(({ className = '', ...rest }, ref) => (
+  <textarea
+    ref={ref}
+    className={`min-h-[200px] w-full rounded-xl border border-line bg-white p-4 text-[13px] leading-7 text-ink-900 placeholder:text-ink-400 focus:border-brand focus:shadow-focus focus:outline-none transition resize-none ${className}`}
+    {...rest}
+  />
+));
 
 export function Select({
   className = '',
