@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@font-face {
+  font-family: 'Ravi';
+  src: url('/public/fonts/Ravi/Ravi-VF.ttf') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  font-family: 'Ravi', 'Tahoma', system-ui, sans-serif;
+}
+
+body {
+  font-family: 'Ravi', 'Tahoma', system-ui, sans-serif;
+  background: #ffffff;
+  color: #16161d;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'ss01', 'ss02';
+}
+
+/* Persian digits use the same Ravi font, but force a tabular feel
+   on timestamps and IDs. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbar to match the Figma's slim treatment. */
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: #d4d6dc;
+  border-radius: 999px;
+}
+.thin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
