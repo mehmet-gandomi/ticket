@@ -3,8 +3,6 @@ import { PageContainer } from '../components/PageContainer';
 import { PageHeader } from '../components/PageHeader';
 import { ChatBubble, ChatHeaderBar } from '../components/Chat';
 import { Button } from '../components/Button';
-import { Field, TextArea } from '../components/FormControls';
-import { Check, Plus } from '../icons';
 import { sampleConversation, tickets } from '../data/mock';
 import { useState } from 'react';
 import { RichEditor } from '../components/RichEditor';

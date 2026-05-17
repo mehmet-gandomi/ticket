@@ -11,6 +11,15 @@ export function TicketNotFoundPage() {
       <PageHeader title="پاسخ هوشمند یافت نشد" subtitle="منتظر پاسخ تیم پشتیبانی باشید" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div className="flex justify-end">
+          <TicketComposer
+            defaultMessage="مشکل ssl چکار باید بکنم ادرس وبسایتم : https://ieffect.ir"
+            files={[{ name: 'اسم فایل.jpg', size: '200KB' }]}
+            showCancel={false}
+            submitLabel="ثبت تیکت"
+            onSubmit={() => navigate('/tickets')}
+          />
+        </div>
         <div className="flex flex-col items-center justify-center gap-6 text-center">
           <div className="text-success/60">
             <BotLaughing size={220} />
@@ -21,16 +30,6 @@ export function TicketNotFoundPage() {
               منتظر پاسخ ادمین های ما باشید. در سریع ترین زمان پاسخگو شما هستند.
             </p>
           </div>
-        </div>
-
-        <div className="flex justify-end">
-          <TicketComposer
-            defaultMessage="مشکل ssl چکار باید بکنم ادرس وبسایتم : https://ieffect.ir"
-            files={[{ name: 'اسم فایل.jpg', size: '200KB' }]}
-            showCancel={false}
-            submitLabel="ثبت تیکت"
-            onSubmit={() => navigate('/tickets')}
-          />
         </div>
       </div>
     </PageContainer>
