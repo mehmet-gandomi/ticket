@@ -30,26 +30,26 @@ export function AdminTicketRow({ ticket, selected, onToggle }: {
       </label>
 
       <div className="flex-1 flex flex-col gap-2 min-w-0">
-        {/* Title row */}
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-[14px] text-ink-900 leading-6 font-semibold min-w-0">{ticket.title}</p>
+        {/* Title + labels */}
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[14px] text-ink-900 leading-6 font-semibold truncate">{ticket.title}</p>
           <div className="flex items-center gap-1.5 shrink-0">
             <Label color={s.color} size="sm">{s.label}</Label>
             <Label color={p.color} size="sm" icon={<Flag size={10} />}>{p.label}</Label>
           </div>
         </div>
 
-        {/* Meta row */}
-        <div className="flex items-center gap-1.5 text-[11px] text-ink-400 tabular flex-nowrap overflow-hidden">
-          <span className="font-bold text-brand text-[13px] shrink-0">#{ticket.id}</span>
-          <span className="w-px h-3 bg-line shrink-0" />
-          <span className="shrink-0">{ticket.ago}</span>
-          <span className="w-px h-3 bg-line shrink-0" />
-          <span className="truncate">{ticket.user}</span>
-          <span className="w-px h-3 bg-line shrink-0" />
-          <span className="shrink-0">{ticket.date}</span>
-          <span className="w-px h-3 bg-line shrink-0" />
-          <span className="shrink-0">{ticket.time}</span>
+        {/* Meta row — wraps naturally */}
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-ink-400 tabular">
+          <span className="font-bold text-brand text-[13px]">#{ticket.id}</span>
+          <span className="w-px h-3 bg-line" />
+          <span>{ticket.ago}</span>
+          <span className="w-px h-3 bg-line" />
+          <span>{ticket.user}</span>
+          <span className="w-px h-3 bg-line" />
+          <span>{ticket.date}</span>
+          <span className="w-px h-3 bg-line" />
+          <span>{ticket.time}</span>
         </div>
 
         {/* Preview */}
