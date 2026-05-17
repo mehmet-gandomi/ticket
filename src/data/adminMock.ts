@@ -41,10 +41,15 @@ export const initialCategories: Category[] = [
   { id: 'billing', title: 'خطا ها', description: 'دسته بندی فنی متناسب با مشکلات فنی', count: 5 },
 ];
 
-export interface SavedAnswer { id: number; category: string; title: string; body: string; }
+export interface SavedAnswerAttachment { id: string; name: string; size: number; }
+export interface SavedAnswer { id: number; category: string; title: string; body: string; attachments?: SavedAnswerAttachment[]; }
 export const initialAnswers: SavedAnswer[] = [
   { id: 1, category: 'مشکل وب', title: 'گواهی SSL منقضی شده',
-    body: 'گواهی SSL را از پنل هاست تمدید کنید. اگر از Let\'s Encrypt استفاده می‌کنید با دستور certbot renew گواهی را به‌روزرسانی نمایید.' },
+    body: 'گواهی SSL را از پنل هاست تمدید کنید. اگر از Let\'s Encrypt استفاده می‌کنید با دستور certbot renew گواهی را به‌روزرسانی نمایید.',
+    attachments: [
+      { id: 'att-1', name: 'ssl-renewal-guide.pdf', size: 204800 },
+      { id: 'att-2', name: 'certbot-screenshot.png', size: 87400 },
+    ] },
   { id: 2, category: 'مشکل وب', title: 'Mixed Content',
     body: 'تمام منابع HTTP را به HTTPS تغییر دهید. در CMS از افزونه Really Simple SSL کمک بگیرید.' },
   { id: 3, category: 'مشکل ایمیل', title: 'ایمیل به اسپم می‌رود',

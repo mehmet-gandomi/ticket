@@ -141,6 +141,7 @@ function EditAnswerModal({ answer, cats, onClose, onSave }: {
         <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت</span>
         <RichEditor placeholder="متن پاسخ آماده را بنویسید..." defaultValue={answer.body} onChange={setBody} />
       </div>
+      <AttachmentsUploader defaultFiles={answer.attachments ?? []} />
       <div className="flex gap-3 mt-2">
         <Button variant="primary"
           onClick={() => { if (title.trim() && body.trim()) { onSave({ ...answer, category: cat, title, body }); onClose(); } }}>
