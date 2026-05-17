@@ -7,16 +7,17 @@ import { Field, Input, Select } from '../components/FormControls';
 import { Button } from '../components/Button';
 import { Pagination } from '../components/Pagination';
 import { Search } from '../icons';
-import { adminTickets, type AdminState } from '../data/adminMock';
+import { adminTickets as initialTickets, type AdminState, type AdminTicket } from '../data/adminMock';
 import { Setting } from '../icons/index'
 
-function StatBox({ count, label, tint }: { count: string | number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default' }) {
+function StatBox({ count, label, tint }: { count: string | number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet' }) {
   const tints: Record<string, string> = {
     gray: 'bg-surface-100 text-ink-700',
     warning: 'bg-[#FFF8EC] text-[#B47100]',
     primary: 'bg-brand-tint text-brand',
     danger: 'bg-[#FDEAEA] text-danger',
     default: 'bg-white text-ink-700 border border-line',
+    violet: 'bg-[#F1E8FF] text-violet',
   };
   return (
     <div className={`flex-1 rounded-2xl px-5 py-4 flex flex-col items-center gap-1 ${tints[tint]}`}>
@@ -28,10 +29,12 @@ function StatBox({ count, label, tint }: { count: string | number; label: string
 
 
 export function AdminTicketListPage() {
+  const [tickets, setTickets] = useState<AdminTicket[]>(initialTickets);
   const [filter, setFilter] = useState<AdminState | 'all'>('all');
   const [priority, setPriority] = useState<string>('all');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
+  const [bulkStatus, setBulkStatus] = useState<AdminState | ''>('');
 
   function toggle(id: string) {
     const next = new Set(selected);
@@ -39,15 +42,25 @@ export function AdminTicketListPage() {
     setSelected(next);
   }
 
+  function applyBulkStatus() {
+    if (!bulkStatus) return;
+    setTickets((prev) =>
+      prev.map((t) => selected.has(t.id) ? { ...t, state: bulkStatus } : t)
+    );
+    setSelected(new Set());
+    setBulkStatus('');
+  }
+
   const counts = {
-    all: adminTickets.length,
-    unreviewed: adminTickets.filter((t) => t.state === 'unreviewed').length,
-    reviewing: adminTickets.filter((t) => t.state === 'reviewing').length,
-    pending: adminTickets.filter((t) => t.state === 'pending').length,
-    closed: adminTickets.filter((t) => t.state === 'closed').length,
+    all: tickets.length,
+    unreviewed: tickets.filter((t) => t.state === 'unreviewed').length,
+    reviewing: tickets.filter((t) => t.state === 'reviewing').length,
+    pending: tickets.filter((t) => t.state === 'pending').length,
+    closed: tickets.filter((t) => t.state === 'closed').length,
+    spam: tickets.filter((t) => t.state === 'spam').length,
   };
 
-  const filtered = adminTickets
+  const filtered = tickets
     .filter((t) => (filter === 'all' ? true : t.state === filter))
     .filter((t) => (priority === 'all' ? true : t.priority === priority))
     .filter((t) => (search.trim() === '' ? true : t.id.includes(search) || t.title.includes(search)));
@@ -58,6 +71,7 @@ export function AdminTicketListPage() {
     { value: 'reviewing', label: 'درحال بررسی', count: counts.reviewing },
     { value: 'pending', label: 'در انتظار پاسخ', count: counts.pending },
     { value: 'closed', label: 'بسته شده', count: counts.closed },
+    { value: 'spam', label: 'اسپم', count: counts.spam },
   ];
 
   const nav = useNavigate();
@@ -89,12 +103,13 @@ export function AdminTicketListPage() {
         </div>
       </Field>
 
-      <div className="grid grid-cols-5 gap-3">
-        <StatBox count="۳۲۰" label="همه تیکت ها" tint="default" />
+      <div className="grid grid-cols-6 gap-3">
+        <StatBox count={counts.all} label="همه تیکت ها" tint="default" />
         <StatBox count={counts.unreviewed} label="بررسی نشده" tint="danger" />
         <StatBox count={counts.reviewing} label="در حال بررسی" tint="primary" />
         <StatBox count={counts.pending} label="در انتظار پاسخ" tint="warning" />
-        <StatBox count="۳۲۰" label="بسته شده" tint="gray" />
+        <StatBox count={counts.closed} label="بسته شده" tint="gray" />
+        <StatBox count={counts.spam} label="اسپم" tint="violet" />
       </div>
 
       <div className="flex items-center justify-between gap-3">
@@ -117,8 +132,29 @@ export function AdminTicketListPage() {
       </div>
 
       {selected.size > 0 && (
-        <div className="flex items-center justify-between rounded-2xl border border-brand-soft bg-brand-tint px-4 py-2.5">
-          <Button variant="primary" size="sm">پاسخ گروهی</Button>
+        <div className="flex items-center justify-between rounded-2xl border border-brand-soft bg-brand-tint px-4 py-2.5 gap-4">
+          <div className="flex items-center gap-3">
+            <Button variant="primary" size="sm">پاسخ گروهی</Button>
+            <div className="flex items-center gap-2">
+              <Select
+                value={bulkStatus}
+                onChange={(e) => setBulkStatus(e.target.value as AdminState | '')}
+                className="!w-auto min-w-[160px] !h-8 !text-[12px]"
+              >
+                <option value="">تغییر وضعیت...</option>
+                <option value="unreviewed">بررسی نشده</option>
+                <option value="reviewing">درحال بررسی</option>
+                <option value="pending">در انتظار پاسخ</option>
+                <option value="closed">بسته شده</option>
+                <option value="spam">اسپم</option>
+              </Select>
+              {bulkStatus && (
+                <Button variant="primary" size="sm" onClick={applyBulkStatus}>
+                  اعمال
+                </Button>
+              )}
+            </div>
+          </div>
           <span className="text-[13px] text-brand">{selected.size} تیکت انتخاب شده</span>
         </div>
       )}

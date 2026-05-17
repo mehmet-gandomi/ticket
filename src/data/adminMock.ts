@@ -1,6 +1,6 @@
 import type { TicketSummary } from '../components/TicketCard';
 
-export type AdminState = 'unreviewed' | 'reviewing' | 'pending' | 'closed';
+export type AdminState = 'unreviewed' | 'reviewing' | 'pending' | 'closed' | 'spam';
 
 export interface AdminTicket extends Omit<TicketSummary, 'status'> {
   user: string;
@@ -25,11 +25,12 @@ export const adminTickets: AdminTicket[] = [
     date: '۱۴۰۵/۰۲/۱۲', time: '۱۱:۰۰', ago: '۶ روز پیش' },
 ];
 
-export const adminStateMap: Record<AdminState, { color: 'default'|'primary'|'warning'|'danger'; label: string }> = {
+export const adminStateMap: Record<AdminState, { color: 'default'|'primary'|'warning'|'danger'|'violet'; label: string }> = {
   unreviewed: { color: 'danger', label: 'بررسی نشده' },
   reviewing: { color: 'primary', label: 'درحال بررسی' },
   pending: { color: 'warning', label: 'در انتظار پاسخ' },
   closed: { color: 'default', label: 'بسته شده' },
+  spam: { color: 'violet', label: 'اسپم' },
 };
 
 export interface Category { id: string; name: string; count: number; }
