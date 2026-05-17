@@ -238,25 +238,31 @@ function AiProviderCard({ provider, config, onChange }: {
   onChange: (c: AiConfig) => void;
 }) {
   return (
-    <div className={`rounded-2xl border bg-white p-5 flex flex-col gap-4 transition ${config.enabled ? 'border-brand shadow-[0_2px_18px_rgba(0,104,255,0.06)]' : 'border-line'}`}>
-      <div className="flex items-center justify-between gap-4">
-        <Toggle checked={config.enabled} onChange={(v) => onChange({ ...config, enabled: v })} label="" />
-        <div className="flex items-center gap-3 flex-1">
-          <div className="flex flex-col gap-0.5 text-right flex-1">
-            <span className="text-[14px] font-bold text-ink-900">{provider.name}</span>
-            <span className="text-[12px] text-ink-500">{provider.description}</span>
-          </div>
+    <div className={`rounded-2xl border bg-white p-5 flex flex-col gap-5 transition ${config.enabled ? 'border-brand shadow-[0_2px_18px_rgba(0,104,255,0.06)]' : 'border-line'}`}>
+      <div className="flex items-start justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => onChange({ ...config, enabled: !config.enabled })}
+          className={`relative w-11 h-6 rounded-full transition shrink-0 mt-0.5 ${config.enabled ? 'bg-brand' : 'bg-line'}`}
+        >
+          <span className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${config.enabled ? 'right-0.5' : 'right-[22px]'}`} />
+        </button>
+        <div className="flex items-center gap-3 flex-1 min-w-0" dir="rtl">
           <div
-            className="size-11 rounded-xl grid place-items-center text-white text-[12px] font-bold shrink-0"
+            className="size-12 rounded-xl grid place-items-center text-white text-[13px] font-bold shrink-0"
             style={{ background: provider.badgeColor }}
           >
             {provider.badge}
+          </div>
+          <div className="flex flex-col gap-1 min-w-0">
+            <span className="text-[14px] font-bold text-ink-900">{provider.name}</span>
+            <span className="text-[12px] text-ink-500 leading-5">{provider.description}</span>
           </div>
         </div>
       </div>
 
       {config.enabled && (
-        <div className="flex flex-col gap-3 pt-1 border-t border-line">
+        <div className="flex flex-col gap-3 pt-4 border-t border-line">
           <Field label="کلید API">
             <Input
               dir="ltr"
