@@ -20,15 +20,17 @@ export function TicketListPage() {
     <PageContainer>
       <PageHeader />
 
-      <Tabs
-        value={filter}
-        onChange={setFilter}
-        options={[
-          { value: 'all', label: 'همه' },
-          { value: 'answered', label: 'پاسخ داده شده' },
-          { value: 'closed', label: 'بسته شده' },
-        ]}
-      />
+      <div className="sm:self-start">
+        <Tabs
+          value={filter}
+          onChange={setFilter}
+          options={[
+            { value: 'all', label: 'همه' },
+            { value: 'answered', label: 'پاسخ داده شده' },
+            { value: 'closed', label: 'بسته شده' },
+          ]}
+        />
+      </div>
 
       <div className="flex flex-col gap-3">
         {filtered.map((t) => (
