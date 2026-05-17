@@ -5,6 +5,7 @@ import { Field, Input, Select, TextArea } from '../components/FormControls';
 import { Button } from '../components/Button';
 import { Label } from '../components/Label';
 import { Plus, Check, Close, TicketStar, ListIcon, Trash, Edit } from '../icons';
+import { PageHeader } from '../components/PageHeader';
 import {
   initialCategories,
   initialAnswers,
@@ -21,7 +22,7 @@ function Toggle({ checked, onChange, label, hint }: {
         className={`relative w-11 h-6 rounded-full transition shrink-0 ${checked ? 'bg-brand' : 'bg-line'}`}>
         <span className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${checked ? 'right-0.5' : 'right-[22px]'}`} />
       </button>
-      <div className="flex flex-col gap-1 items-end flex-1">
+      <div className="flex flex-col gap-1 flex-1">
         <span className="text-[13px] font-bold text-ink-900 text-right">{label}</span>
         {hint && <span className="text-[11px] text-ink-500 text-right leading-5">{hint}</span>}
       </div>
@@ -118,12 +119,12 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
   return (
     <div className="flex flex-col gap-5 flex-1 min-w-0">
       <div className="flex items-center justify-between gap-3">
-        <Button variant="primary" size="md" leadingIcon={<Plus size={14} />} onClick={onAdd}>افزودن دسته</Button>
         <div className="flex items-center gap-3 text-right">
-          <span className="text-[11px] text-ink-400 tabular">{cats.length} دسته بندی</span>
-          <span className="w-px h-3 bg-line" />
           <h3 className="text-[16px] font-bold text-ink-900">دسته بندی سوالات</h3>
+          <span className="w-px h-3 bg-line" />
+          <span className="text-[11px] text-ink-400 tabular">{cats.length} دسته بندی</span>
         </div>
+        <Button variant="primary" size="md" leadingIcon={<Plus size={14} />} onClick={onAdd}>افزودن دسته</Button>
       </div>
       {cats.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
@@ -139,14 +140,14 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
         <div className="flex flex-col gap-2 max-h-[360px] overflow-auto pl-2">
           {cats.map((c) => (
             <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-3 py-2.5 hover:border-brand transition group">
+              <div className="flex items-center gap-3">
+                <span className="size-2 rounded-full bg-brand" />
+                <span className="text-[13px] text-ink-900">{c.name}</span>
+                <span className="text-[11px] text-ink-500 tabular">{c.count} مورد</span>
+              </div>
               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition">
                 <button className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition"><Edit size={14} /></button>
                 <button onClick={() => remove(c.id)} className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-danger hover:bg-red-50 transition"><Trash size={14} /></button>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-ink-500 tabular">{c.count} مورد</span>
-                <span className="size-2 rounded-full bg-brand" />
-                <span className="text-[13px] text-ink-900">{c.name}</span>
               </div>
             </div>
           ))}
@@ -163,8 +164,6 @@ function PersonalizationTab({ cats, setCats, openCat }: {
   const [brand, setBrand] = useState('#3B3214');
   return (
     <div className="flex gap-12">
-      <div className="flex-1 min-w-0"><CategoriesPanel cats={cats} setCats={setCats} onAdd={openCat} /></div>
-      <div className="w-px bg-line" />
       <div className="flex-1 flex flex-col gap-6">
         <Toggle checked={ai} onChange={setAi} label="پاسخ هوشمند" hint="قابلیت پاسخ دهی هوشمند وجود داشته باشد" />
         <Field label="رنگ برند" hint="کد رنگ برند خودتان را وارد کنید.">
@@ -174,6 +173,8 @@ function PersonalizationTab({ cats, setCats, openCat }: {
           </div>
         </Field>
       </div>
+      <div className="w-px bg-line" />
+      <div className="flex-1 min-w-0"><CategoriesPanel cats={cats} setCats={setCats} onAdd={openCat} /></div>
     </div>
   );
 }
@@ -183,24 +184,24 @@ function AnswersTab({ answers, setAnswers, openAns }: {
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex items-center gap-3">
         <Button variant="primary" size="lg" leadingIcon={<Plus size={16} />} onClick={openAns}>افزودن پاسخ</Button>
       </div>
       <div className="flex flex-col gap-3">
         {answers.map((a) => (
           <div key={a.id} className="rounded-2xl border border-line bg-white px-5 py-4 hover:border-brand transition">
             <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-[13px] font-bold text-ink-900">{a.title}</span>
+                  <Label color="primary">{a.category}</Label>
+                </div>
+                <p className="text-[13px] text-ink-500 leading-7 text-right">{a.body}</p>
+              </div>
               <div className="flex items-center gap-2">
                 <button className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition"><Edit size={14} /></button>
                 <button onClick={() => setAnswers(answers.filter((x) => x.id !== a.id))}
                   className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-danger hover:bg-red-50 transition"><Trash size={14} /></button>
-              </div>
-              <div className="flex-1 flex flex-col gap-2 items-end">
-                <div className="flex items-center gap-3">
-                  <Label color="primary">{a.category}</Label>
-                  <span className="text-[13px] font-bold text-ink-900">{a.title}</span>
-                </div>
-                <p className="text-[13px] text-ink-500 leading-7 text-right">{a.body}</p>
               </div>
             </div>
           </div>
@@ -220,21 +221,22 @@ export function AdminSettingsPage() {
 
   return (
     <PageContainer>
-      <header className="flex items-start justify-between gap-6 pb-5 border-b border-line">
-        <button onClick={() => nav('/admin/tickets')}
-          className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition">
-          <ListIcon size={18} /><span>لیست تیکت ها</span>
-        </button>
-        <div className="flex items-start gap-3 text-right">
-          <div>
-            <h1 className="text-[23px] font-bold text-ink-900 leading-[48px]">تنظیمات پشتیبانی</h1>
-            <p className="text-[13px] text-ink-500 leading-6">تکیت پشتیبانی ۲۴ ساعته آماده پاسخگویی</p>
-          </div>
-          <div className="text-brand"><TicketStar size={48} /></div>
-        </div>
-      </header>
 
-      <div className="flex justify-end">
+      <PageHeader
+        title="تنظیمات پشتیبانی"
+        subtitle="پاسخ گویی به مشتریان با الویت های مشخص"
+        action={
+          <button
+            onClick={() => nav('/admin/tickets')}
+            className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition"
+          >
+            <ListIcon size={18} />
+            <span>لیست تیکت‌ها</span>
+          </button>
+        }
+      />
+
+      <div className="flex">
         <div className="inline-flex p-1 rounded-xl border border-line bg-surface-50">
           {([{ id: 'personal', label: 'شخصی سازی' }, { id: 'answers', label: 'تعریف سوالات' }] as const).map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}

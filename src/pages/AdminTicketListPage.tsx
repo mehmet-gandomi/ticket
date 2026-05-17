@@ -8,6 +8,7 @@ import { Button } from '../components/Button';
 import { Pagination } from '../components/Pagination';
 import { Search } from '../icons';
 import { adminTickets, type AdminState } from '../data/adminMock';
+import { Setting } from '../icons/index'
 
 function StatBox({ count, label, tint }: { count: string | number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default' }) {
   const tints: Record<string, string> = {
@@ -69,8 +70,9 @@ export function AdminTicketListPage() {
         action={
           <button
             onClick={() => nav('/admin/settings')}
-            className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-white border border-line text-ink-900 text-[13px] font-medium hover:bg-surface-50 transition"
+            className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition"
           >
+            <Setting size={18} />
             <span>تنظیمات</span>
           </button>
         }
