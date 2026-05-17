@@ -134,7 +134,6 @@ export function AdminTicketListPage() {
       {selected.size > 0 && (
         <div className="flex items-center justify-between rounded-2xl border border-brand-soft bg-brand-tint px-4 py-2.5 gap-4">
           <div className="flex items-center gap-3">
-            <Button variant="primary" size="sm">پاسخ گروهی</Button>
             <div className="flex items-center gap-2">
               <Select
                 value={bulkStatus}
