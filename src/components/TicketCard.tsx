@@ -42,8 +42,8 @@ export function TicketCard({ ticket }: { ticket: TicketSummary }) {
               <span className="font-bold text-brand text-[14px]">#{ticket.id}</span>
               <Label color="default" size="sm">{ticket.ago}</Label>
               <span>{ticket.time}</span>
-              <span className="w-px h-3 bg-line hidden sm:block" />
-              <span className="hidden sm:inline">{ticket.date}</span>
+              <span className="w-px h-3 bg-line" />
+              <span>{ticket.date}</span>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 sm:shrink-0">

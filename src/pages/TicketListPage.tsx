@@ -20,17 +20,15 @@ export function TicketListPage() {
     <PageContainer>
       <PageHeader />
 
-      <div className="overflow-x-auto">
-        <Tabs
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: 'all', label: 'همه' },
-            { value: 'answered', label: 'پاسخ داده شده' },
-            { value: 'closed', label: 'بسته شده' },
-          ]}
-        />
-      </div>
+      <Tabs
+        value={filter}
+        onChange={setFilter}
+        options={[
+          { value: 'all', label: 'همه' },
+          { value: 'answered', label: 'پاسخ داده شده' },
+          { value: 'closed', label: 'بسته شده' },
+        ]}
+      />
 
       <div className="flex flex-col gap-3">
         {filtered.map((t) => (

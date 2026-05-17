@@ -53,12 +53,12 @@ export function Tabs<T extends string>({
   options: { value: T; label: string }[];
 }) {
   return (
-    <div className="inline-flex p-1 rounded-full bg-[#FAFAFA] min-w-max">
+    <div className="flex p-1 rounded-full bg-[#FAFAFA] w-full">
       {options.map((opt) => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`h-10 min-w-[90px] sm:min-w-[116px] rounded-full text-[13px] transition whitespace-nowrap ${
+          className={`flex-1 h-10 rounded-full text-[13px] transition whitespace-nowrap ${
             value === opt.value
               ? 'bg-[#F0F1F3] text-[#3D4350] font-medium'
               : 'text-[#A3A9B6] hover:text-ink-900'
