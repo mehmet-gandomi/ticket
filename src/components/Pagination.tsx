@@ -88,7 +88,7 @@ export function Tabs<T extends string>({
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`flex-1 h-10 rounded-full text-[13px] transition whitespace-nowrap ${
+          className={`flex-1 h-10 rounded-full text-[13px] transition whitespace-nowrap md:min-w-[110px] ${
             value === opt.value
               ? 'bg-[#F0F1F3] text-[#3D4350] font-medium'
               : 'text-[#A3A9B6] hover:text-ink-900'

@@ -46,7 +46,7 @@ export function TicketAiShowPage() {
 
           {/* Full AI answer */}
           <h3 className="text-[13px] font-bold text-right">پاسخ هوشمند</h3>
-          <div className="rounded-xl border border-line bg-surface-50 p-4 max-h-[245px] overflow-auto thin-scroll">
+          <div className="rounded-xl border border-line bg-surface-50 p-4 max-h-[279px] overflow-auto thin-scroll">
             <p className="text-[13px] leading-7 whitespace-pre-line text-right">{aiFullAnswer}</p>
           </div>
 
