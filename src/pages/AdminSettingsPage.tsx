@@ -38,13 +38,15 @@ function Modal({ children, onClose, title, wide }: {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-6" onClick={onClose}>
       <div onClick={(e) => e.stopPropagation()} dir="rtl"
-        className={`bg-white rounded-3xl border border-line p-6 flex flex-col gap-4 ${wide ? 'w-full max-w-[640px]' : 'w-full max-w-[480px]'}`}>
-        <div className="flex items-center justify-between">
+        className={`bg-white rounded-3xl border border-line flex flex-col max-h-[90vh] ${wide ? 'w-full max-w-[640px]' : 'w-full max-w-[480px]'}`}>
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
           <h2 className="text-[16px] font-bold">{title}</h2>
           <button onClick={onClose} className="size-9 grid place-items-center rounded-lg text-ink-500 hover:bg-surface-50"><Close size={18} /></button>
         </div>
-        <div className="h-px bg-line" />
-        {children}
+        <div className="h-px bg-line shrink-0" />
+        <div className="flex flex-col gap-4 overflow-y-auto p-6">
+          {children}
+        </div>
       </div>
     </div>
   );
