@@ -129,18 +129,22 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col divide-y divide-line border border-line rounded-2xl bg-white max-h-[420px] overflow-y-auto">
+        <div className="flex flex-col divide-y divide-line rounded-2xl bg-white max-h-[420px] overflow-y-auto">
           {cats.map((c) => (
             <div key={c.id} className="flex items-start gap-4 px-5 py-4" dir="rtl">
               <div className="flex flex-col gap-1 flex-1 text-right">
                 <div className="flex items-center justify-between">
-                  <Label color="default" size="sm">مرتبط {c.count}</Label>
-                  <span className="text-[14px] font-bold text-ink-900">{c.title}</span>
+                  <div>
+                    <span className="text-[14px] font-bold text-ink-900 block">{c.title}</span>
+                    <span className="text-[12px] text-ink-500 leading-6 block">{c.description}</span>
+                  </div>
+                  <div>
+                    <Label color="default" size="sm">مرتبط {c.count}</Label>
+                    <button onClick={() => remove(c.id)} className="w-8 h-8 grid place-items-center rounded-lg text-danger hover:bg-red-50 transition mr-auto">
+                      <Trash size={16} />
+                    </button>
+                  </div>
                 </div>
-                <span className="text-[12px] text-ink-500 leading-6">{c.description}</span>
-                <button onClick={() => remove(c.id)} className="w-8 h-8 grid place-items-center rounded-lg text-danger hover:bg-red-50 transition">
-                  <Trash size={16} />
-                </button>
               </div>
             </div>
           ))}
