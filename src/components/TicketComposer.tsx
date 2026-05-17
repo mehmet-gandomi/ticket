@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Field, Input, Select, TextArea } from './FormControls';
+import { Field, Input, Select } from './FormControls';
 import { Button } from './Button';
-import { Monitor, Plus, Close, Check, Bold, Italic, AlignRight } from '../icons';
+import { Plus, Close, Check } from '../icons';
 import { ticketSubjects } from '../data/mock';
+import { RichEditor } from './RichEditor';
 
 interface TicketComposerProps {
   defaultSubject?: string;
@@ -15,14 +16,10 @@ interface TicketComposerProps {
   files?: { name: string; size: string }[];
 }
 
-/**
- * The right-hand "compose new ticket" panel that appears on most user screens.
- * Subject dropdown · title input · rich-message textarea · file attach · actions.
- */
 export function TicketComposer({
   defaultSubject = '',
   defaultTitle = '',
-  defaultMessage = '',
+  defaultMessage: _defaultMessage = '',
   showCancel = true,
   onSubmit,
   onCancel,
@@ -31,7 +28,6 @@ export function TicketComposer({
 }: TicketComposerProps) {
   const [subject, setSubject] = useState(defaultSubject);
   const [title, setTitle] = useState(defaultTitle);
-  const [message, setMessage] = useState(defaultMessage);
 
   return (
     <section className="rounded-3xl border border-line bg-white p-6 flex flex-col gap-4 w-full max-w-[583px]">
@@ -39,9 +35,7 @@ export function TicketComposer({
         <Select value={subject} onChange={(e) => setSubject(e.target.value)}>
           <option value="" disabled>انتخاب کنید</option>
           {ticketSubjects.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
+            <option key={s} value={s}>{s}</option>
           ))}
         </Select>
       </Field>
@@ -56,32 +50,10 @@ export function TicketComposer({
         </Field>
       )}
 
-      {/* rich text toolbar + textarea */}
-      <div className="flex items-center justify-end gap-3">
-        <div className="flex items-center gap-1 rounded-xl border border-line bg-white px-2 h-10 text-ink-500">
-          <button className="size-8 grid place-items-center rounded-md hover:bg-surface-50">
-            <Bold size={16} />
-          </button>
-          <button className="size-8 grid place-items-center rounded-md hover:bg-surface-50">
-            <Italic size={16} />
-          </button>
-          <span className="w-px h-4 bg-line" />
-          <button className="size-8 grid place-items-center rounded-md hover:bg-surface-50">
-            <AlignRight size={16} />
-          </button>
-        </div>
-        <Button variant="primary" size="md" leadingIcon={<Monitor size={16} />}>
-          پیش نمایش
-        </Button>
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت</span>
+        <RichEditor placeholder="مشکل خود را با جزئیات کامل توضیح دهید..." />
       </div>
-
-      <Field label="پیام تیکت">
-        <TextArea
-          placeholder="مشکل خود را با جزئیات کامل توضیح دهید..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-      </Field>
 
       {/* attachments */}
       <div className="flex flex-col gap-3">
@@ -97,10 +69,7 @@ export function TicketComposer({
         </div>
 
         {files.map((f) => (
-          <div
-            key={f.name}
-            className="flex items-center gap-4 rounded-xl border border-line bg-white p-3"
-          >
+          <div key={f.name} className="flex items-center gap-4 rounded-xl border border-line bg-white p-3">
             <div className="size-10 rounded-lg bg-brand-tint text-brand grid place-items-center text-[10px] font-bold">
               DOCX
             </div>

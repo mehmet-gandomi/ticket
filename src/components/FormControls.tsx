@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
+import { ChevronDown } from '../icons';
 
 export function Field({
   label,
@@ -30,15 +31,57 @@ export function Input({
   );
 }
 
-export function TextArea({
+export const TextArea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement> & { className?: string }
+>(({ className = '', ...rest }, ref) => (
+  <textarea
+    ref={ref}
+    className={`min-h-[200px] w-full rounded-xl border border-line bg-white p-4 text-[13px] leading-7 text-ink-900 placeholder:text-ink-400 focus:border-brand focus:shadow-focus focus:outline-none transition resize-none ${className}`}
+    {...rest}
+  />
+));
+
+export function RichTextArea({
+  placeholder = '',
   className = '',
-  ...rest
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  editorRef,
+  onContentChange,
+}: {
+  placeholder?: string;
+  className?: string;
+  editorRef?: React.RefObject<HTMLDivElement>;
+  onContentChange?: (html: string) => void;
+}) {
+  const [isEmpty, setIsEmpty] = useState(true);
+
   return (
-    <textarea
-      className={`min-h-[200px] w-full rounded-xl border border-line bg-white p-4 text-[13px] leading-7 text-ink-900 placeholder:text-ink-400 focus:border-brand focus:shadow-focus focus:outline-none transition resize-none ${className}`}
-      {...rest}
-    />
+    <div className="relative">
+      {isEmpty && (
+        <span className="absolute top-4 right-4 text-[13px] text-ink-400 pointer-events-none select-none">
+          {placeholder}
+        </span>
+      )}
+      <div
+        ref={editorRef}
+        contentEditable
+        suppressContentEditableWarning
+        dir="rtl"
+        onInput={(e) => {
+          const el = e.currentTarget;
+          setIsEmpty(el.textContent?.trim() === '');
+          onContentChange?.(el.innerHTML);
+        }}
+        onClick={(e) => {
+          const a = (e.target as HTMLElement).closest('a');
+          if (a) {
+            e.preventDefault();
+            window.open((a as HTMLAnchorElement).href, '_blank', 'noopener,noreferrer');
+          }
+        }}
+        className={`min-h-[200px] w-full rounded-xl border border-line bg-white p-4 text-[13px] leading-7 text-ink-900 focus:border-brand focus:shadow-focus focus:outline-none transition outline-none ${className}`}
+      />
+    </div>
   );
 }
 
@@ -55,18 +98,11 @@ export function Select({
       >
         {children}
       </select>
-      <svg
+      <ChevronDown
         aria-hidden="true"
+        size={16}
         className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-400"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      >
-        <path d="M19 9l-7 6-7-6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      />
     </div>
   );
 }
