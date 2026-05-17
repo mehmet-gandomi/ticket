@@ -38,10 +38,10 @@ function Modal({ children, onClose, title, wide }: {
       <div onClick={(e) => e.stopPropagation()} dir="rtl"
         className={`bg-white rounded-3xl border border-line p-6 flex flex-col gap-4 ${wide ? 'w-full max-w-[640px]' : 'w-full max-w-[480px]'}`}>
         <div className="flex items-center justify-between">
-          <button onClick={onClose} className="size-9 grid place-items-center rounded-lg text-ink-500 hover:bg-surface-50"><Close size={18} /></button>
           <h2 className="text-[16px] font-bold">{title}</h2>
+          <button onClick={onClose} className="size-9 grid place-items-center rounded-lg text-ink-500 hover:bg-surface-50"><Close size={18} /></button>
         </div>
-        <div className="h-px bg-line -mx-6" />
+        <div className="h-px bg-line" />
         {children}
       </div>
     </div>
@@ -55,8 +55,8 @@ function CategoryModal({ onClose, onSave }: { onClose: () => void; onSave: (c: C
     <Modal onClose={onClose} title="افزودن دسته بندی">
       <Field label="عنوان دسته"><Input placeholder="فنی" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
       <Field label="توضیحات دسته"><Input placeholder="دسته فنی در ..." value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
-      <div className="h-px bg-line -mx-6" />
-      <div className="flex justify-end">
+      <div className="h-px bg-line" />
+      <div className="flex">
         <Button variant="primary"
           onClick={() => { if (title.trim()) { onSave({ id: 'c' + Date.now(), title, description, count: 0 }); onClose(); } }}>
           افزودن دسته
@@ -73,8 +73,8 @@ function EditCategoryModal({ cat, onClose, onSave }: { cat: Category; onClose: (
     <Modal onClose={onClose} title="ویرایش دسته بندی">
       <Field label="عنوان دسته"><Input placeholder="فنی" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
       <Field label="توضیحات دسته"><Input placeholder="دسته فنی در ..." value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
-      <div className="h-px bg-line -mx-6" />
-      <div className="flex justify-end">
+      <div className="h-px bg-line" />
+      <div className="flex">
         <Button variant="primary"
           onClick={() => { if (title.trim()) { onSave({ ...cat, title, description }); onClose(); } }}>
           ذخیره تغییرات
@@ -137,7 +137,7 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
           <span className="w-px h-3 bg-line" />
           <span className="text-[11px] text-ink-400 tabular">{cats.length} دسته بندی</span>
         </div>
-        <Button variant="primary" size="md" leadingIcon={<Plus size={14} />} onClick={onAdd}>افزودن دسته</Button>
+        <Button variant="primary" size="md" onClick={onAdd}>افزودن دسته</Button>
       </div>
       {cats.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
@@ -162,11 +162,11 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
                   <div className="flex flex-col items-end gap-1">
                     <Label color="default" size="sm">مرتبط {c.count}</Label>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setEditing(c)} className="w-8 h-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition">
+                      <button onClick={() => setEditing(c)} className="w-6 h-6 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition">
                         <Edit size={14} />
                       </button>
-                      <button onClick={() => remove(c.id)} className="w-8 h-8 grid place-items-center rounded-lg text-danger hover:bg-red-50 transition">
-                        <Trash size={16} />
+                      <button onClick={() => remove(c.id)} className="w-6 h-6 grid place-items-center rounded-lg text-danger hover:bg-red-50 transition">
+                        <Trash size={14} />
                       </button>
                     </div>
                   </div>
