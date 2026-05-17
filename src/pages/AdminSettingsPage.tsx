@@ -211,6 +211,122 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
   );
 }
 
+interface AiProvider {
+  id: string;
+  name: string;
+  description: string;
+  badge: string;
+  badgeColor: string;
+  models: string[];
+}
+
+const externalProviders: AiProvider[] = [
+  { id: 'chatgpt', name: 'ChatGPT', description: 'مدل‌های هوشمند OpenAI برای پاسخ‌دهی خودکار', badge: 'GPT', badgeColor: '#10A37F', models: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'] },
+  { id: 'claude', name: 'Claude', description: 'مدل‌های Anthropic با دقت بالا در پردازش زبان', badge: 'CLD', badgeColor: '#D97757', models: ['claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5'] },
+  { id: 'gemini', name: 'Gemini', description: 'مدل‌های Google با قابلیت‌های چندوجهی', badge: 'GEM', badgeColor: '#4285F4', models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-2.0-flash'] },
+];
+
+const internalProviders: AiProvider[] = [
+  { id: 'gapcode', name: 'گپ‌کد', description: 'سرویس هوش مصنوعی داخلی با پشتیبانی از زبان فارسی', badge: 'گپ', badgeColor: '#7C3AED', models: ['gapcode-v1', 'gapcode-v2'] },
+];
+
+interface AiConfig { enabled: boolean; apiKey: string; model: string; }
+
+function AiProviderCard({ provider, config, onChange }: {
+  provider: AiProvider;
+  config: AiConfig;
+  onChange: (c: AiConfig) => void;
+}) {
+  return (
+    <div className={`rounded-2xl border bg-white p-5 flex flex-col gap-4 transition ${config.enabled ? 'border-brand shadow-[0_2px_18px_rgba(0,104,255,0.06)]' : 'border-line'}`}>
+      <div className="flex items-center justify-between gap-4">
+        <Toggle checked={config.enabled} onChange={(v) => onChange({ ...config, enabled: v })} label="" />
+        <div className="flex items-center gap-3 flex-1">
+          <div className="flex flex-col gap-0.5 text-right flex-1">
+            <span className="text-[14px] font-bold text-ink-900">{provider.name}</span>
+            <span className="text-[12px] text-ink-500">{provider.description}</span>
+          </div>
+          <div
+            className="size-11 rounded-xl grid place-items-center text-white text-[12px] font-bold shrink-0"
+            style={{ background: provider.badgeColor }}
+          >
+            {provider.badge}
+          </div>
+        </div>
+      </div>
+
+      {config.enabled && (
+        <div className="flex flex-col gap-3 pt-1 border-t border-line">
+          <Field label="کلید API">
+            <Input
+              dir="ltr"
+              placeholder="sk-..."
+              value={config.apiKey}
+              onChange={(e) => onChange({ ...config, apiKey: e.target.value })}
+              className="text-left font-mono text-[12px]"
+            />
+          </Field>
+          <Field label="مدل">
+            <Select value={config.model} onChange={(e) => onChange({ ...config, model: e.target.value })}>
+              {provider.models.map((m) => <option key={m} value={m}>{m}</option>)}
+            </Select>
+          </Field>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AiIntegrationTab() {
+  const makeDefault = (p: AiProvider): AiConfig => ({ enabled: false, apiKey: '', model: p.models[0] });
+  const [configs, setConfigs] = useState<Record<string, AiConfig>>(() =>
+    Object.fromEntries([...externalProviders, ...internalProviders].map((p) => [p.id, makeDefault(p)]))
+  );
+
+  function update(id: string, c: AiConfig) {
+    setConfigs((prev) => ({ ...prev, [id]: c }));
+  }
+
+  const activeCount = Object.values(configs).filter((c) => c.enabled).length;
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <h3 className="text-[15px] font-bold text-ink-900">خارجی</h3>
+          <span className="w-px h-3 bg-line" />
+          <span className="text-[11px] text-ink-400">سرویس‌های هوش مصنوعی بین‌المللی</span>
+          {activeCount > 0 && <Label color="primary" size="sm">{activeCount} فعال</Label>}
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {externalProviders.map((p) => (
+            <AiProviderCard key={p.id} provider={p} config={configs[p.id]} onChange={(c) => update(p.id, c)} />
+          ))}
+        </div>
+      </div>
+
+      <div className="h-px bg-line" />
+
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <h3 className="text-[15px] font-bold text-ink-900">داخلی</h3>
+          <span className="w-px h-3 bg-line" />
+          <span className="text-[11px] text-ink-400">سرویس‌های هوش مصنوعی ایرانی</span>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {internalProviders.map((p) => (
+            <AiProviderCard key={p.id} provider={p} config={configs[p.id]} onChange={(c) => update(p.id, c)} />
+          ))}
+        </div>
+      </div>
+
+      <div className="flex">
+        <Button variant="primary" size="md" onClick={() => {}}>ذخیره تنظیمات</Button>
+      </div>
+    </div>
+  );
+}
+
 function PersonalizationTab({ cats, setCats, openCat }: {
   cats: Category[]; setCats: (c: Category[]) => void; openCat: () => void;
 }) {
@@ -284,7 +400,7 @@ function AnswersTab({ answers, setAnswers, cats, openAns }: {
 
 export function AdminSettingsPage() {
   const nav = useNavigate();
-  const [tab, setTab] = useState<'personal' | 'answers'>('personal');
+  const [tab, setTab] = useState<'personal' | 'answers' | 'ai'>('personal');
   const [cats, setCats] = useState<Category[]>(initialCategories);
   const [answers, setAnswers] = useState<SavedAnswer[]>(initialAnswers);
   const [catModal, setCatModal] = useState(false);
@@ -309,7 +425,7 @@ export function AdminSettingsPage() {
 
       <div className="flex">
         <div className="inline-flex p-1 rounded-xl border border-line bg-surface-50">
-          {([{ id: 'personal', label: 'شخصی سازی' }, { id: 'answers', label: 'تعریف سوالات' }] as const).map((t) => (
+          {([{ id: 'personal', label: 'شخصی سازی' }, { id: 'answers', label: 'تعریف سوالات' }, { id: 'ai', label: 'یکپارچه‌سازی هوش مصنوعی' }] as const).map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`h-10 px-6 rounded-lg text-[13px] transition ${tab === t.id ? 'bg-white text-ink-900 shadow font-medium' : 'text-ink-500 hover:text-ink-900'}`}>
               {t.label}
@@ -318,9 +434,9 @@ export function AdminSettingsPage() {
         </div>
       </div>
 
-      {tab === 'personal'
-        ? <PersonalizationTab cats={cats} setCats={setCats} openCat={() => setCatModal(true)} />
-        : <AnswersTab answers={answers} setAnswers={setAnswers} cats={cats} openAns={() => setAnsModal(true)} />}
+      {tab === 'personal' && <PersonalizationTab cats={cats} setCats={setCats} openCat={() => setCatModal(true)} />}
+      {tab === 'answers' && <AnswersTab answers={answers} setAnswers={setAnswers} cats={cats} openAns={() => setAnsModal(true)} />}
+      {tab === 'ai' && <AiIntegrationTab />}
 
       {catModal && <CategoryModal onClose={() => setCatModal(false)} onSave={(c) => setCats([...cats, c])} />}
       {ansModal && <AnswerModal onClose={() => setAnsModal(false)} cats={cats} onSave={(a) => setAnswers([a, ...answers])} />}
