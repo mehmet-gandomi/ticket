@@ -33,14 +33,12 @@ export const adminStateMap: Record<AdminState, { color: 'default'|'primary'|'war
   spam: { color: 'violet', label: 'اسپم' },
 };
 
-export interface Category { id: string; name: string; count: number; }
+export interface Category { id: string; title: string; description: string; count: number; }
 export const initialCategories: Category[] = [
-  { id: 'web', name: 'مشکل وب', count: 12 },
-  { id: 'email', name: 'مشکل ایمیل', count: 8 },
-  { id: 'domain', name: 'مشکل دامنه', count: 4 },
-  { id: 'billing', name: 'مالی', count: 5 },
-  { id: 'security', name: 'امنیت', count: 3 },
-  { id: 'other', name: 'سایر', count: 7 },
+  { id: 'web', title: 'فنی', description: 'دسته بندی فنی متناسب با مشکلات فنی', count: 5 },
+  { id: 'email', title: 'محصولات', description: 'دسته بندی فنی متناسب با مشکلات فنی', count: 5 },
+  { id: 'domain', title: 'آموزشی', description: 'دسته بندی فنی متناسب با مشکلات فنی', count: 5 },
+  { id: 'billing', title: 'خطا ها', description: 'دسته بندی فنی متناسب با مشکلات فنی', count: 5 },
 ];
 
 export interface SavedAnswer { id: number; category: string; title: string; body: string; }

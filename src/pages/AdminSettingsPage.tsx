@@ -49,25 +49,17 @@ function Modal({ children, onClose, title, wide }: {
 }
 
 function CategoryModal({ onClose, onSave }: { onClose: () => void; onSave: (c: Category) => void }) {
-  const [name, setName] = useState('');
-  const [color, setColor] = useState('#0068FF');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   return (
-    <Modal onClose={onClose} title="افزودن دسته جدید">
-      <Field label="نام دسته"><Input placeholder="مثلاً امنیت" value={name} onChange={(e) => setName(e.target.value)} /></Field>
-      <Field label="رنگ دسته">
-        <div className="flex gap-2">
-          {['#0068FF', '#02927A', '#9747FF', '#EB0000', '#FFBE15', '#737377'].map((c) => (
-            <button key={c} onClick={() => setColor(c)}
-              className={`size-9 rounded-lg border-2 transition ${color === c ? 'border-ink-900 scale-110' : 'border-transparent'}`}
-              style={{ background: c }} />
-          ))}
-        </div>
-      </Field>
-      <div className="flex justify-end gap-3 mt-2">
-        <Button variant="danger" onClick={onClose}>لغو</Button>
-        <Button variant="primary" leadingIcon={<Check size={16} />}
-          onClick={() => { if (name.trim()) { onSave({ id: 'c' + Date.now(), name, count: 0 }); onClose(); } }}>
-          ذخیره
+    <Modal onClose={onClose} title="افزودن دسته بندی">
+      <Field label="عنوان دسته"><Input placeholder="فنی" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
+      <Field label="توضیحات دسته"><Input placeholder="دسته فنی در ..." value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
+      <div className="h-px bg-line -mx-6" />
+      <div className="flex justify-end">
+        <Button variant="primary"
+          onClick={() => { if (title.trim()) { onSave({ id: 'c' + Date.now(), title, description, count: 0 }); onClose(); } }}>
+          افزودن دسته
         </Button>
       </div>
     </Modal>
@@ -77,14 +69,14 @@ function CategoryModal({ onClose, onSave }: { onClose: () => void; onSave: (c: C
 function AnswerModal({ onClose, onSave, cats }: {
   onClose: () => void; onSave: (a: SavedAnswer) => void; cats: Category[];
 }) {
-  const [cat, setCat] = useState(cats[0]?.name ?? '');
+  const [cat, setCat] = useState(cats[0]?.title ?? '');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   return (
     <Modal onClose={onClose} title="افزودن پاسخ آماده" wide>
       <Field label="دسته سوال">
         <Select value={cat} onChange={(e) => setCat(e.target.value)}>
-          {cats.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+          {cats.map((c) => <option key={c.id} value={c.title}>{c.title}</option>)}
         </Select>
       </Field>
       <Field label="عنوان پاسخ"><Input placeholder="مثلاً گواهی SSL منقضی شده" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
@@ -137,18 +129,17 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-2 max-h-[360px] overflow-auto pl-2">
+        <div className="flex flex-col divide-y divide-line border border-line rounded-2xl bg-white overflow-hidden max-h-[420px] overflow-auto">
           {cats.map((c) => (
-            <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-3 py-2.5 hover:border-brand transition group">
-              <div className="flex items-center gap-3">
-                <span className="size-2 rounded-full bg-brand" />
-                <span className="text-[13px] text-ink-900">{c.name}</span>
-                <span className="text-[11px] text-ink-500 tabular">{c.count} مورد</span>
+            <div key={c.id} className="flex items-start justify-between gap-4 px-5 py-4">
+              <div className="flex flex-col gap-1 flex-1 text-right">
+                <span className="text-[14px] font-bold text-ink-900">{c.title}</span>
+                <span className="text-[12px] text-ink-500 leading-6">{c.description}</span>
+                <button onClick={() => remove(c.id)} className="w-8 h-8 grid place-items-center rounded-lg text-danger hover:bg-red-50 transition mt-1">
+                  <Trash size={16} />
+                </button>
               </div>
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition">
-                <button className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition"><Edit size={14} /></button>
-                <button onClick={() => remove(c.id)} className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-danger hover:bg-red-50 transition"><Trash size={14} /></button>
-              </div>
+              <Label color="default" size="sm">مرتبط {c.count}</Label>
             </div>
           ))}
         </div>
