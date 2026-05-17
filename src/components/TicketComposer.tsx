@@ -45,13 +45,15 @@ export function TicketComposer({
         </Select>
       </Field>
 
-      <Field label="موضوع خود را بنویسید" hint="یک عنوان کوتاه برای تیکت انتخاب کنید">
-        <Input
-          placeholder="مشکل وب"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </Field>
+      {subject === 'سایر' && (
+        <Field label="موضوع خود را بنویسید" hint="یک عنوان کوتاه برای تیکت انتخاب کنید">
+          <Input
+            placeholder="مشکل وب"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </Field>
+      )}
 
       {/* rich text toolbar + textarea */}
       <div className="flex items-center justify-end gap-3">
