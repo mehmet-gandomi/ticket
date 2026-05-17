@@ -64,15 +64,6 @@ export function AdminTicketListPage() {
     .filter((t) => (priority === 'all' ? true : t.priority === priority))
     .filter((t) => (search.trim() === '' ? true : t.id.includes(search) || t.title.includes(search)));
 
-  const tabs: { value: AdminState | 'all'; label: string; count: number }[] = [
-    { value: 'all', label: 'همه', count: counts.all },
-    { value: 'unreviewed', label: 'بررسی نشده', count: counts.unreviewed },
-    { value: 'reviewing', label: 'در بررسی', count: counts.reviewing },
-    { value: 'pending', label: 'در انتظار', count: counts.pending },
-    { value: 'closed', label: 'بسته', count: counts.closed },
-    { value: 'spam', label: 'اسپم', count: counts.spam },
-  ];
-
   const nav = useNavigate();
 
   return (
@@ -107,38 +98,22 @@ export function AdminTicketListPage() {
         <StatBox count={counts.spam} label="اسپم" tint="violet" />
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col gap-2">
-        {/* Status tabs — scrollable */}
-        <div className="flex items-center border-b border-line overflow-x-auto">
-          {tabs.map((t) => (
-            <button
-              key={t.value}
-              onClick={() => setFilter(t.value)}
-              className={`flex items-center gap-1.5 h-11 px-3 sm:px-4 text-[12px] sm:text-[13px] transition relative whitespace-nowrap shrink-0 ${
-                filter === t.value ? 'text-brand font-medium' : 'text-ink-500 hover:text-ink-900'
-              }`}
-            >
-              <span>{t.label}</span>
-              <span className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] tabular ${
-                filter === t.value ? 'bg-brand text-white' : 'bg-surface-100 text-ink-500'
-              }`}>
-                {t.count}
-              </span>
-              {filter === t.value && <span className="absolute right-0 left-0 -bottom-px h-0.5 bg-brand" />}
-            </button>
-          ))}
-        </div>
-
-        {/* Priority filter */}
-        <div className="w-full sm:w-auto">
-          <Select value={priority} onChange={(e) => setPriority(e.target.value)}>
-            <option value="all">همه الویت‌ها</option>
-            <option value="high">الویت بالا</option>
-            <option value="medium">الویت متوسط</option>
-            <option value="low">الویت کم</option>
-          </Select>
-        </div>
+      {/* Filters — two selects side by side */}
+      <div className="grid grid-cols-2 gap-3">
+        <Select value={filter} onChange={(e) => setFilter(e.target.value as AdminState | 'all')}>
+          <option value="all">همه وضعیت‌ها ({counts.all})</option>
+          <option value="unreviewed">بررسی نشده ({counts.unreviewed})</option>
+          <option value="reviewing">درحال بررسی ({counts.reviewing})</option>
+          <option value="pending">در انتظار پاسخ ({counts.pending})</option>
+          <option value="closed">بسته شده ({counts.closed})</option>
+          <option value="spam">اسپم ({counts.spam})</option>
+        </Select>
+        <Select value={priority} onChange={(e) => setPriority(e.target.value)}>
+          <option value="all">همه الویت‌ها</option>
+          <option value="high">الویت بالا</option>
+          <option value="medium">الویت متوسط</option>
+          <option value="low">الویت کم</option>
+        </Select>
       </div>
 
       {selected.size > 0 && (
