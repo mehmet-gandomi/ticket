@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Field, Input, Select } from './FormControls';
 import { Button } from './Button';
-import { Plus, Close, Check } from '../icons';
+import { Check } from '../icons';
 import { ticketSubjects } from '../data/mock';
 import { RichEditor } from './RichEditor';
+import { AttachmentsUploader } from './AttachmentsUploader';
 
 interface TicketComposerProps {
   defaultSubject?: string;
@@ -13,7 +14,6 @@ interface TicketComposerProps {
   onSubmit?: () => void;
   onCancel?: () => void;
   submitLabel?: string;
-  files?: { name: string; size: string }[];
 }
 
 export function TicketComposer({
@@ -24,7 +24,6 @@ export function TicketComposer({
   onSubmit,
   onCancel,
   submitLabel = 'ارسال تیکت',
-  files = [],
 }: TicketComposerProps) {
   const [subject, setSubject] = useState(defaultSubject);
   const [title, setTitle] = useState(defaultTitle);
@@ -55,39 +54,7 @@ export function TicketComposer({
         <RichEditor placeholder="مشکل خود را با جزئیات کامل توضیح دهید..." />
       </div>
 
-      {/* attachments */}
-      <div className="flex flex-col gap-3">
-        <span className="text-[13px] font-bold text-ink-900 text-right">ضمیمه فایل</span>
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-3 h-12">
-          <div className="flex items-center gap-3 text-[11px]">
-            <span className="text-brand">SVG, PNG, JPG or GIF</span>
-            <span className="text-ink-500">پسوند های مجاز</span>
-          </div>
-          <Button variant="gray" size="sm" leadingIcon={<Plus size={14} />}>
-            افزودن فایل
-          </Button>
-        </div>
-
-        {files.map((f) => (
-          <div key={f.name} className="flex items-center gap-4 rounded-xl border border-line bg-white p-3">
-            <div className="size-10 rounded-lg bg-brand-tint text-brand grid place-items-center text-[10px] font-bold">
-              DOCX
-            </div>
-            <div className="flex-1 flex flex-col gap-2">
-              <div className="flex items-center justify-between text-[13px]">
-                <span className="text-ink-500 tabular">{f.size}</span>
-                <span className="text-ink-900">{f.name}</span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-line overflow-hidden">
-                <div className="h-full w-full bg-brand" />
-              </div>
-            </div>
-            <button className="size-8 grid place-items-center text-ink-700 hover:text-danger transition">
-              <Close size={16} />
-            </button>
-          </div>
-        ))}
-      </div>
+      <AttachmentsUploader />
 
       <div className="h-px bg-line my-1" />
 
