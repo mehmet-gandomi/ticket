@@ -36,15 +36,15 @@ function Modal({ children, onClose, title, wide }: {
   children: ReactNode; onClose: () => void; title: string; wide?: boolean;
 }) {
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-3 sm:p-6" onClick={onClose}>
       <div onClick={(e) => e.stopPropagation()} dir="rtl"
-        className={`bg-white rounded-3xl border border-line flex flex-col max-h-[90vh] ${wide ? 'w-full max-w-[640px]' : 'w-full max-w-[480px]'}`}>
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
+        className={`bg-white rounded-3xl border border-line flex flex-col max-h-[90vh] w-full ${wide ? 'max-w-[640px]' : 'max-w-[480px]'}`}>
+        <div className="flex items-center justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-4 shrink-0">
           <h2 className="text-[16px] font-bold">{title}</h2>
           <button onClick={onClose} className="size-9 grid place-items-center rounded-lg text-ink-500 hover:bg-surface-50"><Close size={18} /></button>
         </div>
         <div className="h-px bg-line shrink-0" />
-        <div className="flex flex-col gap-4 overflow-y-auto p-6">
+        <div className="flex flex-col gap-4 overflow-y-auto p-4 sm:p-6">
           {children}
         </div>
       </div>
@@ -97,7 +97,7 @@ function AnswerModal({ onClose, onSave, cats }: {
   const [body, setBody] = useState('');
   return (
     <Modal onClose={onClose} title="افزودن پاسخ آماده" wide>
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Field label="عنوان سوال"><Input placeholder="مثلاً گواهی SSL منقضی شده" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
         <Field label="دسته سوال">
           <Select value={cat} onChange={(e) => setCat(e.target.value)}>
@@ -129,7 +129,7 @@ function EditAnswerModal({ answer, cats, onClose, onSave }: {
   const [body, setBody] = useState(answer.body);
   return (
     <Modal onClose={onClose} title="ویرایش پاسخ آماده" wide>
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Field label="عنوان سوال"><Input placeholder="مثلاً گواهی SSL منقضی شده" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
         <Field label="دسته سوال">
           <Select value={cat} onChange={(e) => setCat(e.target.value)}>
@@ -304,7 +304,7 @@ function AiIntegrationTab() {
           <span className="text-[11px] text-ink-400">سرویس‌های هوش مصنوعی بین‌المللی</span>
           {activeCount > 0 && <Label color="primary" size="sm">{activeCount} فعال</Label>}
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {externalProviders.map((p) => (
             <AiProviderCard key={p.id} provider={p} config={configs[p.id]} onChange={(c) => update(p.id, c)} />
           ))}
@@ -319,7 +319,7 @@ function AiIntegrationTab() {
           <span className="w-px h-3 bg-line" />
           <span className="text-[11px] text-ink-400">سرویس‌های هوش مصنوعی ایرانی</span>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {internalProviders.map((p) => (
             <AiProviderCard key={p.id} provider={p} config={configs[p.id]} onChange={(c) => update(p.id, c)} />
           ))}
@@ -339,7 +339,7 @@ function PersonalizationTab({ cats, setCats, openCat }: {
   const [ai, setAi] = useState(true);
   const [brand, setBrand] = useState('#3B3214');
   return (
-    <div className="flex gap-12">
+    <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
       <div className="flex-1 flex flex-col gap-6">
         <Toggle checked={ai} onChange={setAi} label="پاسخ هوشمند" hint="قابلیت پاسخ دهی هوشمند وجود داشته باشد" />
         <Field label="رنگ برند" hint="کد رنگ برند خودتان را وارد کنید.">
@@ -349,7 +349,8 @@ function PersonalizationTab({ cats, setCats, openCat }: {
           </div>
         </Field>
       </div>
-      <div className="w-px bg-line" />
+      <div className="hidden lg:block w-px bg-line" />
+      <div className="h-px bg-line lg:hidden" />
       <div className="flex-1 min-w-0"><CategoriesPanel cats={cats} setCats={setCats} onAdd={openCat} /></div>
     </div>
   );
@@ -429,11 +430,11 @@ export function AdminSettingsPage() {
         }
       />
 
-      <div className="flex">
-        <div className="inline-flex p-1 rounded-xl border border-line bg-surface-50">
+      <div className="overflow-x-auto">
+        <div className="inline-flex p-1 rounded-xl border border-line bg-surface-50 min-w-max">
           {([{ id: 'personal', label: 'شخصی سازی' }, { id: 'answers', label: 'تعریف سوالات' }, { id: 'ai', label: 'یکپارچه‌سازی هوش مصنوعی' }] as const).map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`h-10 px-6 rounded-lg text-[13px] transition ${tab === t.id ? 'bg-white text-ink-900 shadow font-medium' : 'text-ink-500 hover:text-ink-900'}`}>
+              className={`h-10 px-4 sm:px-6 rounded-lg text-[13px] transition whitespace-nowrap ${tab === t.id ? 'bg-white text-ink-900 shadow font-medium' : 'text-ink-500 hover:text-ink-900'}`}>
               {t.label}
             </button>
           ))}

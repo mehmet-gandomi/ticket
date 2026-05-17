@@ -8,7 +8,7 @@ import { ReactNode } from 'react';
 export function PageContainer({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-surface-0 text-ink-900" dir="rtl">
-      <div className="mx-auto w-full max-w-[1280px] px-6 lg:px-10 py-12 md:py-20">
+      <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-10 py-6 sm:py-10 lg:py-16">
         <div className="flex flex-col gap-10">{children}</div>
       </div>
     </div>

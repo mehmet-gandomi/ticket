@@ -20,7 +20,7 @@ export function TicketListPage() {
     <PageContainer>
       <PageHeader />
 
-      <div className="flex items-center justify-between">
+      <div className="overflow-x-auto">
         <Tabs
           value={filter}
           onChange={setFilter}

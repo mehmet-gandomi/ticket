@@ -103,7 +103,7 @@ export function AdminTicketListPage() {
         </div>
       </Field>
 
-      <div className="grid grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatBox count={counts.all} label="همه تیکت ها" tint="default" />
         <StatBox count={counts.unreviewed} label="بررسی نشده" tint="danger" />
         <StatBox count={counts.reviewing} label="در حال بررسی" tint="primary" />
@@ -112,17 +112,17 @@ export function AdminTicketListPage() {
         <StatBox count={counts.spam} label="اسپم" tint="violet" />
       </div>
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <Select value={priority} onChange={(e) => setPriority(e.target.value)} className="!w-auto min-w-[140px]">
           <option value="all">الویت</option>
           <option value="high">الویت بالا</option>
           <option value="medium">الویت متوسط</option>
           <option value="low">الویت کم</option>
         </Select>
-        <div className="flex items-center border-b border-line">
+        <div className="flex items-center border-b border-line overflow-x-auto">
           {tabs.map((t) => (
             <button key={t.value} onClick={() => setFilter(t.value)}
-              className={`flex items-center gap-2 h-12 px-4 text-[13px] transition relative ${filter === t.value ? 'text-brand font-medium' : 'text-ink-500 hover:text-ink-900'}`}>
+              className={`flex items-center gap-2 h-12 px-3 sm:px-4 text-[13px] transition relative whitespace-nowrap ${filter === t.value ? 'text-brand font-medium' : 'text-ink-500 hover:text-ink-900'}`}>
               <span>{t.label}</span>
               <span className={`inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-[10px] tabular ${filter === t.value ? 'bg-brand text-white' : 'bg-surface-100 text-ink-500'}`}>{t.count}</span>
               {filter === t.value && <span className="absolute right-0 left-0 -bottom-px h-0.5 bg-brand" />}
@@ -132,27 +132,25 @@ export function AdminTicketListPage() {
       </div>
 
       {selected.size > 0 && (
-        <div className="flex items-center justify-between rounded-2xl border border-brand-soft bg-brand-tint px-4 py-2.5 gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Select
-                value={bulkStatus}
-                onChange={(e) => setBulkStatus(e.target.value as AdminState | '')}
-                className="!w-auto min-w-[160px] !h-8 !text-[12px]"
-              >
-                <option value="">تغییر وضعیت...</option>
-                <option value="unreviewed">بررسی نشده</option>
-                <option value="reviewing">درحال بررسی</option>
-                <option value="pending">در انتظار پاسخ</option>
-                <option value="closed">بسته شده</option>
-                <option value="spam">اسپم</option>
-              </Select>
-              {bulkStatus && (
-                <Button variant="primary" size="sm" onClick={applyBulkStatus}>
-                  اعمال
-                </Button>
-              )}
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-brand-soft bg-brand-tint px-4 py-2.5 gap-3">
+          <div className="flex items-center gap-2">
+            <Select
+              value={bulkStatus}
+              onChange={(e) => setBulkStatus(e.target.value as AdminState | '')}
+              className="!w-auto min-w-[140px] sm:min-w-[160px] !h-8 !text-[12px]"
+            >
+              <option value="">تغییر وضعیت...</option>
+              <option value="unreviewed">بررسی نشده</option>
+              <option value="reviewing">درحال بررسی</option>
+              <option value="pending">در انتظار پاسخ</option>
+              <option value="closed">بسته شده</option>
+              <option value="spam">اسپم</option>
+            </Select>
+            {bulkStatus && (
+              <Button variant="primary" size="sm" onClick={applyBulkStatus}>
+                اعمال
+              </Button>
+            )}
           </div>
           <span className="text-[13px] text-brand">{selected.size} تیکت انتخاب شده</span>
         </div>

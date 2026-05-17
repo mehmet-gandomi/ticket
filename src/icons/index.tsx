@@ -153,6 +153,12 @@ export const AlignRight = ({ size, ...p }: IconProps) => (
   </svg>
 );
 
+export const Menu = ({ size, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M3 6h18M3 12h18M3 18h18" />
+  </svg>
+);
+
 export const AlignCenter = ({ size, ...p }: IconProps) => (
   <svg {...base(size)} {...p}>
     <path d="M3 6h18M6 12h12M3 18h18" />

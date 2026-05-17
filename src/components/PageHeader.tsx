@@ -33,18 +33,21 @@ export function PageHeader({
   );
 
   return (
-    <header className="flex items-start justify-between gap-6 pb-5 border-b border-line">
+    <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 sm:gap-6 pb-5 border-b border-line">
       <div className="flex items-start gap-3 text-right">
-        <div className="text-brand">
+        <div className="text-brand hidden sm:block">
           <TicketStar size={48} />
         </div>
+        <div className="text-brand sm:hidden">
+          <TicketStar size={36} />
+        </div>
         <div>
-          <h1 className="text-[23px] font-bold text-ink-900 leading-[48px]">{title}</h1>
+          <h1 className="text-[19px] sm:text-[23px] font-bold text-ink-900 leading-9 sm:leading-[48px]">{title}</h1>
           <p className="text-[13px] text-ink-500 leading-6">{subtitle}</p>
         </div>
       </div>
 
-      <div>{action ?? defaultAction}</div>
+      <div className="sm:shrink-0">{action ?? defaultAction}</div>
     </header>
   );
 }

@@ -43,7 +43,7 @@ export function TicketChatPage() {
       <PageHeader title={ticket.title} subtitle="گفتگو با تیم پشتیبانی" />
 
       {adminTicket && ticketState && stateInfo && (
-        <div className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-3 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-line bg-white px-5 py-3 gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
             <span className="text-[13px] font-medium text-ink-700">وضعیت تیکت:</span>
             <Label color={stateInfo.color}>{stateInfo.label}</Label>
@@ -53,7 +53,7 @@ export function TicketChatPage() {
             <Select
               value={ticketState}
               onChange={(e) => setTicketState(e.target.value as AdminState)}
-              className="!w-auto min-w-[160px] !h-8 !text-[12px]"
+              className="!w-auto min-w-[140px] sm:min-w-[160px] !h-8 !text-[12px]"
             >
               <option value="unreviewed">بررسی نشده</option>
               <option value="reviewing">درحال بررسی</option>
