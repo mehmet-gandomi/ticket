@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
-import { Button } from './Button';
-import { Plus, Close } from '../icons';
+import { Close } from '../icons';
 
 interface AttachedFile {
   id: string;
@@ -24,27 +23,20 @@ function getExt(name: string): string {
   return parts.length > 1 ? parts[parts.length - 1].toUpperCase() : 'FILE';
 }
 
-function FileRow({ name, size, onRemove }: { name: string; size: number; onRemove: () => void }) {
+function FileChip({ name, size, onRemove }: { name: string; size: number; onRemove: () => void }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-line bg-white p-3">
-      <div className="size-10 rounded-lg bg-brand-tint text-brand grid place-items-center text-[10px] font-bold shrink-0">
+    <div className="flex items-center gap-2 h-9 pl-2 pr-3 rounded-lg border border-line bg-white text-[12px] max-w-full">
+      <span className="shrink-0 px-1.5 py-0.5 rounded-md bg-brand-tint text-brand text-[10px] font-bold">
         {getExt(name)}
-      </div>
-      <div className="flex-1 flex flex-col gap-2 min-w-0">
-        <div className="flex items-center justify-between text-[13px] gap-2">
-          <span className="text-ink-500 tabular shrink-0">{formatSize(size)}</span>
-          <span className="text-ink-900 truncate text-right">{name}</span>
-        </div>
-        <div className="h-1.5 w-full rounded-full bg-line overflow-hidden">
-          <div className="h-full w-full bg-brand" />
-        </div>
-      </div>
+      </span>
+      <span className="truncate text-ink-700 min-w-0">{name}</span>
+      <span className="shrink-0 text-ink-400 tabular">{formatSize(size)}</span>
       <button
         type="button"
-        className="size-8 grid place-items-center text-ink-700 hover:text-danger transition shrink-0"
         onClick={onRemove}
+        className="shrink-0 size-4 grid place-items-center text-ink-400 hover:text-danger transition"
       >
-        <Close size={16} />
+        <Close size={12} />
       </button>
     </div>
   );
@@ -65,25 +57,31 @@ export function AttachmentsUploader({ defaultFiles = [] }: { defaultFiles?: Exis
     e.target.value = '';
   }
 
+  const hasFiles = existing.length > 0 || files.length > 0;
+
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <span className="text-[13px] font-bold text-ink-900 text-right">ضمیمه فایل</span>
 
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-3 h-12">
-        <Button
-          variant="gray"
-          size="sm"
-          leadingIcon={<Plus size={14} />}
-          onClick={() => inputRef.current?.click()}
-          type="button"
-        >
-          افزودن فایل
-        </Button>
-        <div className="flex items-center gap-3 text-[11px]">
-          <span className="text-ink-500">پسوند های مجاز</span>
-          <span className="text-brand">SVG, PNG, JPG or GIF</span>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className="w-full flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line bg-surface-50 hover:border-brand hover:bg-brand-tint/30 transition py-5 px-4 cursor-pointer"
+      >
+        <div className="size-9 rounded-full bg-white border border-line grid place-items-center text-ink-400">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
         </div>
-      </div>
+        <div className="text-center">
+          <p className="text-[13px] font-medium text-ink-700">
+            برای آپلود کلیک کنید
+          </p>
+          <p className="text-[11px] text-ink-400 mt-0.5">SVG, PNG, JPG یا GIF</p>
+        </div>
+      </button>
 
       <input
         ref={inputRef}
@@ -94,12 +92,26 @@ export function AttachmentsUploader({ defaultFiles = [] }: { defaultFiles?: Exis
         onChange={handleAdd}
       />
 
-      {existing.map((f) => (
-        <FileRow key={f.id} name={f.name} size={f.size} onRemove={() => setExisting((prev) => prev.filter((x) => x.id !== f.id))} />
-      ))}
-      {files.map(({ id, file }) => (
-        <FileRow key={id} name={file.name} size={file.size} onRemove={() => setFiles((prev) => prev.filter((x) => x.id !== id))} />
-      ))}
+      {hasFiles && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {existing.map((f) => (
+            <FileChip
+              key={f.id}
+              name={f.name}
+              size={f.size}
+              onRemove={() => setExisting((prev) => prev.filter((x) => x.id !== f.id))}
+            />
+          ))}
+          {files.map(({ id, file }) => (
+            <FileChip
+              key={id}
+              name={file.name}
+              size={file.size}
+              onRemove={() => setFiles((prev) => prev.filter((x) => x.id !== id))}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
