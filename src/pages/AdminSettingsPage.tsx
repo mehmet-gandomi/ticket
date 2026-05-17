@@ -119,6 +119,36 @@ function AnswerModal({ onClose, onSave, cats }: {
   );
 }
 
+function EditAnswerModal({ answer, cats, onClose, onSave }: {
+  answer: SavedAnswer; cats: Category[]; onClose: () => void; onSave: (a: SavedAnswer) => void;
+}) {
+  const [cat, setCat] = useState(answer.category);
+  const [title, setTitle] = useState(answer.title);
+  const [body, setBody] = useState(answer.body);
+  return (
+    <Modal onClose={onClose} title="ویرایش پاسخ آماده" wide>
+      <div className="flex gap-2">
+        <Field label="عنوان سوال"><Input placeholder="مثلاً گواهی SSL منقضی شده" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
+        <Field label="دسته سوال">
+          <Select value={cat} onChange={(e) => setCat(e.target.value)}>
+            {cats.map((c) => <option key={c.id} value={c.title}>{c.title}</option>)}
+          </Select>
+        </Field>
+      </div>
+      <Field label="پیام تیکت">
+        <TextArea placeholder="متن پاسخ آماده را بنویسید..." value={body} onChange={(e) => setBody(e.target.value)} rows={5} />
+      </Field>
+      <div className="flex gap-3 mt-2">
+        <Button variant="primary"
+          onClick={() => { if (title.trim() && body.trim()) { onSave({ ...answer, category: cat, title, body }); onClose(); } }}>
+          ذخیره تغییرات
+        </Button>
+        <Button variant="danger" onClick={onClose}>لغو</Button>
+      </div>
+    </Modal>
+  );
+}
+
 function CategoriesPanel({ cats, setCats, onAdd }: {
   cats: Category[]; setCats: (c: Category[]) => void; onAdd: () => void;
 }) {
@@ -199,16 +229,25 @@ function PersonalizationTab({ cats, setCats, openCat }: {
   );
 }
 
-function AnswersTab({ answers, setAnswers, openAns }: {
-  answers: SavedAnswer[]; setAnswers: (a: SavedAnswer[]) => void; openAns: () => void;
+function AnswersTab({ answers, setAnswers, cats, openAns }: {
+  answers: SavedAnswer[]; setAnswers: (a: SavedAnswer[]) => void; cats: Category[]; openAns: () => void;
 }) {
+  const [catFilter, setCatFilter] = useState('all');
+  const [editing, setEditing] = useState<SavedAnswer | null>(null);
+
+  const visible = catFilter === 'all' ? answers : answers.filter((a) => a.category === catFilter);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Button variant="primary" size="lg" leadingIcon={<AddAnswer size={16} />} onClick={openAns}>افزودن پاسخ</Button>
+        <Select value={catFilter} onChange={(e) => setCatFilter(e.target.value)} className="!w-auto min-w-[160px]">
+          <option value="all">همه دسته‌ها</option>
+          {cats.map((c) => <option key={c.id} value={c.title}>{c.title}</option>)}
+        </Select>
       </div>
       <div className="flex flex-col gap-3">
-        {answers.map((a) => (
+        {visible.map((a) => (
           <div key={a.id} className="rounded-2xl border border-line bg-white px-5 py-4 hover:border-brand transition">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 flex flex-col gap-2">
@@ -219,7 +258,7 @@ function AnswersTab({ answers, setAnswers, openAns }: {
                 <p className="text-[13px] text-ink-500 leading-7 text-right">{a.body}</p>
               </div>
               <div className="flex items-center gap-2">
-                <button className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition"><Edit size={14} /></button>
+                <button onClick={() => setEditing(a)} className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition"><Edit size={14} /></button>
                 <button onClick={() => setAnswers(answers.filter((x) => x.id !== a.id))}
                   className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-danger hover:bg-red-50 transition"><Trash size={14} /></button>
               </div>
@@ -227,6 +266,14 @@ function AnswersTab({ answers, setAnswers, openAns }: {
           </div>
         ))}
       </div>
+      {editing && (
+        <EditAnswerModal
+          answer={editing}
+          cats={cats}
+          onClose={() => setEditing(null)}
+          onSave={(updated) => { setAnswers(answers.map((a) => a.id === updated.id ? updated : a)); setEditing(null); }}
+        />
+      )}
     </div>
   );
 }
@@ -269,7 +316,7 @@ export function AdminSettingsPage() {
 
       {tab === 'personal'
         ? <PersonalizationTab cats={cats} setCats={setCats} openCat={() => setCatModal(true)} />
-        : <AnswersTab answers={answers} setAnswers={setAnswers} openAns={() => setAnsModal(true)} />}
+        : <AnswersTab answers={answers} setAnswers={setAnswers} cats={cats} openAns={() => setAnsModal(true)} />}
 
       {catModal && <CategoryModal onClose={() => setCatModal(false)} onSave={(c) => setCats([...cats, c])} />}
       {ansModal && <AnswerModal onClose={() => setAnsModal(false)} cats={cats} onSave={(a) => setAnswers([a, ...answers])} />}
