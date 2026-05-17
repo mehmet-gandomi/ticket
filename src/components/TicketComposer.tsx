@@ -20,7 +20,7 @@ interface TicketComposerProps {
  * Subject dropdown · title input · rich-message textarea · file attach · actions.
  */
 export function TicketComposer({
-  defaultSubject = 'سایر',
+  defaultSubject = '',
   defaultTitle = '',
   defaultMessage = '',
   showCancel = true,
@@ -37,6 +37,7 @@ export function TicketComposer({
     <section className="rounded-3xl border border-line bg-white p-6 flex flex-col gap-4 w-full max-w-[583px]">
       <Field label="موضوع تیکت" hint="موضوع تیکت خود را از بین گزینه ها مشخص کنید">
         <Select value={subject} onChange={(e) => setSubject(e.target.value)}>
+          <option value="" disabled>انتخاب کنید</option>
           {ticketSubjects.map((s) => (
             <option key={s} value={s}>
               {s}
