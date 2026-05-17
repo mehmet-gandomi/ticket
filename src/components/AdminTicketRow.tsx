@@ -51,7 +51,7 @@ export function AdminTicketRow({ ticket, selected, onToggle }: {
         <p className="text-[13px] text-ink-700 leading-6 text-right truncate">{ticket.preview}</p>
       </div>
       <button
-        onClick={() => nav(`/tickets/${ticket.id}`)}
+        onClick={() => nav(`/tickets/${ticket.id}?admin=1`)}
         className="grid place-items-center size-9 shrink-0 rounded-lg text-ink-500 hover:text-brand transition"
       >
         <ChevronLeft size={20} />

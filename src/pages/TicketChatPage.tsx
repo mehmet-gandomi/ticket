@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { PageContainer } from '../components/PageContainer';
 import { PageHeader } from '../components/PageHeader';
 import { ChatBubble, ChatHeaderBar } from '../components/Chat';
@@ -13,8 +13,11 @@ import { AttachmentsUploader } from '../components/AttachmentsUploader';
 
 export function TicketChatPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const isAdmin = searchParams.get('admin') === '1';
+
   const ticket = tickets.find((t) => t.id === id) ?? tickets[0];
-  const adminTicket = adminTickets.find((t) => t.id === (id ?? ticket.id));
+  const adminTicket = isAdmin ? adminTickets.find((t) => t.id === (id ?? ticket.id)) : null;
 
   const [messages, setMessages] = useState(sampleConversation);
   const [draft, setDraft] = useState('');
@@ -42,18 +45,18 @@ export function TicketChatPage() {
     <PageContainer>
       <PageHeader title={ticket.title} subtitle="گفتگو با تیم پشتیبانی" />
 
-      {adminTicket && ticketState && stateInfo && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-line bg-white px-5 py-3 gap-3 sm:gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-[13px] font-medium text-ink-700">وضعیت تیکت:</span>
+      {isAdmin && adminTicket && ticketState && stateInfo && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-line bg-white px-4 sm:px-5 py-3 gap-3 sm:gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[12px] font-medium text-ink-500">وضعیت:</span>
             <Label color={stateInfo.color}>{stateInfo.label}</Label>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[12px] text-ink-500">تغییر وضعیت:</span>
+            <span className="text-[12px] text-ink-500 shrink-0">تغییر وضعیت:</span>
             <Select
               value={ticketState}
               onChange={(e) => setTicketState(e.target.value as AdminState)}
-              className="!w-auto min-w-[140px] sm:min-w-[160px] !h-8 !text-[12px]"
+              className="!w-full sm:!w-auto sm:min-w-[160px] !h-8 !text-[12px]"
             >
               <option value="unreviewed">بررسی نشده</option>
               <option value="reviewing">درحال بررسی</option>
@@ -65,7 +68,7 @@ export function TicketChatPage() {
         </div>
       )}
 
-      <section className="rounded-3xl border border-line bg-white p-6 flex flex-col gap-4">
+      <section className="rounded-3xl border border-line bg-white p-4 sm:p-6 flex flex-col gap-4">
         <ChatHeaderBar
           id={ticket.id}
           date={ticket.date}
@@ -74,7 +77,7 @@ export function TicketChatPage() {
           status="پاسخ پشتیبان"
         />
 
-        <div className="flex flex-col gap-3 max-h-[320px] overflow-auto thin-scroll p-2">
+        <div className="flex flex-col gap-3 max-h-[320px] overflow-auto thin-scroll p-1">
           {messages.map((m) => (
             <ChatBubble key={m.id} msg={m} />
           ))}
@@ -93,7 +96,7 @@ export function TicketChatPage() {
 
         <div className="flex">
           <Button variant="primary" size="md" onClick={send}>
-            ثبت تیکت
+            ثبت پیام
           </Button>
         </div>
       </section>
