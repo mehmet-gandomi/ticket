@@ -41,10 +41,6 @@ export function AttachmentsUploader() {
       <span className="text-[13px] font-bold text-ink-900 text-right">ضمیمه فایل</span>
 
       <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-3 h-12">
-        <div className="flex items-center gap-3 text-[11px]">
-          <span className="text-brand">SVG, PNG, JPG or GIF</span>
-          <span className="text-ink-500">پسوند های مجاز</span>
-        </div>
         <Button
           variant="gray"
           size="sm"
@@ -54,6 +50,10 @@ export function AttachmentsUploader() {
         >
           افزودن فایل
         </Button>
+        <div className="flex items-center gap-3 text-[11px]">
+          <span className="text-ink-500">پسوند های مجاز</span>
+          <span className="text-brand">SVG, PNG, JPG or GIF</span>
+        </div>
       </div>
 
       <input

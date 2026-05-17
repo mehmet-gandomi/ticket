@@ -148,7 +148,7 @@ export function RichEditor({ placeholder = '', onChange }: RichEditorProps) {
   return (
     <div className="flex flex-col gap-2">
       {/* toolbar */}
-      <div className="flex items-center justify-end">
+      <div className="flex items-center">
         <div className="flex items-center gap-0.5 rounded-xl border border-line bg-white px-2 h-10 text-ink-500">
           <button type="button" onMouseDown={(e) => { e.preventDefault(); execFormat('bold'); }} className={btn} title="Bold">
             <Bold size={16} />
