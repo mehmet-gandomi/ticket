@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 export function Field({
   label,
@@ -40,6 +40,42 @@ export const TextArea = React.forwardRef<
     {...rest}
   />
 ));
+
+export function RichTextArea({
+  placeholder = '',
+  className = '',
+  editorRef,
+  onContentChange,
+}: {
+  placeholder?: string;
+  className?: string;
+  editorRef?: React.RefObject<HTMLDivElement>;
+  onContentChange?: (html: string) => void;
+}) {
+  const [isEmpty, setIsEmpty] = useState(true);
+
+  return (
+    <div className="relative">
+      {isEmpty && (
+        <span className="absolute top-4 right-4 text-[13px] text-ink-400 pointer-events-none select-none">
+          {placeholder}
+        </span>
+      )}
+      <div
+        ref={editorRef}
+        contentEditable
+        suppressContentEditableWarning
+        dir="rtl"
+        onInput={(e) => {
+          const el = e.currentTarget;
+          setIsEmpty(el.textContent?.trim() === '');
+          onContentChange?.(el.innerHTML);
+        }}
+        className={`min-h-[200px] w-full rounded-xl border border-line bg-white p-4 text-[13px] leading-7 text-ink-900 focus:border-brand focus:shadow-focus focus:outline-none transition outline-none ${className}`}
+      />
+    </div>
+  );
+}
 
 export function Select({
   className = '',
