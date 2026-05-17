@@ -83,7 +83,7 @@ export function Tabs<T extends string>({
   options: { value: T; label: string }[];
 }) {
   return (
-    <div className="flex p-1 rounded-full bg-[#FAFAFA] w-full">
+    <div className="flex sm:inline-flex p-1 rounded-full bg-[#FAFAFA] w-full sm:w-auto">
       {options.map((opt) => (
         <button
           key={opt.value}
