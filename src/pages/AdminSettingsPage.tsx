@@ -4,8 +4,10 @@ import { PageContainer } from '../components/PageContainer';
 import { Field, Input, Select, TextArea } from '../components/FormControls';
 import { Button } from '../components/Button';
 import { Label } from '../components/Label';
-import { Plus, Check, Close, TicketStar, ListIcon, Trash, Edit } from '../icons';
+import { Plus, Close, AddAnswer, ListIcon, Trash, Edit } from '../icons';
 import { PageHeader } from '../components/PageHeader';
+import { RichEditor } from '../components/RichEditor';
+import { AttachmentsUploader } from '../components/AttachmentsUploader';
 import {
   initialCategories,
   initialAnswers,
@@ -93,31 +95,25 @@ function AnswerModal({ onClose, onSave, cats }: {
   const [body, setBody] = useState('');
   return (
     <Modal onClose={onClose} title="افزودن پاسخ آماده" wide>
-      <Field label="دسته سوال">
-        <Select value={cat} onChange={(e) => setCat(e.target.value)}>
-          {cats.map((c) => <option key={c.id} value={c.title}>{c.title}</option>)}
-        </Select>
-      </Field>
-      <Field label="عنوان پاسخ"><Input placeholder="مثلاً گواهی SSL منقضی شده" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
-      <Field label="پیام تیکت">
-        <TextArea placeholder="متن پاسخ آماده را بنویسید..." value={body} onChange={(e) => setBody(e.target.value)} />
-      </Field>
-      <div className="flex flex-col gap-2">
-        <span className="text-[13px] font-bold text-ink-900 text-right">ضمیمه فایل</span>
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-3 h-12">
-          <div className="flex items-center gap-3 text-[11px]">
-            <span className="text-brand">SVG, PNG, JPG or GIF</span>
-            <span className="text-ink-500">پسوند های مجاز</span>
-          </div>
-          <Button variant="gray" size="sm" leadingIcon={<Plus size={14} />}>افزودن فایل</Button>
-        </div>
+      <div className="flex gap-2">
+        <Field label="عنوان سوال"><Input placeholder="مثلاً گواهی SSL منقضی شده" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
+        <Field label="دسته سوال">
+          <Select value={cat} onChange={(e) => setCat(e.target.value)}>
+            {cats.map((c) => <option key={c.id} value={c.title}>{c.title}</option>)}
+          </Select>
+        </Field>
       </div>
-      <div className="flex justify-end gap-3 mt-2">
-        <Button variant="danger" onClick={onClose}>لغو</Button>
-        <Button variant="primary" leadingIcon={<Check size={16} />}
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت</span>
+        <RichEditor placeholder="مشکل خود را با جزئیات کامل توضیح دهید..." />
+      </div>
+      <AttachmentsUploader />
+      <div className="flex gap-3 mt-2">
+        <Button variant="primary"
           onClick={() => { if (title.trim() && body.trim()) { onSave({ id: Date.now(), category: cat, title, body }); onClose(); } }}>
           افزودن پاسخ
         </Button>
+        <Button variant="danger" onClick={onClose}>لغو</Button>
       </div>
     </Modal>
   );
@@ -209,7 +205,7 @@ function AnswersTab({ answers, setAnswers, openAns }: {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
-        <Button variant="primary" size="lg" leadingIcon={<Plus size={16} />} onClick={openAns}>افزودن پاسخ</Button>
+        <Button variant="primary" size="lg" leadingIcon={<AddAnswer size={16} />} onClick={openAns}>افزودن پاسخ</Button>
       </div>
       <div className="flex flex-col gap-3">
         {answers.map((a) => (
