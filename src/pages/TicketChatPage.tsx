@@ -3,10 +3,10 @@ import { PageContainer } from '../components/PageContainer';
 import { PageHeader } from '../components/PageHeader';
 import { ChatBubble, ChatHeaderBar } from '../components/Chat';
 import { Button } from '../components/Button';
-import { Field, TextArea } from '../components/FormControls';
-import { Check, Plus } from '../icons';
 import { sampleConversation, tickets } from '../data/mock';
 import { useState } from 'react';
+import { RichEditor } from '../components/RichEditor';
+import { AttachmentsUploader } from '../components/AttachmentsUploader';
 
 export function TicketChatPage() {
   const { id } = useParams();
@@ -51,28 +51,17 @@ export function TicketChatPage() {
 
         <div className="h-px bg-line" />
 
-        <Field label="پیام تیکت">
-          <TextArea
-            placeholder="پاسخ خود را بنویسید..."
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-          />
-        </Field>
-
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 text-[11px]">
-            <span className="text-brand">SVG, PNG, JPG or GIF</span>
-            <span className="text-ink-500">پسوند های مجاز</span>
-          </div>
-          <Button variant="gray" size="sm" leadingIcon={<Plus size={14} />}>
-            افزودن فایل
-          </Button>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت</span>
+          <RichEditor placeholder="مشکل خود را با جزئیات کامل توضیح دهید..." />
         </div>
+
+        <AttachmentsUploader />
 
         <div className="h-px bg-line" />
 
-        <div className="flex justify-end">
-          <Button variant="primary" size="md" leadingIcon={<Check size={16} />} onClick={send}>
+        <div className="flex">
+          <Button variant="primary" size="md" onClick={send}>
             ثبت تیکت
           </Button>
         </div>

@@ -20,7 +20,15 @@ export function TicketLoadingPage() {
       <PageHeader title="در حال تولید پاسخ" subtitle="پاسخ هوشمند ما در حال آماده شدن است" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        <div className="flex flex-col gap-6 items-end">
+        <div className="flex justify-end">
+          <TicketComposer
+            defaultMessage="مشکل ssl چکار باید بکنم ادرس وبسایتم : https://ieffect.ir"
+            showSubmit={false}
+            showCancel
+          />
+        </div>
+        
+        <div className="flex flex-col gap-6 items-start">
           <span className="inline-flex items-center gap-2 h-9 px-3 rounded-lg bg-brand-tint text-brand text-[13px]">
             <AlignRight size={16} />
             در حال نوشتن پاسخ
@@ -43,14 +51,6 @@ export function TicketLoadingPage() {
             ))}
           </div>
           <style>{`@keyframes shimmer { 0% { transform: translateX(0); } 100% { transform: translateX(500%); } }`}</style>
-        </div>
-
-        <div className="flex justify-end">
-          <TicketComposer
-            defaultMessage="مشکل ssl چکار باید بکنم ادرس وبسایتم : https://ieffect.ir"
-            submitLabel="ارسال تیکت"
-            showCancel
-          />
         </div>
       </div>
     </PageContainer>

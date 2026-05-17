@@ -90,13 +90,6 @@ export const ticketSubjects = [
   'سایر',
 ];
 
-export const aiSuggestions: string[] = [
-  'گواهی SSL منقضی شده، آن را از پنل هاست تمدید کنید.',
-  'مشکل از Mixed Content است؛ همه منابع HTTP را به HTTPS تغییر دهید.',
-  'یک ریدایرکت ۳۰۱ از HTTP به HTTPS اضافه کنید.',
-  'با تیم پشتیبانی هاست تماس بگیرید برای نصب صحیح گواهی.',
-];
-
 export const aiFullAnswer = `بستگی داره مشکل دقیقاً چیه. رایج‌ترین حالت‌ها:
 
 ۱. گواهی SSL منقضی شده
