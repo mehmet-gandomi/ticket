@@ -66,6 +66,25 @@ function CategoryModal({ onClose, onSave }: { onClose: () => void; onSave: (c: C
   );
 }
 
+function EditCategoryModal({ cat, onClose, onSave }: { cat: Category; onClose: () => void; onSave: (c: Category) => void }) {
+  const [title, setTitle] = useState(cat.title);
+  const [description, setDescription] = useState(cat.description);
+  return (
+    <Modal onClose={onClose} title="ویرایش دسته بندی">
+      <Field label="عنوان دسته"><Input placeholder="فنی" value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
+      <Field label="توضیحات دسته"><Input placeholder="دسته فنی در ..." value={description} onChange={(e) => setDescription(e.target.value)} /></Field>
+      <div className="h-px bg-line -mx-6" />
+      <div className="flex justify-end">
+        <Button variant="primary"
+          onClick={() => { if (title.trim()) { onSave({ ...cat, title, description }); onClose(); } }}>
+          ذخیره تغییرات
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
+
 function AnswerModal({ onClose, onSave, cats }: {
   onClose: () => void; onSave: (a: SavedAnswer) => void; cats: Category[];
 }) {
@@ -107,7 +126,9 @@ function AnswerModal({ onClose, onSave, cats }: {
 function CategoriesPanel({ cats, setCats, onAdd }: {
   cats: Category[]; setCats: (c: Category[]) => void; onAdd: () => void;
 }) {
+  const [editing, setEditing] = useState<Category | null>(null);
   const remove = (id: string) => setCats(cats.filter((c) => c.id !== id));
+  const saveEdit = (updated: Category) => setCats(cats.map((c) => c.id === updated.id ? updated : c));
   return (
     <div className="flex flex-col gap-5 flex-1 min-w-0">
       <div className="flex items-center justify-between gap-3">
@@ -138,11 +159,16 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
                     <span className="text-[14px] font-bold text-ink-900 block">{c.title}</span>
                     <span className="text-[12px] text-ink-500 leading-6 block">{c.description}</span>
                   </div>
-                  <div>
+                  <div className="flex flex-col items-end gap-1">
                     <Label color="default" size="sm">مرتبط {c.count}</Label>
-                    <button onClick={() => remove(c.id)} className="w-8 h-8 grid place-items-center rounded-lg text-danger hover:bg-red-50 transition mr-auto">
-                      <Trash size={16} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => setEditing(c)} className="w-8 h-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition">
+                        <Edit size={14} />
+                      </button>
+                      <button onClick={() => remove(c.id)} className="w-8 h-8 grid place-items-center rounded-lg text-danger hover:bg-red-50 transition">
+                        <Trash size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -150,6 +176,7 @@ function CategoriesPanel({ cats, setCats, onAdd }: {
           ))}
         </div>
       )}
+      {editing && <EditCategoryModal cat={editing} onClose={() => setEditing(null)} onSave={saveEdit} />}
     </div>
   );
 }
