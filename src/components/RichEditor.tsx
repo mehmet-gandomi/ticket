@@ -1,15 +1,22 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Bold, Italic, AlignRight, AlignCenter, AlignLeft, Link, ListIcon, MessageText, Close } from '../icons';
 
 interface RichEditorProps {
   placeholder?: string;
+  defaultValue?: string;
   onChange?: (html: string) => void;
 }
 
-export function RichEditor({ placeholder = '', onChange }: RichEditorProps) {
+export function RichEditor({ placeholder = '', defaultValue, onChange }: RichEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const savedRange = useRef<Range | null>(null);
-  const [isEmpty, setIsEmpty] = useState(true);
+  const [isEmpty, setIsEmpty] = useState(!defaultValue);
+
+  useEffect(() => {
+    if (defaultValue && editorRef.current) {
+      editorRef.current.innerHTML = defaultValue;
+    }
+  }, []);
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
 

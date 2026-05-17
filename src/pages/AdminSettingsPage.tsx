@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../components/PageContainer';
-import { Field, Input, Select, TextArea } from '../components/FormControls';
+import { Field, Input, Select } from '../components/FormControls';
 import { Button } from '../components/Button';
 import { Label } from '../components/Label';
 import { Plus, Close, AddAnswer, ListIcon, Trash, Edit } from '../icons';
@@ -137,9 +137,10 @@ function EditAnswerModal({ answer, cats, onClose, onSave }: {
           </Select>
         </Field>
       </div>
-      <Field label="پیام تیکت">
-        <TextArea placeholder="متن پاسخ آماده را بنویسید..." value={body} onChange={(e) => setBody(e.target.value)} rows={5} />
-      </Field>
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت</span>
+        <RichEditor placeholder="متن پاسخ آماده را بنویسید..." defaultValue={answer.body} onChange={setBody} />
+      </div>
       <div className="flex gap-3 mt-2">
         <Button variant="primary"
           onClick={() => { if (title.trim() && body.trim()) { onSave({ ...answer, category: cat, title, body }); onClose(); } }}>
