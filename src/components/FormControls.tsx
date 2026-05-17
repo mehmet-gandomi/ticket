@@ -71,6 +71,13 @@ export function RichTextArea({
           setIsEmpty(el.textContent?.trim() === '');
           onContentChange?.(el.innerHTML);
         }}
+        onClick={(e) => {
+          const a = (e.target as HTMLElement).closest('a');
+          if (a) {
+            e.preventDefault();
+            window.open((a as HTMLAnchorElement).href, '_blank', 'noopener,noreferrer');
+          }
+        }}
         className={`min-h-[200px] w-full rounded-xl border border-line bg-white p-4 text-[13px] leading-7 text-ink-900 focus:border-brand focus:shadow-focus focus:outline-none transition outline-none ${className}`}
       />
     </div>
