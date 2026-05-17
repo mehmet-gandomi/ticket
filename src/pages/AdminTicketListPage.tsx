@@ -8,7 +8,7 @@ import { Button } from '../components/Button';
 import { Pagination } from '../components/Pagination';
 import { Search } from '../icons';
 import { adminTickets as initialTickets, type AdminState, type AdminTicket } from '../data/adminMock';
-import { Setting } from '../icons/index'
+import { Setting } from '../icons/index';
 
 function StatBox({ count, label, tint }: { count: string | number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet' }) {
   const tints: Record<string, string> = {
@@ -26,7 +26,6 @@ function StatBox({ count, label, tint }: { count: string | number; label: string
     </div>
   );
 }
-
 
 export function AdminTicketListPage() {
   const [tickets, setTickets] = useState<AdminTicket[]>(initialTickets);
@@ -66,11 +65,11 @@ export function AdminTicketListPage() {
     .filter((t) => (search.trim() === '' ? true : t.id.includes(search) || t.title.includes(search)));
 
   const tabs: { value: AdminState | 'all'; label: string; count: number }[] = [
-    { value: 'all', label: 'همه تیکت ها', count: counts.all },
+    { value: 'all', label: 'همه', count: counts.all },
     { value: 'unreviewed', label: 'بررسی نشده', count: counts.unreviewed },
-    { value: 'reviewing', label: 'درحال بررسی', count: counts.reviewing },
-    { value: 'pending', label: 'در انتظار پاسخ', count: counts.pending },
-    { value: 'closed', label: 'بسته شده', count: counts.closed },
+    { value: 'reviewing', label: 'در بررسی', count: counts.reviewing },
+    { value: 'pending', label: 'در انتظار', count: counts.pending },
+    { value: 'closed', label: 'بسته', count: counts.closed },
     { value: 'spam', label: 'اسپم', count: counts.spam },
   ];
 
@@ -84,17 +83,13 @@ export function AdminTicketListPage() {
         action={
           <button
             onClick={() => nav('/admin/settings')}
-            className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition"
+            className="inline-flex items-center gap-2 h-10 sm:h-12 px-4 sm:px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition shrink-0"
           >
             <Setting size={18} />
             <span>تنظیمات</span>
           </button>
         }
       />
-
-      <div className="flex items-center justify-between">
-        <span className="text-[13px] text-ink-500 tabular">{counts.all} تیکت</span>
-      </div>
 
       <Field label="شماره تیکت" hint="شماره تیکت مد نظر خودتان را وارد کنید">
         <div className="relative">
@@ -112,22 +107,37 @@ export function AdminTicketListPage() {
         <StatBox count={counts.spam} label="اسپم" tint="violet" />
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <Select value={priority} onChange={(e) => setPriority(e.target.value)} className="!w-auto min-w-[140px]">
-          <option value="all">الویت</option>
-          <option value="high">الویت بالا</option>
-          <option value="medium">الویت متوسط</option>
-          <option value="low">الویت کم</option>
-        </Select>
+      {/* Filters */}
+      <div className="flex flex-col gap-2">
+        {/* Status tabs — scrollable */}
         <div className="flex items-center border-b border-line overflow-x-auto">
           {tabs.map((t) => (
-            <button key={t.value} onClick={() => setFilter(t.value)}
-              className={`flex items-center gap-2 h-12 px-3 sm:px-4 text-[13px] transition relative whitespace-nowrap ${filter === t.value ? 'text-brand font-medium' : 'text-ink-500 hover:text-ink-900'}`}>
+            <button
+              key={t.value}
+              onClick={() => setFilter(t.value)}
+              className={`flex items-center gap-1.5 h-11 px-3 sm:px-4 text-[12px] sm:text-[13px] transition relative whitespace-nowrap shrink-0 ${
+                filter === t.value ? 'text-brand font-medium' : 'text-ink-500 hover:text-ink-900'
+              }`}
+            >
               <span>{t.label}</span>
-              <span className={`inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-[10px] tabular ${filter === t.value ? 'bg-brand text-white' : 'bg-surface-100 text-ink-500'}`}>{t.count}</span>
+              <span className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] tabular ${
+                filter === t.value ? 'bg-brand text-white' : 'bg-surface-100 text-ink-500'
+              }`}>
+                {t.count}
+              </span>
               {filter === t.value && <span className="absolute right-0 left-0 -bottom-px h-0.5 bg-brand" />}
             </button>
           ))}
+        </div>
+
+        {/* Priority filter */}
+        <div className="w-full sm:w-auto">
+          <Select value={priority} onChange={(e) => setPriority(e.target.value)}>
+            <option value="all">همه الویت‌ها</option>
+            <option value="high">الویت بالا</option>
+            <option value="medium">الویت متوسط</option>
+            <option value="low">الویت کم</option>
+          </Select>
         </div>
       </div>
 
@@ -137,7 +147,7 @@ export function AdminTicketListPage() {
             <Select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as AdminState | '')}
-              className="!w-auto min-w-[140px] sm:min-w-[160px] !h-8 !text-[12px]"
+              className="!h-8 !text-[12px]"
             >
               <option value="">تغییر وضعیت...</option>
               <option value="unreviewed">بررسی نشده</option>
