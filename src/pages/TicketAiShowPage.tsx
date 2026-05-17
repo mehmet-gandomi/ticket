@@ -20,9 +20,8 @@ export function TicketAiShowPage() {
         <div className="flex justify-end">
           <TicketComposer
             defaultMessage="مشکل ssl چکار باید بکنم ادرس وبسایتم : https://ieffect.ir"
-            files={[{ name: 'اسم فایل.jpg', size: '200KB' }]}
             showCancel={false}
-            submitLabel="ارسال تیکت"
+            showSubmit={false}
           />
         </div>
         

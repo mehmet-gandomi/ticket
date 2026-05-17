@@ -11,6 +11,7 @@ interface TicketComposerProps {
   defaultTitle?: string;
   defaultMessage?: string;
   showCancel?: boolean;
+  showSubmit?: boolean;
   onSubmit?: () => void;
   onCancel?: () => void;
   submitLabel?: string;
@@ -21,6 +22,7 @@ export function TicketComposer({
   defaultTitle = '',
   defaultMessage: _defaultMessage = '',
   showCancel = true,
+  showSubmit = true,
   onSubmit,
   onCancel,
   submitLabel = 'ارسال تیکت',
@@ -59,9 +61,11 @@ export function TicketComposer({
       <div className="h-px bg-line my-1" />
 
       <div className="flex items-center gap-3">
-        <Button variant="primary" size="md" onClick={onSubmit}>
-          {submitLabel}
-        </Button>
+        {showSubmit && (
+          <Button variant="primary" size="md" onClick={onSubmit}>
+            {submitLabel}
+          </Button>
+        )}
         {showCancel && (
           <Button variant="danger" size="md" onClick={onCancel}>
             لغو ارسال

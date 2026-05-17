@@ -14,7 +14,6 @@ export function TicketNotFoundPage() {
         <div className="flex justify-end">
           <TicketComposer
             defaultMessage="مشکل ssl چکار باید بکنم ادرس وبسایتم : https://ieffect.ir"
-            files={[{ name: 'اسم فایل.jpg', size: '200KB' }]}
             showCancel={false}
             submitLabel="ثبت تیکت"
             onSubmit={() => navigate('/tickets')}

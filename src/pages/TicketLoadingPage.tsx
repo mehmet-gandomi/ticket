@@ -23,7 +23,7 @@ export function TicketLoadingPage() {
         <div className="flex justify-end">
           <TicketComposer
             defaultMessage="مشکل ssl چکار باید بکنم ادرس وبسایتم : https://ieffect.ir"
-            submitLabel="ارسال تیکت"
+            showSubmit={false}
             showCancel
           />
         </div>
