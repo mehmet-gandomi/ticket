@@ -1,4 +1,5 @@
 import React, { ReactNode, useState } from 'react';
+import { ChevronDown } from '../icons';
 
 export function Field({
   label,
@@ -97,18 +98,11 @@ export function Select({
       >
         {children}
       </select>
-      <svg
+      <ChevronDown
         aria-hidden="true"
+        size={16}
         className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-400"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      >
-        <path d="M19 9l-7 6-7-6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      />
     </div>
   );
 }
