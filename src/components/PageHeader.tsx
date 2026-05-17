@@ -1,20 +1,36 @@
+import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ListIcon, Ticket, TicketStar } from '../icons';
 
-/**
- * The Figma's "Titel" header. Shows on every dashboard page:
- *   right side: title + subtitle + ticket-star icon
- *   left side:  primary action (varies per page)
- */
 export function PageHeader({
   title = 'تیکت پشتیبانی',
   subtitle = 'پشتیبانی ۲۴ ساعته آماده پاسخگویی',
+  action,
 }: {
   title?: string;
   subtitle?: string;
+  action?: ReactNode;
 }) {
   const { pathname } = useLocation();
   const isList = pathname === '/' || pathname === '/tickets';
+
+  const defaultAction = isList ? (
+    <Link
+      to="/tickets/new"
+      className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition"
+    >
+      <Ticket size={24} />
+      <span>ثبت تیکت جدید</span>
+    </Link>
+  ) : (
+    <Link
+      to="/tickets"
+      className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition"
+    >
+      <ListIcon size={18} />
+      <span>لیست تیکت ها</span>
+    </Link>
+  );
 
   return (
     <header className="flex items-start justify-between gap-6 pb-5 border-b border-line">
@@ -28,26 +44,7 @@ export function PageHeader({
         </div>
       </div>
 
-      {/* primary action button toggles based on the current route */}
-      <div>
-        {isList ? (
-          <Link
-            to="/tickets/new"
-            className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition"
-          >
-            <Ticket size={24} />
-            <span>ثبت تیکت جدید</span>
-          </Link>
-        ) : (
-          <Link
-            to="/tickets"
-            className="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition"
-          >
-            <ListIcon size={18} />
-            <span>لیست تیکت ها</span>
-          </Link>
-        )}
-      </div>
+      <div>{action ?? defaultAction}</div>
     </header>
   );
 }
