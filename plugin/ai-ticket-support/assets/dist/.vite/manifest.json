@@ -1,0 +1,18 @@
+{
+  "public/fonts/Ravi/Ravi-VF.ttf": {
+    "file": "assets/Ravi-VF-xTtXQV-q.ttf",
+    "src": "public/fonts/Ravi/Ravi-VF.ttf"
+  },
+  "src/main.tsx": {
+    "file": "assets/main-CQrXSTAm.js",
+    "name": "main",
+    "src": "src/main.tsx",
+    "isEntry": true,
+    "css": [
+      "assets/main-DQMlGEyt.css"
+    ],
+    "assets": [
+      "assets/Ravi-VF-xTtXQV-q.ttf"
+    ]
+  }
+}

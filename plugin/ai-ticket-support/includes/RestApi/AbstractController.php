@@ -39,16 +39,16 @@ abstract class AbstractController {
         return $this->error('forbidden', $message, 403);
     }
 
-    // ── Permission callbacks ──────────────────────────────────────────────────
+    // ── Permission callbacks (must be public — WordPress calls them via call_user_func) ───
 
-    protected function require_logged_in(): bool|WP_Error {
+    public function require_logged_in(): bool|WP_Error {
         if (! is_user_logged_in()) {
             return $this->error('not_authenticated', 'You must be logged in.', 401);
         }
         return true;
     }
 
-    protected function require_admin(): bool|WP_Error {
+    public function require_admin(): bool|WP_Error {
         if (! current_user_can('manage_options')) {
             return $this->forbidden();
         }

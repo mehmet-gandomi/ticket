@@ -4,6 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  base: './',
   build: {
     outDir:   resolve(__dirname, 'plugin/ai-ticket-support/assets/dist'),
     manifest: true,
