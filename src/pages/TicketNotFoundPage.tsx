@@ -16,7 +16,7 @@ export function TicketNotFoundPage() {
             defaultMessage="مشکل ssl چکار باید بکنم ادرس وبسایتم : https://ieffect.ir"
             showCancel={false}
             submitLabel="ثبت تیکت"
-            onSubmit={() => navigate('/tickets')}
+            onSubmit={async () => { navigate('/tickets'); }}
           />
         </div>
         <div className="flex flex-col items-center justify-center gap-6 text-center">

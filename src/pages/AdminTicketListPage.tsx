@@ -1,23 +1,22 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { PageContainer } from '../components/PageContainer';
-import { PageHeader } from '../components/PageHeader';
-import { AdminTicketRow } from '../components/AdminTicketRow';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate }        from 'react-router-dom';
+import { PageContainer }      from '../components/PageContainer';
+import { PageHeader }         from '../components/PageHeader';
+import { AdminTicketRow }     from '../components/AdminTicketRow';
 import { Field, Input, Select } from '../components/FormControls';
-import { Button } from '../components/Button';
-import { Pagination } from '../components/Pagination';
-import { Search } from '../icons';
-import { adminTickets as initialTickets, type AdminState, type AdminTicket } from '../data/adminMock';
-import { Setting } from '../icons/index';
+import { Button }             from '../components/Button';
+import { Pagination }         from '../components/Pagination';
+import { Search, Setting }    from '../icons';
+import { adminApi, type AdminState, type AdminTicket } from '../api/admin';
 
-function StatBox({ count, label, tint }: { count: string | number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet' }) {
+function StatBox({ count, label, tint }: { count: number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet' }) {
   const tints: Record<string, string> = {
-    gray: 'bg-surface-100 text-ink-700',
+    gray:    'bg-surface-100 text-ink-700',
     warning: 'bg-[#FFF8EC] text-[#B47100]',
     primary: 'bg-brand-tint text-brand',
-    danger: 'bg-[#FDEAEA] text-danger',
+    danger:  'bg-[#FDEAEA] text-danger',
     default: 'bg-white text-ink-700 border border-line',
-    violet: 'bg-[#F1E8FF] text-violet',
+    violet:  'bg-[#F1E8FF] text-violet',
   };
   return (
     <div className={`flex-1 rounded-2xl px-5 py-4 flex flex-col items-center gap-1 ${tints[tint]}`}>
@@ -28,12 +27,40 @@ function StatBox({ count, label, tint }: { count: string | number; label: string
 }
 
 export function AdminTicketListPage() {
-  const [tickets, setTickets] = useState<AdminTicket[]>(initialTickets);
-  const [filter, setFilter] = useState<AdminState | 'all'>('all');
-  const [priority, setPriority] = useState<string>('all');
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [search, setSearch] = useState('');
+  const [tickets, setTickets]     = useState<AdminTicket[]>([]);
+  const [counts, setCounts]       = useState<Record<string, number>>({});
+  const [total, setTotal]         = useState(0);
+  const [page, setPage]           = useState(1);
+  const [filter, setFilter]       = useState<AdminState | 'all'>('all');
+  const [priority, setPriority]   = useState<string>('all');
+  const [search, setSearch]       = useState('');
+  const [selected, setSelected]   = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<AdminState | ''>('');
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState<string | null>(null);
+
+  const nav = useNavigate();
+
+  const load = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    adminApi.tickets({
+      page,
+      perPage:  20,
+      status:   filter === 'all' ? '' : filter,
+      priority: priority === 'all' ? '' : priority,
+      search,
+    })
+      .then((res) => {
+        setTickets(res.items);
+        setTotal(res.total_pages);
+        setCounts({ ...res.counts, all: res.total });
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [page, filter, priority, search]);
+
+  useEffect(() => { load(); }, [load]);
 
   function toggle(id: string) {
     const next = new Set(selected);
@@ -41,30 +68,13 @@ export function AdminTicketListPage() {
     setSelected(next);
   }
 
-  function applyBulkStatus() {
+  async function applyBulkStatus() {
     if (!bulkStatus) return;
-    setTickets((prev) =>
-      prev.map((t) => selected.has(t.id) ? { ...t, state: bulkStatus } : t)
-    );
+    await Promise.all([...selected].map((id) => adminApi.updateTicketState(id, bulkStatus)));
     setSelected(new Set());
     setBulkStatus('');
+    load();
   }
-
-  const counts = {
-    all: tickets.length,
-    unreviewed: tickets.filter((t) => t.state === 'unreviewed').length,
-    reviewing: tickets.filter((t) => t.state === 'reviewing').length,
-    pending: tickets.filter((t) => t.state === 'pending').length,
-    closed: tickets.filter((t) => t.state === 'closed').length,
-    spam: tickets.filter((t) => t.state === 'spam').length,
-  };
-
-  const filtered = tickets
-    .filter((t) => (filter === 'all' ? true : t.state === filter))
-    .filter((t) => (priority === 'all' ? true : t.priority === priority))
-    .filter((t) => (search.trim() === '' ? true : t.id.includes(search) || t.title.includes(search)));
-
-  const nav = useNavigate();
 
   return (
     <PageContainer>
@@ -73,7 +83,7 @@ export function AdminTicketListPage() {
         subtitle="پاسخ گویی به مشتریان با الویت های مشخص"
         action={
           <button
-            onClick={() => nav('/admin/settings')}
+            onClick={() => nav('/settings')}
             className="inline-flex items-center gap-2 h-10 sm:h-12 px-4 sm:px-5 rounded-xl bg-brand text-white text-[13px] font-medium hover:bg-brand-dark transition shrink-0"
           >
             <Setting size={18} />
@@ -90,25 +100,25 @@ export function AdminTicketListPage() {
       </Field>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <StatBox count={counts.all} label="همه تیکت ها" tint="default" />
-        <StatBox count={counts.unreviewed} label="بررسی نشده" tint="danger" />
-        <StatBox count={counts.reviewing} label="در حال بررسی" tint="primary" />
-        <StatBox count={counts.pending} label="در انتظار پاسخ" tint="warning" />
-        <StatBox count={counts.closed} label="بسته شده" tint="gray" />
-        <StatBox count={counts.spam} label="اسپم" tint="violet" />
+        <StatBox count={counts.all        ?? 0} label="همه تیکت ها"      tint="default" />
+        <StatBox count={counts.unreviewed ?? 0} label="بررسی نشده"        tint="danger"  />
+        <StatBox count={counts.reviewing  ?? 0} label="در حال بررسی"     tint="primary" />
+        <StatBox count={counts.pending    ?? 0} label="در انتظار پاسخ"   tint="warning" />
+        <StatBox count={counts.closed     ?? 0} label="بسته شده"          tint="gray"    />
+        <StatBox count={counts.spam       ?? 0} label="اسپم"              tint="violet"  />
       </div>
 
-      {/* Filters — two selects side by side */}
       <div className="grid grid-cols-2 gap-3">
-        <Select value={filter} onChange={(e) => setFilter(e.target.value as AdminState | 'all')}>
-          <option value="all">همه وضعیت‌ها ({counts.all})</option>
-          <option value="unreviewed">بررسی نشده ({counts.unreviewed})</option>
-          <option value="reviewing">درحال بررسی ({counts.reviewing})</option>
-          <option value="pending">در انتظار پاسخ ({counts.pending})</option>
-          <option value="closed">بسته شده ({counts.closed})</option>
-          <option value="spam">اسپم ({counts.spam})</option>
+        <Select value={filter} onChange={(e) => { setFilter(e.target.value as AdminState | 'all'); setPage(1); }}>
+          <option value="all">همه وضعیت‌ها</option>
+          <option value="unreviewed">بررسی نشده</option>
+          <option value="reviewing">درحال بررسی</option>
+          <option value="pending">در انتظار پاسخ</option>
+          <option value="answered">پاسخ داده شده</option>
+          <option value="closed">بسته شده</option>
+          <option value="spam">اسپم</option>
         </Select>
-        <Select value={priority} onChange={(e) => setPriority(e.target.value)}>
+        <Select value={priority} onChange={(e) => { setPriority(e.target.value); setPage(1); }}>
           <option value="all">همه الویت‌ها</option>
           <option value="high">الویت بالا</option>
           <option value="medium">الویت متوسط</option>
@@ -128,28 +138,46 @@ export function AdminTicketListPage() {
               <option value="unreviewed">بررسی نشده</option>
               <option value="reviewing">درحال بررسی</option>
               <option value="pending">در انتظار پاسخ</option>
+              <option value="answered">پاسخ داده شده</option>
               <option value="closed">بسته شده</option>
               <option value="spam">اسپم</option>
             </Select>
-            {bulkStatus && (
-              <Button variant="primary" size="sm" onClick={applyBulkStatus}>
-                اعمال
-              </Button>
-            )}
+            {bulkStatus && <Button variant="primary" size="sm" onClick={applyBulkStatus}>اعمال</Button>}
           </div>
           <span className="text-[13px] text-brand">{selected.size} تیکت انتخاب شده</span>
         </div>
       )}
 
-      <div className="flex flex-col gap-3">
-        {filtered.length === 0 ? (
-          <div className="rounded-2xl border border-line bg-white p-10 text-center text-ink-500 text-[13px]">تیکتی برای نمایش وجود ندارد.</div>
-        ) : filtered.map((t) => (
-          <AdminTicketRow key={t.id} ticket={t} selected={selected.has(t.id)} onToggle={() => toggle(t.id)} />
-        ))}
-      </div>
+      {loading && <div className="text-center py-10 text-ink-500 text-[13px]">در حال بارگذاری...</div>}
+      {error   && <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-[13px] text-danger">{error}</div>}
+      {!loading && !error && (
+        <div className="flex flex-col gap-3">
+          {tickets.length === 0 ? (
+            <div className="rounded-2xl border border-line bg-white p-10 text-center text-ink-500 text-[13px]">
+              تیکتی برای نمایش وجود ندارد.
+            </div>
+          ) : tickets.map((t) => (
+            <AdminTicketRow
+              key={t.id}
+              ticket={{
+                id:       t.id,
+                title:    t.title,
+                user:     t.user,
+                state:    t.state,
+                priority: t.priority,
+                preview:  '',
+                date:     t.createdAt.slice(0, 10),
+                time:     t.createdAt.slice(11, 16),
+                ago:      '',
+              }}
+              selected={selected.has(t.id)}
+              onToggle={() => toggle(t.id)}
+            />
+          ))}
+        </div>
+      )}
 
-      <Pagination page={1} total={10} onChange={() => {}} />
+      <Pagination page={page} total={total} onChange={setPage} />
     </PageContainer>
   );
 }

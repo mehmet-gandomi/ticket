@@ -1,7 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Flag } from '../icons';
 import { Label } from './Label';
-import { adminStateMap, type AdminTicket } from '../data/adminMock';
+import { adminStateMap, type AdminState } from '../api/admin';
+
+interface AdminTicket {
+  id: string;
+  title: string;
+  user: string;
+  state: AdminState;
+  priority: 'low' | 'medium' | 'high';
+  preview: string;
+  date: string;
+  time: string;
+  ago: string;
+}
 
 const priorityMap = {
   low: { color: 'primary' as const, label: 'الویت کم' },
@@ -57,7 +69,7 @@ export function AdminTicketRow({ ticket, selected, onToggle }: {
       </div>
 
       <button
-        onClick={() => nav(`/tickets/${ticket.id}?admin=1`)}
+        onClick={() => nav(`/tickets/${ticket.id}`)}
         className="grid place-items-center size-7 shrink-0 text-ink-400 hover:text-brand transition"
       >
         <ChevronLeft size={16} />
