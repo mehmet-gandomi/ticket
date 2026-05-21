@@ -29,7 +29,6 @@ final class Plugin {
         add_action('init',              [Database::instance(), 'maybe_upgrade']);
         add_action('init',              [Pages::instance(),    'register_rewrite_rules']);
         add_action('template_redirect', [Pages::instance(),    'maybe_serve_app']);
-        add_action('wp_enqueue_scripts',[Assets::instance(),   'enqueue']);
         add_action('rest_api_init',     [$this,                'register_rest_routes']);
     }
 
