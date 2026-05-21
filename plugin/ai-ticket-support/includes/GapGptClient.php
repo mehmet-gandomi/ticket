@@ -22,15 +22,17 @@ final class GapGptClient {
      * @return string|null   output_text on success, null on failure
      */
     public function respond(string $model, string $input): ?string {
-        $response = wp_remote_post(self::BASE_URL . '/responses', [
+        $response = wp_remote_post(self::BASE_URL . '/chat/completions', [
             'timeout' => self::TIMEOUT,
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->api_key,
                 'Content-Type'  => 'application/json',
             ],
             'body' => wp_json_encode([
-                'model' => $model,
-                'input' => $input,
+                'model'    => $model,
+                'messages' => [
+                    ['role' => 'user', 'content' => $input],
+                ],
             ]),
         ]);
 
@@ -43,10 +45,10 @@ final class GapGptClient {
         $body = json_decode(wp_remote_retrieve_body($response), true);
 
         if ($code !== 200 || ! is_array($body)) {
-            error_log('ATS GapGptClient unexpected response: ' . wp_remote_retrieve_body($response));
+            error_log('ATS GapGptClient unexpected response [' . $code . ']: ' . wp_remote_retrieve_body($response));
             return null;
         }
 
-        return isset($body['output_text']) ? (string) $body['output_text'] : null;
+        return $body['choices'][0]['message']['content'] ?? null;
     }
 }
