@@ -30,21 +30,31 @@ final class SettingsController extends AbstractController {
                 'aiEnabled'  => ['type' => 'boolean', 'default' => false],
                 'brandColor' => ['type' => 'string',  'default' => '#3B3214',
                                  'sanitize_callback' => 'sanitize_hex_color'],
-                'providers'  => ['type' => 'array',   'default' => []],
+                // providers is a JSON object (not array) — read from raw JSON body instead
              ]],
         ]);
     }
 
     public function show(): WP_REST_Response {
-        $settings = get_option(self::OPTION_KEY, self::DEFAULTS);
-        return $this->ok(array_merge(self::DEFAULTS, (array) $settings));
+        $saved    = (array) get_option(self::OPTION_KEY, self::DEFAULTS);
+        $settings = array_merge(self::DEFAULTS, $saved);
+        // ensure providers is always a JSON object, never a JSON array
+        if (empty($settings['providers']) || ! is_array($settings['providers'])) {
+            $settings['providers'] = (object) [];
+        }
+        return $this->ok($settings);
     }
 
     public function store(WP_REST_Request $req): WP_REST_Response {
+        // providers is a JSON object keyed by provider id; get_param() coerces objects to
+        // indexed arrays when 'type'=>'array' is declared, so read from raw JSON body instead.
+        $json      = $req->get_json_params() ?? [];
+        $providers = isset($json['providers']) && is_array($json['providers']) ? $json['providers'] : [];
+
         $settings = [
             'aiEnabled'  => (bool) $req->get_param('aiEnabled'),
             'brandColor' => sanitize_hex_color($req->get_param('brandColor')) ?: '#3B3214',
-            'providers'  => $this->sanitize_providers((array) ($req->get_param('providers') ?? [])),
+            'providers'  => $this->sanitize_providers($providers),
         ];
 
         update_option(self::OPTION_KEY, $settings);
