@@ -236,13 +236,38 @@ function EditAnswerModal({ answer, cats, onClose, onSave }: {
 
 // ── AI providers config ───────────────────────────────────────────────────────
 
-interface AiProvider { id: string; name: string; description: string; badge: string; badgeColor: string; models: string[]; }
+interface ModelGroup { label: string; models: string[] }
+interface AiProvider { id: string; name: string; description: string; badge: string; badgeColor: string; modelGroups: ModelGroup[] }
+
+const GAPCODE_MODEL_GROUPS: ModelGroup[] = [
+  { label: 'گپ‌کد (بومی)', models: [
+    'gapgpt-qwen-3.5', 'gapgpt-qwen-3.5-thinking', 'gapgpt-qwen-3.6', 'gapgpt-qwen-3.6-thinking',
+  ]},
+  { label: 'OpenAI', models: [
+    'gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
+    'gpt-5', 'gpt-5-mini', 'gpt-5-codex', 'o3-mini', 'o4-mini',
+  ]},
+  { label: 'Anthropic', models: [
+    'claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5',
+    'claude-3-7-sonnet-20250219', 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022',
+  ]},
+  { label: 'Google Gemini', models: [
+    'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite',
+    'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash',
+  ]},
+  { label: 'Google Gemma', models: ['gemma-3-27b-it'] },
+  { label: 'XAI', models: ['grok-4', 'grok-3', 'grok-3-mini', 'grok-3-mini-fast'] },
+  { label: 'Deepseek', models: ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-r1'] },
+  { label: 'Alibaba (Qwen)', models: [
+    'qwen3-235b-a22b', 'qwen3-coder', 'qwen3-coder-480b-a35b-instruct', 'qwen-max', 'qwen-plus', 'qwen-turbo',
+  ]},
+];
 
 const AI_PROVIDERS: AiProvider[] = [
-  { id: 'chatgpt', name: 'ChatGPT',  description: 'مدل‌های هوشمند OpenAI برای پاسخ‌دهی خودکار',             badge: 'GPT', badgeColor: '#10A37F', models: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'] },
-  { id: 'claude',  name: 'Claude',   description: 'مدل‌های Anthropic با دقت بالا در پردازش زبان',           badge: 'CLD', badgeColor: '#D97757', models: ['claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5'] },
-  { id: 'gemini',  name: 'Gemini',   description: 'مدل‌های Google با قابلیت‌های چندوجهی',                   badge: 'GEM', badgeColor: '#4285F4', models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-2.0-flash'] },
-  { id: 'gapcode', name: 'گپ‌کد',   description: 'سرویس هوش مصنوعی داخلی با پشتیبانی از زبان فارسی',     badge: 'گپ',  badgeColor: '#7C3AED', models: ['gapcode-v1', 'gapcode-v2'] },
+  { id: 'chatgpt', name: 'ChatGPT',  description: 'مدل‌های هوشمند OpenAI برای پاسخ‌دهی خودکار',             badge: 'GPT', badgeColor: '#10A37F', modelGroups: [{ label: '', models: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'] }] },
+  { id: 'claude',  name: 'Claude',   description: 'مدل‌های Anthropic با دقت بالا در پردازش زبان',           badge: 'CLD', badgeColor: '#D97757', modelGroups: [{ label: '', models: ['claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5'] }] },
+  { id: 'gemini',  name: 'Gemini',   description: 'مدل‌های Google با قابلیت‌های چندوجهی',                   badge: 'GEM', badgeColor: '#4285F4', modelGroups: [{ label: '', models: ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash'] }] },
+  { id: 'gapcode', name: 'گپ‌کد',   description: 'سرویس هوش مصنوعی داخلی با پشتیبانی از زبان فارسی',     badge: 'گپ',  badgeColor: '#7C3AED', modelGroups: GAPCODE_MODEL_GROUPS },
 ];
 
 function AiProviderCard({ provider, config, onChange }: {
@@ -275,7 +300,13 @@ function AiProviderCard({ provider, config, onChange }: {
           </Field>
           <Field label="مدل">
             <Select value={config.model} onChange={(e) => onChange({ ...config, model: e.target.value })}>
-              {provider.models.map((m) => <option key={m} value={m}>{m}</option>)}
+              {provider.modelGroups.map((group) =>
+                group.label
+                  ? <optgroup key={group.label} label={group.label}>
+                      {group.models.map((m) => <option key={m} value={m}>{m}</option>)}
+                    </optgroup>
+                  : group.models.map((m) => <option key={m} value={m}>{m}</option>)
+              )}
             </Select>
           </Field>
         </div>
@@ -305,7 +336,7 @@ function AiIntegrationTab({ settings, onChange }: { settings: Settings; onChange
             <AiProviderCard
               key={p.id}
               provider={p}
-              config={providers[p.id] ?? { enabled: false, apiKey: '', model: p.models[0] }}
+              config={providers[p.id] ?? { enabled: false, apiKey: '', model: p.modelGroups[0].models[0] }}
               onChange={(c) => update(p.id, c)}
             />
           ))}
