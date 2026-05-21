@@ -9,7 +9,12 @@ export function TicketNewPage() {
 
   async function handleSubmit(payload: { title: string; body: string; priority: string; category_id?: number | null }) {
     const ticket = await ticketsApi.create(payload);
-    navigate(`/tickets/${ticket.id}`);
+
+    if (ticket.aiStatus === 'done' && ticket.aiSuggestion) {
+      navigate(`/tickets/${ticket.id}/ai-show`);
+    } else {
+      navigate(`/tickets/${ticket.id}`);
+    }
   }
 
   return (

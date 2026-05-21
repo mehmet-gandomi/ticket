@@ -10,6 +10,8 @@ export interface Ticket {
   priority: 'low' | 'medium' | 'high';
   categoryId: number | null;
   categoryTitle: string | null;
+  aiStatus: 'none' | 'done' | 'failed';
+  aiSuggestion: string | null;
   createdAt: string;
   updatedAt: string;
 }

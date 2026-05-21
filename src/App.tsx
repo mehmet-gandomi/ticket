@@ -33,9 +33,8 @@ export default function App() {
         <Route path="/"                element={<Navigate to="/tickets" replace />} />
         <Route path="/tickets"         element={<TicketListPage />} />
         <Route path="/tickets/new"     element={<TicketNewPage />} />
-        <Route path="/tickets/loading" element={<TicketLoadingPage />} />
-        <Route path="/tickets/ai-show" element={<TicketAiShowPage />} />
         <Route path="/tickets/not-found" element={<TicketNotFoundPage />} />
+        <Route path="/tickets/:id/ai-show" element={<TicketAiShowPage />} />
         <Route path="/tickets/:id"     element={<TicketChatPage />} />
         <Route path="*"                element={<Navigate to="/tickets" replace />} />
       </Routes>

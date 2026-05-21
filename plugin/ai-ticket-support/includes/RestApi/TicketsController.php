@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ATS\RestApi;
 
 use ATS\Database;
+use ATS\AiService;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
@@ -105,6 +106,13 @@ final class TicketsController extends AbstractController {
         }
 
         $ticket = $db->get_ticket($ticket_id);
+
+        // Run AI suggestion (synchronous — prompt is small thanks to category filter)
+        $suggestion = (new AiService())->suggest($ticket, $body);
+        $db->save_ai_suggestion($ticket_id, $suggestion);
+
+        // Re-fetch so ai_status / ai_suggestion columns are fresh
+        $ticket = $db->get_ticket($ticket_id);
         return $this->created($this->format_ticket($ticket));
     }
 
@@ -177,6 +185,8 @@ final class TicketsController extends AbstractController {
             'priority'       => $t['priority'],
             'categoryId'     => $t['category_id'] ? (int) $t['category_id'] : null,
             'categoryTitle'  => $t['category_title'] ?? null,
+            'aiStatus'       => $t['ai_status'] ?? 'none',
+            'aiSuggestion'   => $t['ai_suggestion'] ?? null,
             'createdAt'      => $t['created_at'],
             'updatedAt'      => $t['updated_at'],
         ];

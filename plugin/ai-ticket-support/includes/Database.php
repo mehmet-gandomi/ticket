@@ -5,7 +5,7 @@ namespace ATS;
 
 final class Database {
 
-    private const DB_VERSION = '1.0.0';
+    private const DB_VERSION = '1.1.0';
 
     private static ?self $instance = null;
 
@@ -39,14 +39,16 @@ final class Database {
         ) ENGINE=InnoDB {$charset};");
 
         dbDelta("CREATE TABLE {$this->db->prefix}ats_tickets (
-            id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            user_id     BIGINT UNSIGNED NOT NULL,
-            title       VARCHAR(255)    NOT NULL,
-            status      VARCHAR(20)     NOT NULL DEFAULT 'unreviewed',
-            priority    VARCHAR(10)     NOT NULL DEFAULT 'low',
-            category_id BIGINT UNSIGNED DEFAULT NULL,
-            created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            user_id       BIGINT UNSIGNED NOT NULL,
+            title         VARCHAR(255)    NOT NULL,
+            status        VARCHAR(20)     NOT NULL DEFAULT 'unreviewed',
+            priority      VARCHAR(10)     NOT NULL DEFAULT 'low',
+            category_id   BIGINT UNSIGNED DEFAULT NULL,
+            ai_status     VARCHAR(10)     NOT NULL DEFAULT 'none',
+            ai_suggestion TEXT            NULL,
+            created_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY idx_user   (user_id),
             KEY idx_status (status)
@@ -204,6 +206,17 @@ final class Database {
             ['status' => $status, 'updated_at' => current_time('mysql')],
             ['id'     => $id],
             ['%s', '%s'],
+            ['%d']
+        );
+    }
+
+    public function save_ai_suggestion(int $ticket_id, ?string $suggestion): bool {
+        $status = $suggestion !== null ? 'done' : 'failed';
+        return (bool) $this->db->update(
+            $this->db->prefix . 'ats_tickets',
+            ['ai_status' => $status, 'ai_suggestion' => $suggestion, 'updated_at' => current_time('mysql')],
+            ['id'        => $ticket_id],
+            ['%s', $suggestion !== null ? '%s' : '%s'],
             ['%d']
         );
     }
