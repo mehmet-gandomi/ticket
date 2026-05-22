@@ -53,6 +53,7 @@ export function AttachmentsUploader({ defaultFiles = [], onFilesChange }: {
   // Sync to parent whenever the file list changes (avoids calling setState
   // inside another setState updater, which React prohibits)
   useEffect(() => {
+    console.log('[Uploader] useEffect firing, files:', files.length, 'onFilesChange present:', !!onFilesChange);
     onFilesChange?.(files.map((f) => f.file));
   }, [files]); // eslint-disable-line react-hooks/exhaustive-deps
 

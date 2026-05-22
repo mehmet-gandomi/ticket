@@ -13,18 +13,26 @@ export function TicketNewPage() {
 
   async function handleSubmit(payload: { title: string; body: string; priority: string; category_id?: number | null }) {
     setSubmitting(true);
+    console.log('[NewTicket] handleSubmit called, filesRef.current:', filesRef.current);
     try {
       const ticket = await ticketsApi.create(payload);
+      console.log('[NewTicket] ticket created id:', ticket.id);
       const files = filesRef.current;
+      console.log('[NewTicket] files to upload:', files.length, files.map(f => f.name));
       if (files.length > 0) {
-        await Promise.all(files.map((f) => ticketsApi.uploadAttachment(ticket.id, f)));
+        await Promise.all(files.map((f) => {
+          console.log('[NewTicket] uploading:', f.name);
+          return ticketsApi.uploadAttachment(ticket.id, f);
+        }));
+        console.log('[NewTicket] all uploads done');
       }
       if (ticket.aiStatus === 'done' && ticket.aiSuggestion) {
         navigate(`/tickets/${ticket.id}/ai-show`);
       } else {
         navigate(`/tickets/${ticket.id}`);
       }
-    } catch {
+    } catch (e) {
+      console.error('[NewTicket] error:', e);
       setSubmitting(false);
     }
   }
@@ -50,7 +58,10 @@ export function TicketNewPage() {
         <TicketComposer
           onSubmit={handleSubmit}
           onCancel={() => navigate('/tickets')}
-          onFilesChange={(files) => { filesRef.current = files; }}
+          onFilesChange={(files) => {
+            console.log('[NewTicket] onFilesChange:', files.length, files.map(f => f.name));
+            filesRef.current = files;
+          }}
         />
       </div>
     </PageContainer>
