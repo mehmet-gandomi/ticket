@@ -82,8 +82,12 @@ final class Database {
 
     // ── Tickets ──────────────────────────────────────────────────────────────
 
-    public function get_tickets_for_user(int $user_id, int $page = 1, int $per_page = 20): array {
+    public function get_tickets_for_user(int $user_id, int $page = 1, int $per_page = 20, array $statuses = []): array {
         $offset = ($page - 1) * $per_page;
+        [$where, $values] = $this->user_ticket_where($user_id, $statuses);
+        $values[] = $per_page;
+        $values[] = $offset;
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
         return $this->db->get_results(
             $this->db->prepare(
                 "SELECT t.*, c.title AS category_title,
@@ -91,22 +95,35 @@ final class Database {
                          WHERE ticket_id = t.id ORDER BY created_at ASC LIMIT 1) AS first_body
                  FROM {$this->db->prefix}ats_tickets t
                  LEFT JOIN {$this->db->prefix}ats_categories c ON c.id = t.category_id
-                 WHERE t.user_id = %d
+                 WHERE {$where}
                  ORDER BY t.created_at DESC
                  LIMIT %d OFFSET %d",
-                $user_id, $per_page, $offset
+                ...$values
             ),
             ARRAY_A
         );
     }
 
-    public function count_tickets_for_user(int $user_id): int {
+    public function count_tickets_for_user(int $user_id, array $statuses = []): int {
+        [$where, $values] = $this->user_ticket_where($user_id, $statuses);
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
         return (int) $this->db->get_var(
             $this->db->prepare(
-                "SELECT COUNT(*) FROM {$this->db->prefix}ats_tickets WHERE user_id = %d",
-                $user_id
+                "SELECT COUNT(*) FROM {$this->db->prefix}ats_tickets WHERE {$where}",
+                ...$values
             )
         );
+    }
+
+    private function user_ticket_where(int $user_id, array $statuses): array {
+        $where  = 't.user_id = %d';
+        $values = [$user_id];
+        if (! empty($statuses)) {
+            $placeholders = implode(', ', array_fill(0, count($statuses), '%s'));
+            $where       .= " AND t.status IN ({$placeholders})";
+            $values       = array_merge($values, $statuses);
+        }
+        return [$where, $values];
     }
 
     public function get_all_tickets(array $filters = [], int $page = 1, int $per_page = 20): array {

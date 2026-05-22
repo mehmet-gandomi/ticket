@@ -40,8 +40,10 @@ export interface TicketDetailResponse {
 }
 
 export const ticketsApi = {
-  list(page = 1, perPage = 20): Promise<TicketListResponse> {
-    return api.get(`/tickets?page=${page}&per_page=${perPage}`);
+  list(page = 1, perPage = 20, status = ''): Promise<TicketListResponse> {
+    const q = new URLSearchParams({ page: String(page), per_page: String(perPage) });
+    if (status) q.set('status', status);
+    return api.get(`/tickets?${q}`);
   },
 
   create(payload: { title: string; body: string; priority: string; category_id?: number | null }): Promise<Ticket> {

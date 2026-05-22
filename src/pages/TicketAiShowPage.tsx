@@ -5,6 +5,7 @@ import { PageHeader }     from '../components/PageHeader';
 import { Button }         from '../components/Button';
 import { Like, Dislike, Check, Close } from '../icons';
 import { ticketsApi, type Ticket, type Message } from '../api/tickets';
+import { toShamsi }       from './TicketListPage';
 import { getConfig }      from '../config';
 
 export function TicketAiShowPage() {
@@ -84,7 +85,7 @@ export function TicketAiShowPage() {
               <div className="px-4 py-3 text-[13px] leading-6 bg-brand-tint rounded-[24px_0_24px_24px] text-right"
                 dangerouslySetInnerHTML={{ __html: firstMsg.body }} />
               <div className="flex items-center gap-2 text-[11px] text-ink-400 px-3">
-                <span className="tabular">{ticket.createdAt.slice(0, 10)}</span>
+                <span className="tabular">{toShamsi(ticket.createdAt)}</span>
                 <span className="tabular">{ticket.createdAt.slice(11, 16)}</span>
               </div>
             </div>

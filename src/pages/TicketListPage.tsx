@@ -1,21 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
-import { PageContainer }  from '../components/PageContainer';
-import { PageHeader }     from '../components/PageHeader';
-import { TicketCard }     from '../components/TicketCard';
+import jalaali from 'jalaali-js';
+import { PageContainer }    from '../components/PageContainer';
+import { PageHeader }       from '../components/PageHeader';
+import { TicketCard }       from '../components/TicketCard';
 import { Tabs, Pagination } from '../components/Pagination';
 import { ticketsApi, type Ticket } from '../api/tickets';
 
 const PER_PAGE = 5;
 
-type Filter = 'all' | 'answered' | 'closed';
+type Filter = 'all' | 'pending' | 'answered' | 'closed';
 
-function relativeTime(iso: string): string {
+export function toShamsi(iso: string): string {
+  const d = new Date(iso);
+  const { jy, jm, jd } = jalaali.toJalaali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`;
+}
+
+export function relativeTime(iso: string): string {
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (diff < 60)     return 'لحظاتی پیش';
   if (diff < 3600)   return `${Math.floor(diff / 60)} دقیقه پیش`;
   if (diff < 86400)  return `${Math.floor(diff / 3600)} ساعت پیش`;
   if (diff < 604800) return `${Math.floor(diff / 86400)} روز پیش`;
-  return iso.slice(0, 10);
+  return toShamsi(iso);
 }
 
 function toCard(t: Ticket) {
@@ -25,26 +32,26 @@ function toCard(t: Ticket) {
     status:   t.status,
     priority: t.priority,
     preview:  t.preview,
-    date:     t.createdAt.slice(0, 10),
+    date:     toShamsi(t.createdAt),
     time:     t.createdAt.slice(11, 16),
     ago:      relativeTime(t.updatedAt),
   };
 }
 
 export function TicketListPage() {
-  const [filter, setFilter]   = useState<Filter>('all');
-  const [page, setPage]       = useState(1);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [filter, setFilter]     = useState<Filter>('all');
+  const [page, setPage]         = useState(1);
+  const [tickets, setTickets]   = useState<Ticket[]>([]);
   const [totalPages, setTotalPages] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string | null>(null);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState<string | null>(null);
 
   const load = useCallback(() => {
     let active = true;
     setLoading(true);
     setError(null);
 
-    ticketsApi.list(page, PER_PAGE)
+    ticketsApi.list(page, PER_PAGE, filter === 'all' ? '' : filter)
       .then((res) => {
         if (!active) return;
         setTickets(res.items);
@@ -54,11 +61,9 @@ export function TicketListPage() {
       .finally(() => { if (active) setLoading(false); });
 
     return () => { active = false; };
-  }, [page]);
+  }, [page, filter]);
 
   useEffect(load, [load]);
-
-  const filtered = filter === 'all' ? tickets : tickets.filter((t) => t.status === filter);
 
   return (
     <PageContainer>
@@ -70,6 +75,7 @@ export function TicketListPage() {
           onChange={(v) => { setFilter(v as Filter); setPage(1); }}
           options={[
             { value: 'all',      label: 'همه' },
+            { value: 'pending',  label: 'در انتظار پاسخ' },
             { value: 'answered', label: 'پاسخ داده شده' },
             { value: 'closed',   label: 'بسته شده' },
           ]}
@@ -84,12 +90,12 @@ export function TicketListPage() {
       )}
       {!loading && !error && (
         <div className="flex flex-col gap-3">
-          {filtered.length === 0 ? (
+          {tickets.length === 0 ? (
             <div className="rounded-2xl border border-line bg-white p-10 text-center text-ink-500 text-[13px]">
               تیکتی برای نمایش وجود ندارد.
             </div>
           ) : (
-            filtered.map((t) => <TicketCard key={t.id} ticket={toCard(t)} />)
+            tickets.map((t) => <TicketCard key={t.id} ticket={toCard(t)} />)
           )}
         </div>
       )}

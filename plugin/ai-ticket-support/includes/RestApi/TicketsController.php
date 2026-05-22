@@ -28,6 +28,7 @@ final class TicketsController extends AbstractController {
                 'args'                => [
                     'page'     => ['type' => 'integer', 'default' => 1, 'minimum' => 1],
                     'per_page' => ['type' => 'integer', 'default' => 20, 'minimum' => 1, 'maximum' => 100],
+                    'status'   => ['type' => 'string',  'default' => ''],
                 ],
             ],
             [
@@ -84,8 +85,16 @@ final class TicketsController extends AbstractController {
         $page    = (int) $req->get_param('page');
         $per     = (int) $req->get_param('per_page');
 
-        $tickets = $db->get_tickets_for_user($user_id, $page, $per);
-        $total   = $db->count_tickets_for_user($user_id);
+        // Map user-facing status to internal DB statuses
+        $statuses = match ($req->get_param('status')) {
+            'pending'  => ['unreviewed', 'reviewing', 'spam'],
+            'answered' => ['pending', 'answered'],
+            'closed'   => ['closed'],
+            default    => [],
+        };
+
+        $tickets = $db->get_tickets_for_user($user_id, $page, $per, $statuses);
+        $total   = $db->count_tickets_for_user($user_id, $statuses);
 
         $response = $this->ok([
             'items'      => array_map([$this, 'format_ticket'], $tickets),
