@@ -109,7 +109,7 @@ final class Database {
         // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
         return (int) $this->db->get_var(
             $this->db->prepare(
-                "SELECT COUNT(*) FROM {$this->db->prefix}ats_tickets WHERE {$where}",
+                "SELECT COUNT(*) FROM {$this->db->prefix}ats_tickets t WHERE {$where}",
                 ...$values
             )
         );
