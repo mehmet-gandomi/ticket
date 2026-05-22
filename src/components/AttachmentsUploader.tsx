@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Close } from '../icons';
 
 interface AttachedFile {
@@ -50,26 +50,24 @@ export function AttachmentsUploader({ defaultFiles = [], onFilesChange }: {
   const [existing, setExisting] = useState<ExistingFile[]>(defaultFiles);
   const [files, setFiles] = useState<AttachedFile[]>([]);
 
+  // Sync to parent whenever the file list changes (avoids calling setState
+  // inside another setState updater, which React prohibits)
+  useEffect(() => {
+    onFilesChange?.(files.map((f) => f.file));
+  }, [files]); // eslint-disable-line react-hooks/exhaustive-deps
+
   function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(e.target.files ?? []);
     const next: AttachedFile[] = selected.map((file) => ({
       id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
       file,
     }));
-    setFiles((prev) => {
-      const updated = [...prev, ...next];
-      onFilesChange?.(updated.map((f) => f.file));
-      return updated;
-    });
+    setFiles((prev) => [...prev, ...next]);
     e.target.value = '';
   }
 
   function removeFile(id: string) {
-    setFiles((prev) => {
-      const updated = prev.filter((x) => x.id !== id);
-      onFilesChange?.(updated.map((f) => f.file));
-      return updated;
-    });
+    setFiles((prev) => prev.filter((x) => x.id !== id));
   }
 
   const hasFiles = existing.length > 0 || files.length > 0;
