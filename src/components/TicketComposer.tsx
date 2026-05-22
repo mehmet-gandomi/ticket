@@ -3,7 +3,7 @@ import { Field, Input, Select } from './FormControls';
 import { Button } from './Button';
 import { RichEditor } from './RichEditor';
 import { AttachmentsUploader } from './AttachmentsUploader';
-import { adminApi, type Category } from '../api/admin';
+import { ticketsApi, type Category } from '../api/tickets';
 
 interface SubmitPayload {
   title: string;
@@ -45,7 +45,7 @@ export function TicketComposer({
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    adminApi.categories().then(setCategories).catch(() => {});
+    ticketsApi.categories().then(setCategories).catch(() => {});
   }, []);
 
   const errors = {

@@ -24,24 +24,28 @@ export function TicketNewPage() {
     }
   }
 
+  if (submitting) {
+    return (
+      <PageContainer>
+        <PageHeader title="در حال تولید پاسخ" subtitle="پاسخ هوشمند ما در حال آماده شدن است" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          <div className="flex justify-end">
+            <TicketComposer showSubmit={false} showCancel={false} onSubmit={handleSubmit} onCancel={() => {}} />
+          </div>
+          <AiLoadingPanel />
+        </div>
+      </PageContainer>
+    );
+  }
+
   return (
     <PageContainer>
-      <PageHeader
-        title={submitting ? 'در حال تولید پاسخ' : 'ثبت تیکت جدید'}
-        subtitle={submitting ? 'پاسخ هوشمند ما در حال آماده شدن است' : 'پشتیبانی هوشمند، آماده پاسخگویی به سوالات شما'}
-      />
-
-      <div className={submitting ? 'grid grid-cols-1 lg:grid-cols-2 gap-8 items-start' : 'flex'}>
-        <div className={submitting ? 'flex justify-end' : ''}>
-          <TicketComposer
-            onSubmit={handleSubmit}
-            onCancel={() => navigate('/tickets')}
-            showSubmit={!submitting}
-            showCancel={!submitting}
-          />
-        </div>
-
-        {submitting && <AiLoadingPanel />}
+      <PageHeader title="ثبت تیکت جدید" subtitle="پشتیبانی هوشمند، آماده پاسخگویی به سوالات شما" />
+      <div className="flex">
+        <TicketComposer
+          onSubmit={handleSubmit}
+          onCancel={() => navigate('/tickets')}
+        />
       </div>
     </PageContainer>
   );

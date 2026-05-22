@@ -20,6 +20,14 @@ use WP_Error;
 final class TicketsController extends AbstractController {
 
     public function register_routes(): void {
+        register_rest_route(self::NAMESPACE, '/categories', [
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'categories_index'],
+                'permission_callback' => [$this, 'require_logged_in'],
+            ],
+        ]);
+
         register_rest_route(self::NAMESPACE, '/tickets', [
             [
                 'methods'             => 'GET',
@@ -214,6 +222,16 @@ final class TicketsController extends AbstractController {
         $db->resolve_ticket_with_ai($id, $ticket['ai_suggestion']);
         $ticket = $db->get_ticket($id);
         return $this->ok($this->format_ticket($ticket));
+    }
+
+    public function categories_index(): WP_REST_Response {
+        $cats = Database::instance()->get_categories();
+        return $this->ok(array_map(fn($c) => [
+            'id'          => (string) $c['id'],
+            'title'       => $c['title'],
+            'description' => $c['description'],
+            'count'       => (int) $c['ticket_count'],
+        ], $cats));
     }
 
     // ── Formatters ────────────────────────────────────────────────────────────

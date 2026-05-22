@@ -39,7 +39,18 @@ export interface TicketDetailResponse {
   messages: Message[];
 }
 
+export interface Category {
+  id: string;
+  title: string;
+  description: string;
+  count: number;
+}
+
 export const ticketsApi = {
+  categories(): Promise<Category[]> {
+    return api.get('/categories');
+  },
+
   list(page = 1, perPage = 20, status = ''): Promise<TicketListResponse> {
     const q = new URLSearchParams({ page: String(page), per_page: String(perPage) });
     if (status) q.set('status', status);
