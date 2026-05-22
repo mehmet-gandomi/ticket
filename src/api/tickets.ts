@@ -13,6 +13,7 @@ export interface Ticket {
   aiStatus: 'none' | 'done' | 'failed';
   aiSuggestion: string | null;
   aiResolved: boolean;
+  preview: string;
   createdAt: string;
   updatedAt: string;
 }

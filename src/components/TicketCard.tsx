@@ -38,14 +38,16 @@ export function TicketCard({ ticket }: { ticket: TicketSummary }) {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
           <div className="flex flex-col gap-1 min-w-0">
             <p className="text-[13px] text-ink-900 leading-6 font-semibold">{ticket.title}</p>
-            <div className="flex items-center gap-1.5 sm:gap-3 text-[10px] sm:text-[11px] text-ink-400 tabular flex-nowrap">
+            <div className="flex items-center gap-1.5 sm:gap-3 text-[10px] sm:text-[11px] text-ink-400 tabular flex-wrap">
               <span className="font-bold text-brand text-[12px] sm:text-[14px] shrink-0">#{ticket.id}</span>
               <span className="w-px h-3 bg-line shrink-0" />
-              <span className="shrink-0">{ticket.ago}</span>
-              <span className="w-px h-3 bg-line shrink-0" />
-              <span className="shrink-0">{ticket.time}</span>
-              <span className="w-px h-3 bg-line shrink-0" />
-              <span className="shrink-0">{ticket.date}</span>
+              <span className="shrink-0">ثبت: {ticket.date} {ticket.time}</span>
+              {ticket.ago && (
+                <>
+                  <span className="w-px h-3 bg-line shrink-0" />
+                  <span className="shrink-0 text-ink-600">آخرین فعالیت: {ticket.ago}</span>
+                </>
+              )}
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 sm:shrink-0">
@@ -55,9 +57,11 @@ export function TicketCard({ ticket }: { ticket: TicketSummary }) {
           </div>
         </div>
 
-        <p className="text-[13px] text-ink-700 leading-6 text-right truncate">
-          {ticket.preview}
-        </p>
+        {ticket.preview && (
+          <p className="text-[13px] text-ink-500 leading-6 text-right truncate">
+            {ticket.preview}
+          </p>
+        )}
       </div>
 
       <span className="grid place-items-center size-9 shrink-0 rounded-lg text-ink-500 group-hover:text-brand transition">

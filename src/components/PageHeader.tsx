@@ -12,7 +12,7 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   const { pathname } = useLocation();
-  const isList = pathname === '/' || pathname === '/tickets';
+  const isList = pathname === '/' || pathname.replace(/\/$/, '') === '/tickets';
 
   const defaultAction = isList ? (
     <Link
