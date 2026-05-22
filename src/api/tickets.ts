@@ -12,6 +12,7 @@ export interface Ticket {
   categoryTitle: string | null;
   aiStatus: 'none' | 'done' | 'failed';
   aiSuggestion: string | null;
+  aiResolved: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -52,5 +53,9 @@ export const ticketsApi = {
 
   sendMessage(id: string, body: string): Promise<{ messages: Message[] }> {
     return api.post(`/tickets/${id}/messages`, { body });
+  },
+
+  aiResolve(id: string): Promise<Ticket> {
+    return api.post(`/tickets/${id}/ai-resolve`, {});
   },
 };

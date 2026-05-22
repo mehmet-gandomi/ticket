@@ -9,7 +9,7 @@ import { Pagination }         from '../components/Pagination';
 import { Search, Setting }    from '../icons';
 import { adminApi, type AdminState, type AdminTicket } from '../api/admin';
 
-function StatBox({ count, label, tint }: { count: number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet' }) {
+function StatBox({ count, label, tint }: { count: number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet'|'success' }) {
   const tints: Record<string, string> = {
     gray:    'bg-surface-100 text-ink-700',
     warning: 'bg-[#FFF8EC] text-[#B47100]',
@@ -17,6 +17,7 @@ function StatBox({ count, label, tint }: { count: number; label: string; tint: '
     danger:  'bg-[#FDEAEA] text-danger',
     default: 'bg-white text-ink-700 border border-line',
     violet:  'bg-[#F1E8FF] text-violet',
+    success: 'bg-[#EAFAF3] text-success',
   };
   return (
     <div className={`flex-1 rounded-2xl px-5 py-4 flex flex-col items-center gap-1 ${tints[tint]}`}>
@@ -29,6 +30,7 @@ function StatBox({ count, label, tint }: { count: number; label: string; tint: '
 export function AdminTicketListPage() {
   const [tickets, setTickets]     = useState<AdminTicket[]>([]);
   const [counts, setCounts]       = useState<Record<string, number>>({});
+  const [aiResolved, setAiResolved] = useState(0);
   const [total, setTotal]         = useState(0);
   const [page, setPage]           = useState(1);
   const [filter, setFilter]       = useState<AdminState | 'all'>('all');
@@ -55,6 +57,7 @@ export function AdminTicketListPage() {
         setTickets(res.items);
         setTotal(res.total_pages);
         setCounts({ ...res.counts, all: res.total });
+        setAiResolved(res.aiResolved ?? 0);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -99,13 +102,14 @@ export function AdminTicketListPage() {
         </div>
       </Field>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
         <StatBox count={counts.all        ?? 0} label="همه تیکت ها"      tint="default" />
         <StatBox count={counts.unreviewed ?? 0} label="بررسی نشده"        tint="danger"  />
         <StatBox count={counts.reviewing  ?? 0} label="در حال بررسی"     tint="primary" />
         <StatBox count={counts.pending    ?? 0} label="در انتظار پاسخ"   tint="warning" />
         <StatBox count={counts.closed     ?? 0} label="بسته شده"          tint="gray"    />
         <StatBox count={counts.spam       ?? 0} label="اسپم"              tint="violet"  />
+        <StatBox count={aiResolved}             label="پاسخ هوشمند"       tint="success" />
       </div>
 
       <div className="grid grid-cols-2 gap-3">

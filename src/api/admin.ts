@@ -22,6 +22,7 @@ export interface AdminTicketListResponse {
   page: number;
   total_pages: number;
   counts: Record<AdminState | 'all', number>;
+  aiResolved: number;
 }
 
 export interface Category {

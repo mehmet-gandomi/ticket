@@ -11,11 +11,23 @@ export function TicketAiShowPage() {
   const { id }         = useParams<{ id: string }>();
   const navigate       = useNavigate();
   const { user }       = getConfig();
-  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
-  const [ticket, setTicket]     = useState<Ticket | null>(null);
-  const [firstMsg, setFirstMsg] = useState<Message | null>(null);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState<string | null>(null);
+  const [feedback, setFeedback]   = useState<'up' | 'down' | null>(null);
+  const [ticket, setTicket]       = useState<Ticket | null>(null);
+  const [firstMsg, setFirstMsg]   = useState<Message | null>(null);
+  const [loading, setLoading]     = useState(true);
+  const [resolving, setResolving] = useState(false);
+  const [error, setError]         = useState<string | null>(null);
+
+  async function handleResolve() {
+    if (!id || resolving) return;
+    setResolving(true);
+    try {
+      await ticketsApi.aiResolve(id);
+      navigate('/tickets');
+    } catch {
+      setResolving(false);
+    }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -121,9 +133,10 @@ export function TicketAiShowPage() {
               variant="success"
               size="md"
               leadingIcon={<Check size={16} />}
-              onClick={() => navigate('/tickets')}
+              onClick={handleResolve}
+              disabled={resolving}
             >
-              مشکل حل شد
+              {resolving ? 'در حال بستن...' : 'مشکل حل شد'}
             </Button>
             <Button
               variant="danger"

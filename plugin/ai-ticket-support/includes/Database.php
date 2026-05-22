@@ -5,7 +5,7 @@ namespace ATS;
 
 final class Database {
 
-    private const DB_VERSION = '1.1.0';
+    private const DB_VERSION = '1.2.0';
 
     private static ?self $instance = null;
 
@@ -47,6 +47,7 @@ final class Database {
             category_id   BIGINT UNSIGNED DEFAULT NULL,
             ai_status     VARCHAR(10)     NOT NULL DEFAULT 'none',
             ai_suggestion TEXT            NULL,
+            ai_resolved   TINYINT(1)      NOT NULL DEFAULT 0,
             created_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
@@ -207,6 +208,27 @@ final class Database {
             ['id'     => $id],
             ['%s', '%s'],
             ['%d']
+        );
+    }
+
+    public function resolve_ticket_with_ai(int $ticket_id, string $ai_body): bool {
+        $this->db->insert(
+            $this->db->prefix . 'ats_messages',
+            ['ticket_id' => $ticket_id, 'user_id' => 0, 'author_type' => 'support', 'body' => $ai_body],
+            ['%d', '%d', '%s', '%s']
+        );
+        return (bool) $this->db->update(
+            $this->db->prefix . 'ats_tickets',
+            ['status' => 'closed', 'ai_resolved' => 1, 'updated_at' => current_time('mysql')],
+            ['id' => $ticket_id],
+            ['%s', '%d', '%s'],
+            ['%d']
+        );
+    }
+
+    public function count_ai_resolved(): int {
+        return (int) $this->db->get_var(
+            "SELECT COUNT(*) FROM {$this->db->prefix}ats_tickets WHERE ai_resolved = 1"
         );
     }
 

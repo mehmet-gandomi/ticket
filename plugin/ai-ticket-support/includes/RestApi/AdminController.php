@@ -134,6 +134,7 @@ final class AdminController extends AbstractController {
             'page'        => $page,
             'total_pages' => (int) ceil($total / $per),
             'counts'      => $counts,
+            'aiResolved'  => $db->count_ai_resolved(),
         ]);
     }
 

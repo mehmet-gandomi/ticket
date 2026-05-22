@@ -65,6 +65,17 @@ final class TicketsController extends AbstractController {
                 ],
             ],
         ]);
+
+        register_rest_route(self::NAMESPACE, '/tickets/(?P<id>\d+)/ai-resolve', [
+            [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'ai_resolve'],
+                'permission_callback' => [$this, 'require_logged_in'],
+                'args'                => [
+                    'id' => ['type' => 'integer'],
+                ],
+            ],
+        ]);
     }
 
     public function index(WP_REST_Request $req): WP_REST_Response {
@@ -172,6 +183,30 @@ final class TicketsController extends AbstractController {
         ]);
     }
 
+    public function ai_resolve(WP_REST_Request $req): WP_REST_Response|WP_Error {
+        $db      = Database::instance();
+        $id      = (int) $req->get_param('id');
+        $user_id = get_current_user_id();
+
+        $ticket = $db->get_ticket($id);
+        if ($ticket === null) {
+            return $this->not_found('Ticket not found.');
+        }
+        if ((int) $ticket['user_id'] !== $user_id) {
+            return $this->forbidden();
+        }
+        if ($ticket['status'] === 'closed') {
+            return $this->error('already_closed', 'Ticket is already closed.', 422);
+        }
+        if (empty($ticket['ai_suggestion'])) {
+            return $this->error('no_ai_suggestion', 'No AI suggestion available.', 422);
+        }
+
+        $db->resolve_ticket_with_ai($id, $ticket['ai_suggestion']);
+        $ticket = $db->get_ticket($id);
+        return $this->ok($this->format_ticket($ticket));
+    }
+
     // ── Formatters ────────────────────────────────────────────────────────────
 
     private function format_ticket(array $t): array {
@@ -187,6 +222,7 @@ final class TicketsController extends AbstractController {
             'categoryTitle'  => $t['category_title'] ?? null,
             'aiStatus'       => $t['ai_status'] ?? 'none',
             'aiSuggestion'   => $t['ai_suggestion'] ?? null,
+            'aiResolved'     => (bool) ($t['ai_resolved'] ?? false),
             'createdAt'      => $t['created_at'],
             'updatedAt'      => $t['updated_at'],
         ];
