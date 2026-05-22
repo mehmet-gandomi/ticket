@@ -22,7 +22,7 @@ final class GapGptClient {
      * @param  string $input the full prompt text
      * @return string|null   output_text on success, null on failure
      */
-    public function respond(string $model, string $input): ?string {
+    public function respond(string $model, string $system, string $user): ?string {
         $args = [
             'timeout' => self::TIMEOUT,
             'headers' => [
@@ -31,7 +31,10 @@ final class GapGptClient {
             ],
             'body' => wp_json_encode([
                 'model'    => $model,
-                'messages' => [['role' => 'user', 'content' => $input]],
+                'messages' => [
+                    ['role' => 'system', 'content' => $system],
+                    ['role' => 'user',   'content' => $user],
+                ],
             ]),
         ];
 
