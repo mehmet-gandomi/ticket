@@ -42,7 +42,10 @@ function FileChip({ name, size, onRemove }: { name: string; size: number; onRemo
   );
 }
 
-export function AttachmentsUploader({ defaultFiles = [] }: { defaultFiles?: ExistingFile[] }) {
+export function AttachmentsUploader({ defaultFiles = [], onFilesChange }: {
+  defaultFiles?: ExistingFile[];
+  onFilesChange?: (files: File[]) => void;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [existing, setExisting] = useState<ExistingFile[]>(defaultFiles);
   const [files, setFiles] = useState<AttachedFile[]>([]);
@@ -53,8 +56,20 @@ export function AttachmentsUploader({ defaultFiles = [] }: { defaultFiles?: Exis
       id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
       file,
     }));
-    setFiles((prev) => [...prev, ...next]);
+    setFiles((prev) => {
+      const updated = [...prev, ...next];
+      onFilesChange?.(updated.map((f) => f.file));
+      return updated;
+    });
     e.target.value = '';
+  }
+
+  function removeFile(id: string) {
+    setFiles((prev) => {
+      const updated = prev.filter((x) => x.id !== id);
+      onFilesChange?.(updated.map((f) => f.file));
+      return updated;
+    });
   }
 
   const hasFiles = existing.length > 0 || files.length > 0;
@@ -107,7 +122,7 @@ export function AttachmentsUploader({ defaultFiles = [] }: { defaultFiles?: Exis
               key={id}
               name={file.name}
               size={file.size}
-              onRemove={() => setFiles((prev) => prev.filter((x) => x.id !== id))}
+              onRemove={() => removeFile(id)}
             />
           ))}
         </div>

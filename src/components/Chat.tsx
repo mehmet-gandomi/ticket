@@ -1,5 +1,16 @@
 import type { ChatMessage } from '../data/mock';
 
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function getExt(name: string): string {
+  const parts = name.split('.');
+  return parts.length > 1 ? parts[parts.length - 1].toUpperCase() : 'FILE';
+}
+
 export function ChatBubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.author === 'user';
   return (
@@ -27,9 +38,27 @@ export function ChatBubble({ msg }: { msg: ChatMessage }) {
             ? 'bg-brand-tint rounded-[24px_0_24px_24px]'
             : 'bg-success-tint rounded-[0_24px_24px_24px]'
         }`}
-      >
-        {msg.body}
-      </div>
+        dangerouslySetInnerHTML={{ __html: msg.body }}
+      />
+      {msg.attachments && msg.attachments.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 pt-0.5">
+          {msg.attachments.map((a) => (
+            <a
+              key={a.id}
+              href={a.url}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 h-8 pl-2 pr-3 rounded-lg border border-line bg-white text-[11px] hover:border-brand transition"
+            >
+              <span className="px-1.5 py-0.5 rounded-md bg-brand-tint text-brand text-[9px] font-bold shrink-0">
+                {getExt(a.filename)}
+              </span>
+              <span className="truncate text-ink-700 max-w-[120px]">{a.filename}</span>
+              <span className="text-ink-400 tabular shrink-0">{formatSize(a.size)}</span>
+            </a>
+          ))}
+        </div>
+      )}
       <div className={`flex items-center gap-2 text-[11px] text-ink-400 px-3 ${isUser ? 'self-end' : 'self-start flex-row-reverse'}`}>
         <span className="tabular">{msg.date}</span>
         <span className="tabular">{msg.time}</span>

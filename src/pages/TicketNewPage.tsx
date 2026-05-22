@@ -10,10 +10,11 @@ export function TicketNewPage() {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(payload: { title: string; body: string; priority: string; category_id?: number | null }) {
+  async function handleSubmit(payload: { title: string; body: string; priority: string; category_id?: number | null; files: File[] }) {
     setSubmitting(true);
     try {
       const ticket = await ticketsApi.create(payload);
+      await Promise.all(payload.files.map((f) => ticketsApi.uploadAttachment(ticket.id, f)));
       if (ticket.aiStatus === 'done' && ticket.aiSuggestion) {
         navigate(`/tickets/${ticket.id}/ai-show`);
       } else {

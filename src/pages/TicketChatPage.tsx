@@ -20,10 +20,11 @@ export function TicketChatPage() {
 
   const [ticket, setTicket]     = useState<Ticket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [draft, setDraft]       = useState('');
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState<string | null>(null);
-  const [sending, setSending]   = useState(false);
+  const [draft, setDraft]             = useState('');
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState<string | null>(null);
+  const [sending, setSending]         = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -50,7 +51,16 @@ export function TicketChatPage() {
       const res = isAdmin
         ? await adminApi.replyToTicket(id, draft)
         : await ticketsApi.sendMessage(id, draft);
-      setMessages(res.messages);
+
+      const newMsgId = res.messages[res.messages.length - 1]?.id;
+      if (newMsgId && pendingFiles.length > 0) {
+        await Promise.all(pendingFiles.map((f) => ticketsApi.uploadAttachment(id, f, newMsgId)));
+        setPendingFiles([]);
+      }
+
+      // Re-fetch to get messages with fresh attachment data
+      const detail = await ticketsApi.detail(id);
+      setMessages(detail.messages);
       setDraft('');
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'خطا در ارسال پیام');
@@ -125,12 +135,13 @@ export function TicketChatPage() {
         <div className="flex flex-col gap-3 max-h-[320px] overflow-auto thin-scroll p-1">
           {messages.map((m) => (
             <ChatBubble key={m.id} msg={{
-              id:         m.id,
-              author:     m.authorType,
-              authorName: m.authorName,
-              body:       m.body,
-              date:       m.createdAt.slice(0, 10),
-              time:       m.createdAt.slice(11, 16),
+              id:          m.id,
+              author:      m.authorType,
+              authorName:  m.authorName,
+              body:        m.body,
+              date:        m.createdAt.slice(0, 10),
+              time:        m.createdAt.slice(11, 16),
+              attachments: m.attachments,
             }} />
           ))}
         </div>
@@ -145,7 +156,7 @@ export function TicketChatPage() {
                 onChange={setDraft}
               />
             </div>
-            <AttachmentsUploader />
+            <AttachmentsUploader onFilesChange={setPendingFiles} />
             <div className="h-px bg-line" />
             <div className="flex">
               <Button variant="primary" size="md" onClick={send} disabled={sending}>

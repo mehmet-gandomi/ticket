@@ -5,7 +5,7 @@ namespace ATS;
 
 final class Database {
 
-    private const DB_VERSION = '1.2.0';
+    private const DB_VERSION = '1.3.0';
 
     private static ?self $instance = null;
 
@@ -75,6 +75,22 @@ final class Database {
             updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY idx_category (category_id)
+        ) ENGINE=InnoDB {$charset};");
+
+        dbDelta("CREATE TABLE {$this->db->prefix}ats_attachments (
+            id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            ticket_id   BIGINT UNSIGNED NOT NULL,
+            message_id  BIGINT UNSIGNED DEFAULT NULL,
+            user_id     BIGINT UNSIGNED NOT NULL,
+            filename    VARCHAR(255)    NOT NULL,
+            stored_name VARCHAR(255)    NOT NULL,
+            file_url    VARCHAR(512)    NOT NULL,
+            file_size   BIGINT UNSIGNED NOT NULL DEFAULT 0,
+            mime_type   VARCHAR(100)    NOT NULL DEFAULT '',
+            created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY idx_ticket  (ticket_id),
+            KEY idx_message (message_id)
         ) ENGINE=InnoDB {$charset};");
 
         update_option('ats_db_version', self::DB_VERSION);
@@ -384,6 +400,36 @@ final class Database {
             $this->db->prefix . 'ats_saved_answers',
             ['id' => $id],
             ['%d']
+        );
+    }
+
+    // ── Attachments ───────────────────────────────────────────────────────────
+
+    public function create_attachment(int $ticket_id, ?int $message_id, int $user_id, string $filename, string $stored_name, string $file_url, int $file_size, string $mime_type): int|false {
+        $result = $this->db->insert(
+            $this->db->prefix . 'ats_attachments',
+            [
+                'ticket_id'   => $ticket_id,
+                'message_id'  => $message_id,
+                'user_id'     => $user_id,
+                'filename'    => $filename,
+                'stored_name' => $stored_name,
+                'file_url'    => $file_url,
+                'file_size'   => $file_size,
+                'mime_type'   => $mime_type,
+            ],
+            ['%d', $message_id !== null ? '%d' : '%s', '%d', '%s', '%s', '%s', '%d', '%s']
+        );
+        return $result !== false ? (int) $this->db->insert_id : false;
+    }
+
+    public function get_attachments_for_ticket(int $ticket_id): array {
+        return $this->db->get_results(
+            $this->db->prepare(
+                "SELECT * FROM {$this->db->prefix}ats_attachments WHERE ticket_id = %d ORDER BY created_at ASC",
+                $ticket_id
+            ),
+            ARRAY_A
         );
     }
 }

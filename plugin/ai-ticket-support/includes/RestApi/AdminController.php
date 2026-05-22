@@ -186,8 +186,25 @@ final class AdminController extends AbstractController {
 
         $db->update_ticket_status($id, 'pending');
 
-        $messages = $db->get_messages($id);
-        return $this->created(['messages' => array_map([$this, 'format_message'], $messages)]);
+        $messages   = $db->get_messages($id);
+        $att_by_msg = $this->group_attachments($db->get_attachments_for_ticket($id));
+        return $this->created(['messages' => array_map(fn($m) => $this->format_message($m, $att_by_msg[(string) $m['id']] ?? []), $messages)]);
+    }
+
+    private function group_attachments(array $all): array {
+        $grouped = [];
+        foreach ($all as $a) {
+            if ($a['message_id']) {
+                $grouped[(string) $a['message_id']][] = [
+                    'id'       => (string) $a['id'],
+                    'url'      => $a['file_url'],
+                    'filename' => $a['filename'],
+                    'size'     => (int) $a['file_size'],
+                    'mimeType' => $a['mime_type'],
+                ];
+            }
+        }
+        return $grouped;
     }
 
     // ── Categories ────────────────────────────────────────────────────────────
@@ -288,14 +305,15 @@ final class AdminController extends AbstractController {
         ];
     }
 
-    private function format_message(array $m): array {
+    private function format_message(array $m, array $attachments = []): array {
         return [
-            'id'         => (string) $m['id'],
-            'ticketId'   => (string) $m['ticket_id'],
-            'authorType' => $m['author_type'],
-            'authorName' => $m['author_name'] ?? ($m['author_type'] === 'support' ? 'پشتیبان' : 'کاربر'),
-            'body'       => $m['body'],
-            'createdAt'  => $m['created_at'],
+            'id'          => (string) $m['id'],
+            'ticketId'    => (string) $m['ticket_id'],
+            'authorType'  => $m['author_type'],
+            'authorName'  => $m['author_name'] ?? ($m['author_type'] === 'support' ? 'پشتیبان' : 'کاربر'),
+            'body'        => $m['body'],
+            'createdAt'   => $m['created_at'],
+            'attachments' => $attachments,
         ];
     }
 

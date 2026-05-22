@@ -75,6 +75,18 @@ final class TicketsController extends AbstractController {
             ],
         ]);
 
+        register_rest_route(self::NAMESPACE, '/tickets/(?P<id>\d+)/attachments', [
+            [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'upload_attachment'],
+                'permission_callback' => [$this, 'require_logged_in'],
+                'args'                => [
+                    'id'         => ['type' => 'integer'],
+                    'message_id' => ['type' => 'integer', 'default' => null],
+                ],
+            ],
+        ]);
+
         register_rest_route(self::NAMESPACE, '/tickets/(?P<id>\d+)/ai-resolve', [
             [
                 'methods'             => 'POST',
@@ -158,11 +170,24 @@ final class TicketsController extends AbstractController {
             return $this->forbidden();
         }
 
-        $messages = $db->get_messages($id);
+        $messages    = $db->get_messages($id);
+        $all_att     = $db->get_attachments_for_ticket($id);
+        $att_by_msg  = [];
+        $att_no_msg  = [];
+        foreach ($all_att as $att) {
+            if ($att['message_id']) {
+                $att_by_msg[(string) $att['message_id']][] = $this->format_attachment($att);
+            } else {
+                $att_no_msg[] = $this->format_attachment($att);
+            }
+        }
 
         return $this->ok([
-            'ticket'   => $this->format_ticket($ticket),
-            'messages' => array_map([$this, 'format_message'], $messages),
+            'ticket'      => $this->format_ticket($ticket),
+            'messages'    => array_map(function($m) use ($att_by_msg) {
+                return $this->format_message($m, $att_by_msg[(string) $m['id']] ?? []);
+            }, $messages),
+            'attachments' => $att_no_msg,
         ]);
     }
 
@@ -224,6 +249,54 @@ final class TicketsController extends AbstractController {
         return $this->ok($this->format_ticket($ticket));
     }
 
+    public function upload_attachment(WP_REST_Request $req): WP_REST_Response|WP_Error {
+        $db      = Database::instance();
+        $id      = (int) $req->get_param('id');
+        $user_id = get_current_user_id();
+
+        $ticket = $db->get_ticket($id);
+        if ($ticket === null) {
+            return $this->not_found('Ticket not found.');
+        }
+        if ((int) $ticket['user_id'] !== $user_id && ! current_user_can('manage_options')) {
+            return $this->forbidden();
+        }
+        if (empty($_FILES['file'])) {
+            return $this->error('no_file', 'No file provided.', 400);
+        }
+
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+
+        $upload = wp_handle_upload($_FILES['file'], ['test_form' => false]);
+        if (isset($upload['error'])) {
+            return $this->error('upload_error', $upload['error'], 400);
+        }
+
+        $message_id = $req->get_param('message_id') ? (int) $req->get_param('message_id') : null;
+        $att_id = $db->create_attachment(
+            $id,
+            $message_id,
+            $user_id,
+            sanitize_file_name($_FILES['file']['name']),
+            basename($upload['file']),
+            $upload['url'],
+            (int) filesize($upload['file']),
+            $upload['type']
+        );
+
+        if ($att_id === false) {
+            return $this->error('db_error', 'Failed to save attachment.', 500);
+        }
+
+        return $this->created([
+            'id'       => (string) $att_id,
+            'url'      => $upload['url'],
+            'filename' => sanitize_file_name($_FILES['file']['name']),
+            'size'     => (int) filesize($upload['file']),
+            'mimeType' => $upload['type'],
+        ]);
+    }
+
     public function categories_index(): WP_REST_Response {
         $cats = Database::instance()->get_categories();
         return $this->ok(array_map(fn($c) => [
@@ -260,14 +333,25 @@ final class TicketsController extends AbstractController {
         ];
     }
 
-    private function format_message(array $m): array {
+    private function format_message(array $m, array $attachments = []): array {
         return [
-            'id'         => (string) $m['id'],
-            'ticketId'   => (string) $m['ticket_id'],
-            'authorType' => $m['author_type'],
-            'authorName' => $m['author_name'] ?? ($m['author_type'] === 'support' ? 'پشتیبان' : 'کاربر'),
-            'body'       => $m['body'],
-            'createdAt'  => $m['created_at'],
+            'id'          => (string) $m['id'],
+            'ticketId'    => (string) $m['ticket_id'],
+            'authorType'  => $m['author_type'],
+            'authorName'  => $m['author_name'] ?? ($m['author_type'] === 'support' ? 'پشتیبان' : 'کاربر'),
+            'body'        => $m['body'],
+            'createdAt'   => $m['created_at'],
+            'attachments' => $attachments,
+        ];
+    }
+
+    private function format_attachment(array $a): array {
+        return [
+            'id'       => (string) $a['id'],
+            'url'      => $a['file_url'],
+            'filename' => $a['filename'],
+            'size'     => (int) $a['file_size'],
+            'mimeType' => $a['mime_type'],
         ];
     }
 
