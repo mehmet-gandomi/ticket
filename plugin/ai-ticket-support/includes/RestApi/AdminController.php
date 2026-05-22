@@ -50,7 +50,7 @@ final class AdminController extends AbstractController {
              'args' => [
                 'id'     => ['type' => 'integer'],
                 'status' => ['type' => 'string', 'required' => true,
-                             'enum' => ['unreviewed', 'reviewing', 'pending', 'answered', 'closed', 'spam']],
+                             'enum' => ['unreviewed', 'reviewing', 'pending', 'answered', 'closed', 'spam', 'ai_resolved']],
              ]],
             ['methods' => 'DELETE', 'callback' => [$this, 'tickets_destroy'], 'permission_callback' => $admin,
              'args' => ['id' => ['type' => 'integer']]],
@@ -124,7 +124,7 @@ final class AdminController extends AbstractController {
         $tickets = $db->get_all_tickets($filters, $page, $per);
         $total   = $db->count_all_tickets($filters);
 
-        $statuses = ['unreviewed', 'reviewing', 'pending', 'answered', 'closed', 'spam'];
+        $statuses = ['unreviewed', 'reviewing', 'pending', 'answered', 'closed', 'spam', 'ai_resolved'];
         $counts   = [];
         foreach ($statuses as $s) {
             $counts[$s] = $db->count_all_tickets(['status' => $s]);
@@ -175,7 +175,7 @@ final class AdminController extends AbstractController {
         if ($ticket === null) {
             return $this->not_found('Ticket not found.');
         }
-        if ($ticket['status'] === 'closed') {
+        if (in_array($ticket['status'], ['closed', 'ai_resolved'], true)) {
             return $this->error('ticket_closed', 'This ticket is closed.', 422);
         }
 

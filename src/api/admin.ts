@@ -1,7 +1,7 @@
 import { api } from './client';
 import type { Message } from './tickets';
 
-export type AdminState = 'unreviewed' | 'reviewing' | 'pending' | 'answered' | 'closed' | 'spam';
+export type AdminState = 'unreviewed' | 'reviewing' | 'pending' | 'answered' | 'closed' | 'spam' | 'ai_resolved';
 
 export interface AdminTicket {
   id: string;
@@ -50,12 +50,13 @@ export interface Settings {
 }
 
 export const adminStateMap: Record<AdminState, { color: 'default'|'primary'|'success'|'warning'|'danger'|'violet'; label: string }> = {
-  unreviewed: { color: 'danger',  label: 'بررسی نشده' },
-  reviewing:  { color: 'primary', label: 'درحال بررسی' },
-  pending:    { color: 'warning', label: 'در انتظار پاسخ' },
-  answered:   { color: 'success', label: 'پاسخ داده شده' },
-  closed:     { color: 'default', label: 'بسته شده' },
-  spam:       { color: 'violet',  label: 'اسپم' },
+  unreviewed:  { color: 'danger',  label: 'بررسی نشده' },
+  reviewing:   { color: 'primary', label: 'درحال بررسی' },
+  pending:     { color: 'warning', label: 'در انتظار پاسخ' },
+  answered:    { color: 'success', label: 'پاسخ داده شده' },
+  closed:      { color: 'default', label: 'بسته شده' },
+  spam:        { color: 'violet',  label: 'اسپم' },
+  ai_resolved: { color: 'success', label: 'پاسخ هوشمند' },
 };
 
 export const adminApi = {

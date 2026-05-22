@@ -206,7 +206,7 @@ final class TicketsController extends AbstractController {
         if ((int) $ticket['user_id'] !== $user_id && ! current_user_can('manage_options')) {
             return $this->forbidden();
         }
-        if ($ticket['status'] === 'closed') {
+        if (in_array($ticket['status'], ['closed', 'ai_resolved'], true)) {
             return $this->error('ticket_closed', 'This ticket is closed.', 422);
         }
 
@@ -239,7 +239,7 @@ final class TicketsController extends AbstractController {
         if ((int) $ticket['user_id'] !== $user_id) {
             return $this->forbidden();
         }
-        if ($ticket['status'] === 'closed') {
+        if (in_array($ticket['status'], ['closed', 'ai_resolved'], true)) {
             return $this->error('already_closed', 'Ticket is already closed.', 422);
         }
         if (empty($ticket['ai_suggestion'])) {
@@ -364,6 +364,7 @@ final class TicketsController extends AbstractController {
             'pending'                          => 'answered',
             'answered'                         => 'answered',
             'closed'                           => 'closed',
+            'ai_resolved'                      => 'closed',
             default                            => 'pending',
         };
     }

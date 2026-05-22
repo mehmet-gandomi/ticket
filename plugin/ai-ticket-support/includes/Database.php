@@ -273,7 +273,7 @@ final class Database {
         );
         return (bool) $this->db->update(
             $this->db->prefix . 'ats_tickets',
-            ['status' => 'closed', 'ai_resolved' => 1, 'updated_at' => current_time('mysql')],
+            ['status' => 'ai_resolved', 'ai_resolved' => 1, 'updated_at' => current_time('mysql')],
             ['id' => $ticket_id],
             ['%s', '%d', '%s'],
             ['%d']

@@ -146,7 +146,7 @@ export function TicketChatPage() {
           ))}
         </div>
 
-        {ticket.adminState !== 'closed' && (
+        {ticket.adminState !== 'closed' && ticket.adminState !== 'ai_resolved' && (
           <>
             <div className="h-px bg-line" />
             <div className="flex flex-col gap-1.5">

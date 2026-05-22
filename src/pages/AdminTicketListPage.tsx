@@ -57,7 +57,13 @@ function DeleteConfirmModal({ ticketId, onClose, onConfirm }: {
   );
 }
 
-function StatBox({ count, label, tint }: { count: number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet'|'success' }) {
+function StatBox({ count, label, tint, active, onClick }: {
+  count: number;
+  label: string;
+  tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet'|'success';
+  active?: boolean;
+  onClick?: () => void;
+}) {
   const tints: Record<string, string> = {
     gray:    'bg-surface-100 text-ink-700',
     warning: 'bg-[#FFF8EC] text-[#B47100]',
@@ -68,17 +74,20 @@ function StatBox({ count, label, tint }: { count: number; label: string; tint: '
     success: 'bg-[#EAFAF3] text-success',
   };
   return (
-    <div className={`flex-1 rounded-2xl px-5 py-4 flex flex-col items-center gap-1 ${tints[tint]}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex-1 rounded-2xl px-5 py-4 flex flex-col items-center gap-1 transition ${tints[tint]} ${active ? 'ring-2 ring-inset ring-current' : 'hover:opacity-80'}`}
+    >
       <div className="text-[19px] font-bold tabular">{count}</div>
       <div className="text-[11px]">{label}</div>
-    </div>
+    </button>
   );
 }
 
 export function AdminTicketListPage() {
   const [tickets, setTickets]     = useState<AdminTicket[]>([]);
   const [counts, setCounts]       = useState<Record<string, number>>({});
-  const [aiResolved, setAiResolved] = useState(0);
   const [total, setTotal]         = useState(0);
   const [page, setPage]           = useState(1);
   const [filter, setFilter]       = useState<AdminState | 'all'>('all');
@@ -106,7 +115,6 @@ export function AdminTicketListPage() {
         setTickets(res.items);
         setTotal(res.total_pages);
         setCounts({ ...res.counts, all: res.total });
-        setAiResolved(res.aiResolved ?? 0);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -152,14 +160,15 @@ export function AdminTicketListPage() {
         </div>
       </Field>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-        <StatBox count={counts.all        ?? 0} label="همه تیکت ها"      tint="default" />
-        <StatBox count={counts.unreviewed ?? 0} label="بررسی نشده"        tint="danger"  />
-        <StatBox count={counts.reviewing  ?? 0} label="در حال بررسی"     tint="primary" />
-        <StatBox count={counts.pending    ?? 0} label="در انتظار پاسخ"   tint="warning" />
-        <StatBox count={counts.closed     ?? 0} label="بسته شده"          tint="gray"    />
-        <StatBox count={counts.spam       ?? 0} label="اسپم"              tint="violet"  />
-        <StatBox count={aiResolved}             label="پاسخ هوشمند"       tint="success" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+        <StatBox count={counts.all         ?? 0} label="همه تیکت‌ها"      tint="default" active={filter === 'all'}         onClick={() => { setFilter('all');         setPage(1); }} />
+        <StatBox count={counts.unreviewed  ?? 0} label="بررسی نشده"       tint="danger"  active={filter === 'unreviewed'}  onClick={() => { setFilter('unreviewed');  setPage(1); }} />
+        <StatBox count={counts.reviewing   ?? 0} label="در حال بررسی"     tint="primary" active={filter === 'reviewing'}   onClick={() => { setFilter('reviewing');   setPage(1); }} />
+        <StatBox count={counts.pending     ?? 0} label="در انتظار پاسخ"   tint="warning" active={filter === 'pending'}     onClick={() => { setFilter('pending');     setPage(1); }} />
+        <StatBox count={counts.answered    ?? 0} label="پاسخ داده شده"    tint="success" active={filter === 'answered'}    onClick={() => { setFilter('answered');    setPage(1); }} />
+        <StatBox count={counts.closed      ?? 0} label="بسته شده"         tint="gray"    active={filter === 'closed'}      onClick={() => { setFilter('closed');      setPage(1); }} />
+        <StatBox count={counts.spam        ?? 0} label="اسپم"              tint="violet"  active={filter === 'spam'}        onClick={() => { setFilter('spam');        setPage(1); }} />
+        <StatBox count={counts.ai_resolved ?? 0} label="پاسخ هوشمند"      tint="success" active={filter === 'ai_resolved'} onClick={() => { setFilter('ai_resolved'); setPage(1); }} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -171,6 +180,7 @@ export function AdminTicketListPage() {
           <option value="answered">پاسخ داده شده</option>
           <option value="closed">بسته شده</option>
           <option value="spam">اسپم</option>
+          <option value="ai_resolved">پاسخ هوشمند</option>
         </Select>
         <Select value={priority} onChange={(e) => { setPriority(e.target.value); setPage(1); }}>
           <option value="all">همه الویت‌ها</option>
@@ -195,6 +205,7 @@ export function AdminTicketListPage() {
               <option value="answered">پاسخ داده شده</option>
               <option value="closed">بسته شده</option>
               <option value="spam">اسپم</option>
+              <option value="ai_resolved">پاسخ هوشمند</option>
             </Select>
             {bulkStatus && <Button variant="primary" size="sm" onClick={applyBulkStatus}>اعمال</Button>}
           </div>
