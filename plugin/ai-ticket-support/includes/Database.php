@@ -155,8 +155,9 @@ final class Database {
             $values[] = $filters['priority'];
         }
         if (!empty($filters['search'])) {
-            $where[]  = '(title LIKE %s OR CAST(id AS CHAR) LIKE %s)';
+            $where[]  = "(t.title LIKE %s OR CAST(t.id AS CHAR) LIKE %s OR u.display_name LIKE %s)";
             $like     = '%' . $this->db->esc_like($filters['search']) . '%';
+            $values[] = $like;
             $values[] = $like;
             $values[] = $like;
         }
@@ -184,22 +185,25 @@ final class Database {
         $values = [];
 
         if (!empty($filters['status'])) {
-            $where[]  = 'status = %s';
+            $where[]  = 't.status = %s';
             $values[] = $filters['status'];
         }
         if (!empty($filters['priority'])) {
-            $where[]  = 'priority = %s';
+            $where[]  = 't.priority = %s';
             $values[] = $filters['priority'];
         }
         if (!empty($filters['search'])) {
-            $where[]  = '(title LIKE %s OR CAST(id AS CHAR) LIKE %s)';
+            $where[]  = "(t.title LIKE %s OR CAST(t.id AS CHAR) LIKE %s OR u.display_name LIKE %s)";
             $like     = '%' . $this->db->esc_like($filters['search']) . '%';
+            $values[] = $like;
             $values[] = $like;
             $values[] = $like;
         }
 
         $sql_where = implode(' AND ', $where);
-        $base      = "SELECT COUNT(*) FROM {$this->db->prefix}ats_tickets WHERE {$sql_where}";
+        $base      = "SELECT COUNT(*) FROM {$this->db->prefix}ats_tickets t
+                      LEFT JOIN {$this->db->prefix}users u ON u.ID = t.user_id
+                      WHERE {$sql_where}";
 
         $query = $values
             ? $this->db->prepare($base, ...$values)

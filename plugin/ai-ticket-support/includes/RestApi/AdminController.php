@@ -125,7 +125,7 @@ final class AdminController extends AbstractController {
         $total   = $db->count_all_tickets($filters);
 
         $statuses = ['unreviewed', 'reviewing', 'pending', 'answered', 'closed', 'spam', 'ai_resolved'];
-        $counts   = [];
+        $counts   = ['all' => $db->count_all_tickets([])];
         foreach ($statuses as $s) {
             $counts[$s] = $db->count_all_tickets(['status' => $s]);
         }

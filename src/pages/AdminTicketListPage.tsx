@@ -114,7 +114,7 @@ export function AdminTicketListPage() {
       .then((res) => {
         setTickets(res.items);
         setTotal(res.total_pages);
-        setCounts({ ...res.counts, all: res.total });
+        setCounts(res.counts);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -153,9 +153,9 @@ export function AdminTicketListPage() {
         }
       />
 
-      <Field label="شماره تیکت" hint="شماره تیکت مد نظر خودتان را وارد کنید">
+      <Field label="جستجو" hint="جستجو بر اساس شماره تیکت، موضوع یا نام کاربر">
         <div className="relative">
-          <Input placeholder="شماره تیکت" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+          <Input placeholder="شماره تیکت، موضوع یا نام کاربر..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
         </div>
       </Field>
