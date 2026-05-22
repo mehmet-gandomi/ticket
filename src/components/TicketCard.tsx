@@ -38,22 +38,24 @@ export function TicketCard({ ticket }: { ticket: TicketSummary }) {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
           <div className="flex flex-col gap-1 min-w-0">
             <p className="text-[13px] text-ink-900 leading-6 font-semibold">{ticket.title}</p>
-            <div className="flex items-center gap-1.5 sm:gap-3 text-[10px] sm:text-[11px] text-ink-400 tabular flex-wrap">
+            <div className="flex items-center gap-1.5 sm:gap-3 text-[10px] sm:text-[11px] text-ink-400 tabular flex-nowrap overflow-hidden">
               <span className="font-bold text-brand text-[12px] sm:text-[14px] shrink-0">#{ticket.id}</span>
-              <span className="w-px h-3 bg-line shrink-0" />
-              <span className="shrink-0">ثبت: {ticket.date} {ticket.time}</span>
               {ticket.ago && (
                 <>
                   <span className="w-px h-3 bg-line shrink-0" />
-                  <span className="shrink-0 text-ink-600">آخرین فعالیت: {ticket.ago}</span>
+                  <span className="shrink-0">{ticket.ago}</span>
                 </>
               )}
+              <span className="w-px h-3 bg-line shrink-0" />
+              <span className="shrink-0">{ticket.time}</span>
+              <span className="w-px h-3 bg-line shrink-0" />
+              <span className="shrink-0">{ticket.date}</span>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 sm:shrink-0">
-            <Label color={status.color} size="md">{status.label}</Label>
-            <span className="w-px h-4 bg-line hidden sm:block" aria-hidden />
             <Label color={priority.color} size="md" icon={<Flag size={16} />}>{priority.label}</Label>
+            <span className="w-px h-4 bg-line hidden sm:block" aria-hidden />
+            <Label color={status.color} size="md">{status.label}</Label>
           </div>
         </div>
 

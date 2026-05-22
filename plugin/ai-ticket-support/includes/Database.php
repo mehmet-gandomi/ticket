@@ -92,7 +92,7 @@ final class Database {
                  FROM {$this->db->prefix}ats_tickets t
                  LEFT JOIN {$this->db->prefix}ats_categories c ON c.id = t.category_id
                  WHERE t.user_id = %d
-                 ORDER BY t.updated_at DESC
+                 ORDER BY t.created_at DESC
                  LIMIT %d OFFSET %d",
                 $user_id, $per_page, $offset
             ),
