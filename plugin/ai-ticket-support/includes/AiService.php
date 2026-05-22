@@ -28,6 +28,7 @@ final class AiService {
 - فقط از اطلاعات موجود در پایگاه دانش زیر استفاده کن.
 - پاسخ را با کلمات خودت بنویس. متن پایگاه دانش را کپی نکن.
 - اگر جواب نیاز به مراحل دارد، آن‌ها را به صورت قدم‌به‌قدم بنویس.
+- اگر در پایگاه دانش لینکی وجود دارد، آن را عیناً در پاسخ ذکر کن.
 - همه اطلاعات لازم را بگو — نه کمتر، نه بیشتر. اضافه‌گویی نکن.
 - از ایموجی استفاده نکن.
 - زبان ساده و قابل فهم به کار ببر.
@@ -114,6 +115,21 @@ SYS;
         return $score;
     }
 
+    /**
+     * Convert HTML to plain text while keeping anchor URLs visible.
+     * e.g. <a href="https://example.com">کلیک کنید</a>
+     *   →  کلیک کنید (https://example.com)
+     */
+    private function html_to_text(string $html): string {
+        // Replace <a href="URL">text</a> with "text (URL)"
+        $text = preg_replace_callback(
+            '/<a\s[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is',
+            static fn($m) => trim(strip_tags($m[2])) . ' (' . $m[1] . ')',
+            $html
+        );
+        return strip_tags((string) $text);
+    }
+
     private function tokenize(string $text): array {
         $text  = mb_strtolower(strip_tags($text));
         $words = preg_split('/[\s\.,،؛:!\?؟\-\/\(\)]+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
@@ -126,7 +142,7 @@ SYS;
     private function build_prompt(string $title, string $message, array $answers): string {
         $kb = '';
         foreach ($answers as $i => $a) {
-            $body = strip_tags((string) $a['body']);
+            $body = $this->html_to_text((string) $a['body']);
             $body = preg_replace('/\s+/', ' ', trim($body));
             if (mb_strlen($body) > self::MAX_BODY_CHARS) {
                 $body = mb_substr($body, 0, self::MAX_BODY_CHARS) . '…';
