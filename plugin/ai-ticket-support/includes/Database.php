@@ -230,6 +230,11 @@ final class Database {
         );
     }
 
+    public function delete_ticket(int $id): void {
+        $this->db->delete($this->db->prefix . 'ats_messages', ['ticket_id' => $id], ['%d']);
+        $this->db->delete($this->db->prefix . 'ats_tickets',  ['id'        => $id], ['%d']);
+    }
+
     public function resolve_ticket_with_ai(int $ticket_id, string $ai_body): bool {
         $this->db->insert(
             $this->db->prefix . 'ats_messages',

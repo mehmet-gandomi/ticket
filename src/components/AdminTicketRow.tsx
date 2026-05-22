@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Flag } from '../icons';
+import { ChevronLeft, Flag, Trash } from '../icons';
 import { Label } from './Label';
 import { adminStateMap, type AdminState } from '../api/admin';
 
@@ -21,10 +21,11 @@ const priorityMap = {
   high: { color: 'danger' as const, label: 'الویت بالا' },
 };
 
-export function AdminTicketRow({ ticket, selected, onToggle }: {
+export function AdminTicketRow({ ticket, selected, onToggle, onDelete }: {
   ticket: AdminTicket;
   selected: boolean;
   onToggle: () => void;
+  onDelete?: () => void;
 }) {
   const s = adminStateMap[ticket.state];
   const p = priorityMap[ticket.priority];
@@ -68,12 +69,22 @@ export function AdminTicketRow({ ticket, selected, onToggle }: {
         <p className="text-[12px] text-ink-500 leading-5 text-right truncate">{ticket.preview}</p>
       </div>
 
-      <button
-        onClick={() => nav(`/tickets/${ticket.id}`)}
-        className="grid place-items-center size-7 shrink-0 text-ink-400 hover:text-brand transition"
-      >
-        <ChevronLeft size={16} />
-      </button>
+      <div className="flex items-center gap-1 shrink-0">
+        {onDelete && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="grid place-items-center size-7 text-ink-400 hover:text-danger transition rounded-lg hover:bg-red-50"
+          >
+            <Trash size={15} />
+          </button>
+        )}
+        <button
+          onClick={() => nav(`/tickets/${ticket.id}`)}
+          className="grid place-items-center size-7 text-ink-400 hover:text-brand transition"
+        >
+          <ChevronLeft size={16} />
+        </button>
+      </div>
     </div>
   );
 }

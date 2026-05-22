@@ -22,6 +22,12 @@ interface TicketComposerProps {
   defaultMessage?: string;
 }
 
+const PRIORITIES = [
+  { value: 'low',    label: 'الویت کم' },
+  { value: 'medium', label: 'الویت متوسط' },
+  { value: 'high',   label: 'الویت بالا' },
+];
+
 export function TicketComposer({
   showCancel = true,
   showSubmit = true,
@@ -33,7 +39,9 @@ export function TicketComposer({
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState<string>('');
   const [customTitle, setCustomTitle] = useState('');
-  const [body, setBody] = useState('');
+  const [priority, setPriority]     = useState<string>('');
+  const [body, setBody]             = useState('');
+  const [submitted, setSubmitted]   = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -43,14 +51,24 @@ export function TicketComposer({
   const isCustom = categoryId === 'other';
   const title    = isCustom ? customTitle : (categories.find((c) => c.id === categoryId)?.title ?? '');
 
+  const errors = {
+    category: submitted && !categoryId,
+    title:    submitted && isCustom && !customTitle.trim(),
+    priority: submitted && !priority,
+    body:     submitted && !body.trim(),
+  };
+
+  const isValid = !!categoryId && (!isCustom || !!customTitle.trim()) && !!priority && !!body.trim();
+
   async function handleSubmit() {
-    if (!title.trim() || !body.trim()) return;
+    setSubmitted(true);
+    if (!isValid) return;
     setSubmitting(true);
     try {
       await onSubmit?.({
         title:       title.trim(),
         body:        body.trim(),
-        priority:    'low',
+        priority,
         category_id: categoryId && !isCustom ? Number(categoryId) : null,
       });
     } finally {
@@ -60,29 +78,51 @@ export function TicketComposer({
 
   return (
     <section className="rounded-3xl border border-line bg-white p-6 flex flex-col gap-4 w-full max-w-[583px]">
-      <Field label="موضوع تیکت" hint="موضوع تیکت خود را از بین گزینه ها مشخص کنید">
-        <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+      <Field label="موضوع تیکت *" hint="موضوع تیکت خود را از بین گزینه ها مشخص کنید">
+        <Select
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+          className={errors.category ? 'border-danger' : ''}
+        >
           <option value="" disabled>انتخاب کنید</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>{c.title}</option>
           ))}
           <option value="other">سایر</option>
         </Select>
+        {errors.category && <span className="text-[12px] text-danger text-right">لطفاً موضوع تیکت را انتخاب کنید</span>}
       </Field>
 
       {isCustom && (
-        <Field label="موضوع خود را بنویسید" hint="یک عنوان کوتاه برای تیکت انتخاب کنید">
+        <Field label="موضوع خود را بنویسید *" hint="یک عنوان کوتاه برای تیکت انتخاب کنید">
           <Input
             placeholder="مشکل وب"
             value={customTitle}
             onChange={(e) => setCustomTitle(e.target.value)}
+            className={errors.title ? 'border-danger' : ''}
           />
+          {errors.title && <span className="text-[12px] text-danger text-right">لطفاً عنوان تیکت را وارد کنید</span>}
         </Field>
       )}
 
+      <Field label="اولویت *" hint="اولویت تیکت خود را مشخص کنید">
+        <Select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          className={errors.priority ? 'border-danger' : ''}
+        >
+          <option value="" disabled>انتخاب کنید</option>
+          {PRIORITIES.map((p) => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </Select>
+        {errors.priority && <span className="text-[12px] text-danger text-right">لطفاً اولویت را انتخاب کنید</span>}
+      </Field>
+
       <div className="flex flex-col gap-1.5">
-        <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت</span>
+        <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت *</span>
         <RichEditor placeholder="مشکل خود را با جزئیات کامل توضیح دهید..." onChange={setBody} />
+        {errors.body && <span className="text-[12px] text-danger text-right">لطفاً پیام تیکت را وارد کنید</span>}
       </div>
 
       <AttachmentsUploader />

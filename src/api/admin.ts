@@ -77,6 +77,10 @@ export const adminApi = {
     return api.post(`/admin/tickets/${id}/messages`, { body });
   },
 
+  deleteTicket(id: string): Promise<void> {
+    return api.delete(`/admin/tickets/${id}`);
+  },
+
   // Categories
   categories(): Promise<Category[]> {
     return api.get('/admin/categories');

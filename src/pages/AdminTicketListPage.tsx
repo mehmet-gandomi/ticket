@@ -6,8 +6,55 @@ import { AdminTicketRow }     from '../components/AdminTicketRow';
 import { Field, Input, Select } from '../components/FormControls';
 import { Button }             from '../components/Button';
 import { Pagination }         from '../components/Pagination';
-import { Search, Setting }    from '../icons';
+import { Search, Setting, Trash, Close } from '../icons';
 import { adminApi, type AdminState, type AdminTicket } from '../api/admin';
+
+function DeleteConfirmModal({ ticketId, onClose, onConfirm }: {
+  ticketId: string;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const [deleting, setDeleting] = useState(false);
+
+  async function confirm() {
+    setDeleting(true);
+    try { await onConfirm(); } finally { setDeleting(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} dir="rtl"
+        className="bg-white rounded-3xl border border-line w-full max-w-[420px] flex flex-col">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4">
+          <h2 className="text-[16px] font-bold text-ink-900">حذف تیکت</h2>
+          <button onClick={onClose} className="size-9 grid place-items-center rounded-lg text-ink-500 hover:bg-surface-50">
+            <Close size={18} />
+          </button>
+        </div>
+        <div className="h-px bg-line" />
+        <div className="flex flex-col gap-5 p-6">
+          <div className="flex items-start gap-4">
+            <span className="size-11 rounded-2xl bg-red-50 grid place-items-center text-danger shrink-0">
+              <Trash size={20} />
+            </span>
+            <div className="flex flex-col gap-1 text-right">
+              <p className="text-[14px] font-bold text-ink-900">آیا مطمئن هستید؟</p>
+              <p className="text-[13px] text-ink-500 leading-6">
+                تیکت <span className="font-bold text-ink-700">#{ticketId}</span> و تمام پیام‌های آن به طور کامل حذف می‌شود و قابل بازگشت نیست.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="danger" size="md" onClick={confirm} disabled={deleting}>
+              {deleting ? 'در حال حذف...' : 'بله، حذف شود'}
+            </Button>
+            <Button variant="secondary" size="md" onClick={onClose}>انصراف</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function StatBox({ count, label, tint }: { count: number; label: string; tint: 'gray'|'warning'|'primary'|'danger'|'default'|'violet'|'success' }) {
   const tints: Record<string, string> = {
@@ -40,6 +87,7 @@ export function AdminTicketListPage() {
   const [bulkStatus, setBulkStatus] = useState<AdminState | ''>('');
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState<string | null>(null);
+  const [deleteId, setDeleteId]   = useState<string | null>(null);
 
   const nav = useNavigate();
 
@@ -80,6 +128,7 @@ export function AdminTicketListPage() {
   }
 
   return (
+    <>
     <PageContainer>
       <PageHeader
         title="ادمین پشتیبانی"
@@ -176,6 +225,7 @@ export function AdminTicketListPage() {
               }}
               selected={selected.has(t.id)}
               onToggle={() => toggle(t.id)}
+              onDelete={() => setDeleteId(t.id)}
             />
           ))}
         </div>
@@ -183,5 +233,18 @@ export function AdminTicketListPage() {
 
       <Pagination page={page} total={total} onChange={setPage} />
     </PageContainer>
+
+    {deleteId && (
+      <DeleteConfirmModal
+        ticketId={deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={async () => {
+          await adminApi.deleteTicket(deleteId);
+          setDeleteId(null);
+          load();
+        }}
+      />
+    )}
+    </>
   );
 }

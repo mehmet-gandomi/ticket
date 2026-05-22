@@ -46,12 +46,14 @@ final class AdminController extends AbstractController {
         ]);
 
         register_rest_route(self::NAMESPACE, '/admin/tickets/(?P<id>\d+)', [
-            ['methods' => 'PUT',  'callback' => [$this, 'tickets_update'], 'permission_callback' => $admin,
+            ['methods' => 'PUT',    'callback' => [$this, 'tickets_update'],  'permission_callback' => $admin,
              'args' => [
                 'id'     => ['type' => 'integer'],
                 'status' => ['type' => 'string', 'required' => true,
                              'enum' => ['unreviewed', 'reviewing', 'pending', 'answered', 'closed', 'spam']],
              ]],
+            ['methods' => 'DELETE', 'callback' => [$this, 'tickets_destroy'], 'permission_callback' => $admin,
+             'args' => ['id' => ['type' => 'integer']]],
         ]);
 
         register_rest_route(self::NAMESPACE, '/admin/tickets/(?P<id>\d+)/messages', [
@@ -150,6 +152,18 @@ final class AdminController extends AbstractController {
 
         $db->update_ticket_status($id, $status);
         return $this->ok($this->format_ticket($db->get_ticket($id)));
+    }
+
+    public function tickets_destroy(WP_REST_Request $req): WP_REST_Response|WP_Error {
+        $db = Database::instance();
+        $id = (int) $req->get_param('id');
+
+        if ($db->get_ticket($id) === null) {
+            return $this->not_found('Ticket not found.');
+        }
+
+        $db->delete_ticket($id);
+        return $this->ok(['deleted' => $id]);
     }
 
     public function tickets_reply(WP_REST_Request $req): WP_REST_Response|WP_Error {
