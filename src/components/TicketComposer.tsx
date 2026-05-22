@@ -38,7 +38,7 @@ export function TicketComposer({
 }: TicketComposerProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState<string>('');
-  const [customTitle, setCustomTitle] = useState('');
+  const [title, setTitle]           = useState('');
   const [priority, setPriority]     = useState<string>('');
   const [body, setBody]             = useState('');
   const [submitted, setSubmitted]   = useState(false);
@@ -48,17 +48,14 @@ export function TicketComposer({
     adminApi.categories().then(setCategories).catch(() => {});
   }, []);
 
-  const isCustom = categoryId === 'other';
-  const title    = isCustom ? customTitle : (categories.find((c) => c.id === categoryId)?.title ?? '');
-
   const errors = {
     category: submitted && !categoryId,
-    title:    submitted && isCustom && !customTitle.trim(),
+    title:    submitted && !title.trim(),
     priority: submitted && !priority,
     body:     submitted && !body.trim(),
   };
 
-  const isValid = !!categoryId && (!isCustom || !!customTitle.trim()) && !!priority && !!body.trim();
+  const isValid = !!categoryId && !!title.trim() && !!priority && !!body.trim();
 
   async function handleSubmit() {
     setSubmitted(true);
@@ -69,7 +66,7 @@ export function TicketComposer({
         title:       title.trim(),
         body:        body.trim(),
         priority,
-        category_id: categoryId && !isCustom ? Number(categoryId) : null,
+        category_id: categoryId ? Number(categoryId) : null,
       });
     } finally {
       setSubmitting(false);
@@ -78,7 +75,7 @@ export function TicketComposer({
 
   return (
     <section className="rounded-3xl border border-line bg-white p-6 flex flex-col gap-4 w-full max-w-[583px]">
-      <Field label="موضوع تیکت *" hint="موضوع تیکت خود را از بین گزینه ها مشخص کنید">
+      <Field label="دسته‌بندی" hint="دسته مرتبط با مشکل خود را انتخاب کنید">
         <Select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
@@ -88,24 +85,21 @@ export function TicketComposer({
           {categories.map((c) => (
             <option key={c.id} value={c.id}>{c.title}</option>
           ))}
-          <option value="other">سایر</option>
         </Select>
         {errors.category && <span className="text-[12px] text-danger text-right">لطفاً موضوع تیکت را انتخاب کنید</span>}
       </Field>
 
-      {isCustom && (
-        <Field label="موضوع خود را بنویسید *" hint="یک عنوان کوتاه برای تیکت انتخاب کنید">
-          <Input
-            placeholder="مشکل وب"
-            value={customTitle}
-            onChange={(e) => setCustomTitle(e.target.value)}
-            className={errors.title ? 'border-danger' : ''}
-          />
-          {errors.title && <span className="text-[12px] text-danger text-right">لطفاً عنوان تیکت را وارد کنید</span>}
-        </Field>
-      )}
+      <Field label="عنوان تیکت" hint="یک عنوان کوتاه برای تیکت انتخاب کنید">
+        <Input
+          placeholder="مشکل وب"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className={errors.title ? 'border-danger' : ''}
+        />
+        {errors.title && <span className="text-[12px] text-danger text-right">لطفاً عنوان تیکت را وارد کنید</span>}
+      </Field>
 
-      <Field label="اولویت *" hint="اولویت تیکت خود را مشخص کنید">
+      <Field label="اولویت" hint="اولویت تیکت خود را مشخص کنید">
         <Select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
@@ -120,7 +114,7 @@ export function TicketComposer({
       </Field>
 
       <div className="flex flex-col gap-1.5">
-        <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت *</span>
+        <span className="text-[13px] font-bold text-ink-900 text-right">پیام تیکت</span>
         <RichEditor placeholder="مشکل خود را با جزئیات کامل توضیح دهید..." onChange={setBody} />
         {errors.body && <span className="text-[12px] text-danger text-right">لطفاً پیام تیکت را وارد کنید</span>}
       </div>
