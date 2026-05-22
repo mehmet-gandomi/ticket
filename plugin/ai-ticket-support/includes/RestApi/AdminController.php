@@ -291,6 +291,10 @@ final class AdminController extends AbstractController {
     // ── Formatters ────────────────────────────────────────────────────────────
 
     private function format_ticket(array $t): array {
+        $raw_body = strip_tags((string) ($t['first_body'] ?? ''));
+        $raw_body = preg_replace('/\s+/', ' ', trim($raw_body));
+        $preview  = mb_strlen($raw_body) > 120 ? mb_substr($raw_body, 0, 120) . '…' : $raw_body;
+
         return [
             'id'            => (string) $t['id'],
             'userId'        => (int) $t['user_id'],
@@ -300,6 +304,7 @@ final class AdminController extends AbstractController {
             'priority'      => $t['priority'],
             'categoryId'    => $t['category_id'] ? (int) $t['category_id'] : null,
             'categoryTitle' => $t['category_title'] ?? null,
+            'preview'       => $preview,
             'createdAt'     => $t['created_at'],
             'updatedAt'     => $t['updated_at'],
         ];

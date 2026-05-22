@@ -8,6 +8,7 @@ import { Button }             from '../components/Button';
 import { Pagination }         from '../components/Pagination';
 import { Search, Setting, Trash, Close } from '../icons';
 import { adminApi, type AdminState, type AdminTicket } from '../api/admin';
+import { toShamsi, relativeTime } from './TicketListPage';
 
 function DeleteConfirmModal({ ticketId, onClose, onConfirm }: {
   ticketId: string;
@@ -218,10 +219,10 @@ export function AdminTicketListPage() {
                 user:     t.user,
                 state:    t.state,
                 priority: t.priority,
-                preview:  '',
-                date:     t.createdAt.slice(0, 10),
+                preview:  t.preview,
+                date:     toShamsi(t.createdAt),
                 time:     t.createdAt.slice(11, 16),
-                ago:      '',
+                ago:      relativeTime(t.updatedAt),
               }}
               selected={selected.has(t.id)}
               onToggle={() => toggle(t.id)}

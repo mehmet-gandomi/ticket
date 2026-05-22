@@ -12,6 +12,7 @@ export interface AdminTicket {
   priority: 'low' | 'medium' | 'high';
   categoryId: number | null;
   categoryTitle: string | null;
+  preview: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -48,11 +49,11 @@ export interface Settings {
   providers: Record<string, { enabled: boolean; apiKey: string; model: string }>;
 }
 
-export const adminStateMap: Record<AdminState, { color: 'default'|'primary'|'warning'|'danger'|'violet'; label: string }> = {
+export const adminStateMap: Record<AdminState, { color: 'default'|'primary'|'success'|'warning'|'danger'|'violet'; label: string }> = {
   unreviewed: { color: 'danger',  label: 'بررسی نشده' },
   reviewing:  { color: 'primary', label: 'درحال بررسی' },
   pending:    { color: 'warning', label: 'در انتظار پاسخ' },
-  answered:   { color: 'primary', label: 'پاسخ داده شده' },
+  answered:   { color: 'success', label: 'پاسخ داده شده' },
   closed:     { color: 'default', label: 'بسته شده' },
   spam:       { color: 'violet',  label: 'اسپم' },
 };

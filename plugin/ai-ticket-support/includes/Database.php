@@ -163,7 +163,9 @@ final class Database {
 
         $sql_where = implode(' AND ', $where);
         $offset    = ($page - 1) * $per_page;
-        $base      = "SELECT t.*, u.display_name AS user_name, c.title AS category_title
+        $base      = "SELECT t.*, u.display_name AS user_name, c.title AS category_title,
+                             (SELECT body FROM {$this->db->prefix}ats_messages
+                              WHERE ticket_id = t.id ORDER BY created_at ASC LIMIT 1) AS first_body
                       FROM {$this->db->prefix}ats_tickets t
                       LEFT JOIN {$this->db->prefix}users u ON u.ID = t.user_id
                       LEFT JOIN {$this->db->prefix}ats_categories c ON c.id = t.category_id
