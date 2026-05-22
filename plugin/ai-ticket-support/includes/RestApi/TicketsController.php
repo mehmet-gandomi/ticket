@@ -152,8 +152,10 @@ final class TicketsController extends AbstractController {
         $db->save_ai_suggestion($ticket_id, $suggestion);
 
         // Re-fetch so ai_status / ai_suggestion columns are fresh
-        $ticket = $db->get_ticket($ticket_id);
-        return $this->created($this->format_ticket($ticket));
+        $ticket    = $db->get_ticket($ticket_id);
+        $formatted = $this->format_ticket($ticket);
+        $formatted['firstMessageId'] = (string) $msg_id;
+        return $this->created($formatted);
     }
 
     public function show(WP_REST_Request $req): WP_REST_Response|WP_Error {

@@ -16,6 +16,7 @@ export interface Ticket {
   preview: string;
   createdAt: string;
   updatedAt: string;
+  firstMessageId?: string;
 }
 
 export interface Attachment {
