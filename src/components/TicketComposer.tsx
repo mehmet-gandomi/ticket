@@ -10,7 +10,6 @@ interface SubmitPayload {
   body: string;
   priority: string;
   category_id: number | null;
-  files: File[];
 }
 
 interface TicketComposerProps {
@@ -18,8 +17,8 @@ interface TicketComposerProps {
   showSubmit?: boolean;
   onSubmit?: (payload: SubmitPayload) => Promise<void> | void;
   onCancel?: () => void;
+  onFilesChange?: (files: File[]) => void;
   submitLabel?: string;
-  /** @deprecated Display only – not submitted to the API */
   defaultMessage?: string;
 }
 
@@ -34,6 +33,7 @@ export function TicketComposer({
   showSubmit = true,
   onSubmit,
   onCancel,
+  onFilesChange,
   submitLabel = 'ارسال تیکت',
   defaultMessage: _defaultMessage,
 }: TicketComposerProps) {
@@ -42,7 +42,6 @@ export function TicketComposer({
   const [title, setTitle]           = useState('');
   const [priority, setPriority]     = useState<string>('');
   const [body, setBody]             = useState('');
-  const [files, setFiles]           = useState<File[]>([]);
   const [submitted, setSubmitted]   = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -69,7 +68,6 @@ export function TicketComposer({
         body:        body.trim(),
         priority,
         category_id: categoryId ? Number(categoryId) : null,
-        files,
       });
     } finally {
       setSubmitting(false);
@@ -122,7 +120,7 @@ export function TicketComposer({
         {errors.body && <span className="text-[12px] text-danger text-right">لطفاً پیام تیکت را وارد کنید</span>}
       </div>
 
-      <AttachmentsUploader onFilesChange={setFiles} />
+      <AttachmentsUploader onFilesChange={onFilesChange} />
 
       <div className="h-px bg-line my-1" />
 

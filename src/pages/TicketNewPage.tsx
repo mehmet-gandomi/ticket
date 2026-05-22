@@ -1,20 +1,24 @@
-import { useState }       from 'react';
-import { useNavigate }    from 'react-router-dom';
-import { PageContainer }  from '../components/PageContainer';
-import { PageHeader }     from '../components/PageHeader';
-import { TicketComposer } from '../components/TicketComposer';
-import { AiLoadingPanel } from '../components/AiLoadingPanel';
-import { ticketsApi }     from '../api/tickets';
+import { useState, useRef }  from 'react';
+import { useNavigate }        from 'react-router-dom';
+import { PageContainer }      from '../components/PageContainer';
+import { PageHeader }         from '../components/PageHeader';
+import { TicketComposer }     from '../components/TicketComposer';
+import { AiLoadingPanel }     from '../components/AiLoadingPanel';
+import { ticketsApi }         from '../api/tickets';
 
 export function TicketNewPage() {
-  const navigate = useNavigate();
+  const navigate    = useNavigate();
+  const filesRef    = useRef<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(payload: { title: string; body: string; priority: string; category_id?: number | null; files: File[] }) {
+  async function handleSubmit(payload: { title: string; body: string; priority: string; category_id?: number | null }) {
     setSubmitting(true);
     try {
       const ticket = await ticketsApi.create(payload);
-      await Promise.all(payload.files.map((f) => ticketsApi.uploadAttachment(ticket.id, f)));
+      const files = filesRef.current;
+      if (files.length > 0) {
+        await Promise.all(files.map((f) => ticketsApi.uploadAttachment(ticket.id, f)));
+      }
       if (ticket.aiStatus === 'done' && ticket.aiSuggestion) {
         navigate(`/tickets/${ticket.id}/ai-show`);
       } else {
@@ -46,6 +50,7 @@ export function TicketNewPage() {
         <TicketComposer
           onSubmit={handleSubmit}
           onCancel={() => navigate('/tickets')}
+          onFilesChange={(files) => { filesRef.current = files; }}
         />
       </div>
     </PageContainer>
