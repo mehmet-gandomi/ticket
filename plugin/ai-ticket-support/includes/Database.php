@@ -247,8 +247,20 @@ final class Database {
     }
 
     public function delete_ticket(int $id): void {
-        $this->db->delete($this->db->prefix . 'ats_messages', ['ticket_id' => $id], ['%d']);
-        $this->db->delete($this->db->prefix . 'ats_tickets',  ['id'        => $id], ['%d']);
+        $attachments = $this->get_attachments_for_ticket($id);
+        foreach ($attachments as $att) {
+            $upload_dir = wp_upload_dir();
+            $file_path  = trailingslashit($upload_dir['basedir']) . ltrim(
+                str_replace($upload_dir['baseurl'], '', $att['file_url']),
+                '/'
+            );
+            if (file_exists($file_path)) {
+                @unlink($file_path);
+            }
+        }
+        $this->db->delete($this->db->prefix . 'ats_attachments', ['ticket_id' => $id], ['%d']);
+        $this->db->delete($this->db->prefix . 'ats_messages',    ['ticket_id' => $id], ['%d']);
+        $this->db->delete($this->db->prefix . 'ats_tickets',     ['id'        => $id], ['%d']);
     }
 
     public function resolve_ticket_with_ai(int $ticket_id, string $ai_body): bool {
