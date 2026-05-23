@@ -31,7 +31,7 @@ function Toggle({ checked, onChange, label, hint }: {
 // ── AI providers ──────────────────────────────────────────────────────────────
 
 interface ModelGroup { label: string; models: string[] }
-interface AiProvider { id: string; name: string; description: string; badge: string; badgeColor: string; modelGroups: ModelGroup[] }
+interface AiProvider { id: string; name: string; description: string; badge: string; badgeColor: string; modelGroups: ModelGroup[]; tokenUrl?: string }
 
 const GAPCODE_MODEL_GROUPS: ModelGroup[] = [
   { label: 'گپ‌کد (بومی)', models: [
@@ -61,7 +61,7 @@ const AI_PROVIDERS: AiProvider[] = [
   { id: 'chatgpt', name: 'ChatGPT',  description: 'مدل‌های هوشمند OpenAI برای پاسخ‌دهی خودکار',             badge: 'GPT', badgeColor: '#10A37F', modelGroups: [{ label: '', models: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'] }] },
   { id: 'claude',  name: 'Claude',   description: 'مدل‌های Anthropic با دقت بالا در پردازش زبان',           badge: 'CLD', badgeColor: '#D97757', modelGroups: [{ label: '', models: ['claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5'] }] },
   { id: 'gemini',  name: 'Gemini',   description: 'مدل‌های Google با قابلیت‌های چندوجهی',                   badge: 'GEM', badgeColor: '#4285F4', modelGroups: [{ label: '', models: ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash'] }] },
-  { id: 'gapcode', name: 'گپ‌کد',   description: 'سرویس هوش مصنوعی داخلی با پشتیبانی از زبان فارسی',     badge: 'گپ',  badgeColor: '#7C3AED', modelGroups: GAPCODE_MODEL_GROUPS },
+  { id: 'gapcode', name: 'GapGPT',  description: 'سرویس هوش مصنوعی داخلی با پشتیبانی از زبان فارسی',     badge: 'گپ',  badgeColor: '#7C3AED', modelGroups: GAPCODE_MODEL_GROUPS, tokenUrl: 'https://gapgpt.app/platform-v2/tokens' },
 ];
 
 type TestState = 'idle' | 'loading' | 'ok' | 'fail';
@@ -112,6 +112,16 @@ function AiProviderCard({ provider, config, onChange }: {
       {/* Expanded config + connection test */}
       {config.enabled && (
         <div className="flex flex-col gap-3 pt-3 border-t border-line">
+          {provider.tokenUrl && (
+            <a
+              href={provider.tokenUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[12px] text-brand hover:underline text-right"
+            >
+              دریافت کلید API از {provider.name} ←
+            </a>
+          )}
           <Field label="کلید API">
             <Input dir="ltr" placeholder="sk-..." value={config.apiKey}
               onChange={(e) => onChange({ ...config, apiKey: e.target.value })}
