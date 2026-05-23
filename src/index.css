@@ -2,13 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Brand CSS custom properties are injected by app-shell.php after this
+   stylesheet so they always reflect the admin's saved brandColor setting.
+   The fallback values here are only active during `vite dev`. */
 :root {
-  /* Brand color as space-separated RGB so Tailwind opacity utilities work.
-     JavaScript reads settings.brandColor and updates these at runtime. */
-  --brand:      0 104 255;   /* #0068FF */
-  --brand-dark: 0 95 232;    /* #005FE8 */
-  --brand-tint: 230 240 255; /* #E6F0FF */
-  --brand-soft: 176 208 255; /* #B0D0FF */
+  --brand:      0 104 255;
+  --brand-dark: 0 95 232;
+  --brand-tint: 230 240 255;
+  --brand-soft: 176 208 255;
 }
 
 

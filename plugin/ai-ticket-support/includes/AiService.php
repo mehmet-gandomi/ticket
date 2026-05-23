@@ -11,15 +11,15 @@ namespace ATS;
  * 1. Filter saved answers by the ticket's category (falls back to all).
  * 2. Score each answer by keyword overlap with the user's message.
  *    Answers with zero overlap are skipped entirely — no AI call made.
- * 3. Take only the top TOP_K answers as a knowledge base.
+ * 3. Take only the top aiTopK answers as a knowledge base (admin-configurable).
  * 4. Single AI call: model generates a fresh answer from that knowledge base.
  *    It does not copy-paste; it synthesises a clear, concise response.
  */
 final class AiService {
 
     private const DEFAULT_MODEL  = 'gapgpt-qwen-3.5';
-    private const TOP_K          = 4;   // max answers sent to AI as context
-    private const MAX_BODY_CHARS = 400; // per-answer body truncation
+    private const TOP_K          = 4;   // fallback when setting is missing
+    private const MAX_BODY_CHARS = 400; // fallback when setting is missing
 
     private const SYSTEM_PROMPT = <<<'SYS'
 تو یک کارشناس پشتیبانی فنی هستی. وظیفه‌ات نوشتن یک پاسخ کامل و واضح برای سوال کاربر است.
@@ -38,7 +38,10 @@ final class AiService {
 SYS;
 
     public function suggest(array $ticket, string $user_message): ?string {
-        $client = $this->resolve_client();
+        // Load settings once for this request.
+        $settings = (array) get_option('ats_settings', []);
+
+        $client = $this->resolve_client($settings);
         if ($client === null) {
             return null;
         }
@@ -49,14 +52,16 @@ SYS;
             return null;
         }
 
-        $top = $this->top_k($user_message, $pool);
+        $top_k = max(1, min(10, (int) ($settings['aiTopK'] ?? self::TOP_K)));
+        $top   = $this->top_k($user_message, $pool, $top_k);
         if (empty($top)) {
             return null; // no keyword overlap — skip AI call entirely
         }
 
-        $prompt = $this->build_prompt($ticket['title'], $user_message, $top);
-        $model  = $this->resolve_model();
-        $result = $client->respond($model, self::SYSTEM_PROMPT, $prompt);
+        $max_body = max(100, min(2000, (int) ($settings['aiMaxBodyChars'] ?? self::MAX_BODY_CHARS)));
+        $prompt   = $this->build_prompt($ticket['title'], $user_message, $top, $max_body);
+        $model    = $this->resolve_model($settings);
+        $result   = $client->respond($model, self::SYSTEM_PROMPT, $prompt);
 
         if ($result === null || mb_stripos($result, 'پاسخ مناسبی یافت نشد') !== false) {
             return null;
@@ -78,11 +83,7 @@ SYS;
         return $answers;
     }
 
-    /**
-     * Score every answer by keyword overlap with the user message,
-     * return the top TOP_K with score > 0, sorted best-first.
-     */
-    private function top_k(string $user_message, array $answers): array {
+    private function top_k(string $user_message, array $answers, int $top_k): array {
         $words = $this->tokenize($user_message);
         if (empty($words)) {
             return [];
@@ -101,9 +102,6 @@ SYS;
         }
 
         usort($scored, fn($a, $b) => $b['score'] <=> $a['score']);
-
-        $top_k = (int) (((array) get_option('ats_settings', []))['aiTopK'] ?? self::TOP_K);
-        $top_k = max(1, min(10, $top_k));
         return array_column(array_slice($scored, 0, $top_k), 'answer');
     }
 
@@ -118,13 +116,7 @@ SYS;
         return $score;
     }
 
-    /**
-     * Convert HTML to plain text while keeping anchor URLs visible.
-     * e.g. <a href="https://example.com">کلیک کنید</a>
-     *   →  کلیک کنید (https://example.com)
-     */
     private function html_to_text(string $html): string {
-        // Replace <a href="URL">text</a> with "text (URL)"
         $text = preg_replace_callback(
             '/<a\s[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is',
             static fn($m) => trim(strip_tags($m[2])) . ' (' . $m[1] . ')',
@@ -136,24 +128,21 @@ SYS;
     private function tokenize(string $text): array {
         $text  = mb_strtolower(strip_tags($text));
         $words = preg_split('/[\s\.,،؛:!\?؟\-\/\(\)]+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
-        // drop very short words (particles, prepositions)
         return array_values(array_unique(array_filter($words, fn($w) => mb_strlen($w) > 2)));
     }
 
     // ── Prompt ────────────────────────────────────────────────────────────────
 
-    private function build_prompt(string $title, string $message, array $answers): string {
+    private function build_prompt(string $title, string $message, array $answers, int $max_body): string {
         $kb = '';
         foreach ($answers as $i => $a) {
             $body = $this->html_to_text((string) $a['body']);
             $body = preg_replace('/\s+/', ' ', trim($body));
-            $max_chars = (int) (((array) get_option('ats_settings', []))['aiMaxBodyChars'] ?? self::MAX_BODY_CHARS);
-            $max_chars = max(100, min(2000, $max_chars));
-            if (mb_strlen($body) > $max_chars) {
-                $body = mb_substr($body, 0, $max_chars) . '…';
+            if (mb_strlen($body) > $max_body) {
+                $body = mb_substr($body, 0, $max_body) . '…';
             }
-            $n    = $i + 1;
-            $kb  .= "--- مورد {$n} ---\nعنوان: {$a['title']}\nمحتوا: {$body}\n\n";
+            $n   = $i + 1;
+            $kb .= "--- مورد {$n} ---\nعنوان: {$a['title']}\nمحتوا: {$body}\n\n";
         }
 
         $user_text = trim(strip_tags($message));
@@ -171,10 +160,9 @@ PROMPT;
 
     // ── Config ────────────────────────────────────────────────────────────────
 
-    private function resolve_client(): ?GapGptClient {
-        $settings  = (array) get_option('ats_settings', []);
+    private function resolve_client(array $settings): ?GapGptClient {
         $providers = (array) ($settings['providers'] ?? []);
-        $gapcode   = (array) ($providers['gapcode'] ?? []);
+        $gapcode   = (array) ($providers['gapcode']  ?? []);
 
         if (empty($gapcode['enabled']) || empty($gapcode['apiKey'])) {
             return null;
@@ -183,10 +171,9 @@ PROMPT;
         return new GapGptClient((string) $gapcode['apiKey']);
     }
 
-    private function resolve_model(): string {
-        $settings  = (array) get_option('ats_settings', []);
+    private function resolve_model(array $settings): string {
         $providers = (array) ($settings['providers'] ?? []);
-        $gapcode   = (array) ($providers['gapcode'] ?? []);
+        $gapcode   = (array) ($providers['gapcode']  ?? []);
         return ! empty($gapcode['model']) ? (string) $gapcode['model'] : self::DEFAULT_MODEL;
     }
 }

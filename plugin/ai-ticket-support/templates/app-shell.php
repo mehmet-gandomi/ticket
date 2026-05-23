@@ -66,10 +66,18 @@ $config = [
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo esc_html($page_title ?? get_bloginfo('name')); ?></title>
-    <style><?php echo $brand_css; // phpcs:ignore WordPress.Security.EscapeOutput ?></style>
     <?php foreach ($entry['css'] ?? [] as $css_file): ?>
     <link rel="stylesheet" href="<?php echo esc_url($dist_url . $css_file); ?>">
     <?php endforeach; ?>
+    <?php /* Brand overrides MUST come after the linked stylesheet — the compiled
+             Tailwind CSS has :root defaults in it, so this inline block wins. */ ?>
+    <style><?php echo $brand_css; // phpcs:ignore WordPress.Security.EscapeOutput ?></style>
+    <script>
+    (function(){
+        var s=getComputedStyle(document.documentElement);
+        console.log('[ATS brand]','--brand:',s.getPropertyValue('--brand').trim(),'config:',window.atsConfig&&window.atsConfig.brandColor);
+    })();
+    </script>
 </head>
 <body>
     <div id="root"></div>
