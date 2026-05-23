@@ -7,6 +7,7 @@ import {
   Setting,
   TicketStar,
   Menu,
+  BookOpen,
 } from '../icons';
 import { getConfig } from '../config';
 import type { ReactNode } from 'react';
@@ -17,8 +18,9 @@ const USER_NAV = [
 ];
 
 const ADMIN_NAV = [
-  { to: '/tickets',  label: 'صف تیکت‌ها', icon: <ListIcon size={18} /> },
-  { to: '/settings', label: 'تنظیمات',    icon: <Setting  size={18} /> },
+  { to: '/tickets',   label: 'صف تیکت‌ها',  icon: <ListIcon  size={18} /> },
+  { to: '/knowledge', label: 'پایگاه دانش', icon: <BookOpen  size={18} /> },
+  { to: '/settings',  label: 'تنظیمات',     icon: <Setting   size={18} /> },
 ];
 
 function NavItems({ items, onClose }: { items: typeof USER_NAV; onClose?: () => void }) {

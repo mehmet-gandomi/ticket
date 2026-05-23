@@ -196,6 +196,13 @@ export const Record = ({ size, ...p }: IconProps) => (
   </svg>
 );
 
+export const BookOpen = ({ size, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+  </svg>
+);
+
 export const Setting = ({ size, ...p }: IconProps) => (
   <svg {...base(size)} {...p}>
     <circle cx="12" cy="12" r="3" />

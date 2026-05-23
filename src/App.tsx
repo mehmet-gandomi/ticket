@@ -8,6 +8,7 @@ import { TicketAiShowPage }     from './pages/TicketAiShowPage';
 import { TicketNotFoundPage }   from './pages/TicketNotFoundPage';
 import { AdminTicketListPage }  from './pages/AdminTicketListPage';
 import { AdminSettingsPage }    from './pages/AdminSettingsPage';
+import { AdminKnowledgePage }  from './pages/AdminKnowledgePage';
 import { Layout }               from './components/Sidebar';
 
 export default function App() {
@@ -20,8 +21,9 @@ export default function App() {
           <Route path="/"         element={<Navigate to="/tickets" replace />} />
           <Route path="/tickets"  element={<AdminTicketListPage />} />
           <Route path="/tickets/:id" element={<TicketChatPage />} />
-          <Route path="/settings" element={<AdminSettingsPage />} />
-          <Route path="*"         element={<Navigate to="/tickets" replace />} />
+          <Route path="/settings"   element={<AdminSettingsPage />} />
+          <Route path="/knowledge" element={<AdminKnowledgePage />} />
+          <Route path="*"          element={<Navigate to="/tickets" replace />} />
         </Routes>
       </Layout>
     );
