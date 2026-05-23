@@ -90,7 +90,7 @@ SYS;
             return null;
         }
 
-        $result = self::strip_copout(trim($result));
+        $result = trim($result);
         return $result !== '' ? $result : null;
     }
 
@@ -175,53 +175,6 @@ SYS;
 
 بر اساس پایگاه دانش بالا، پاسخ مناسب را بنویس.
 PROMPT;
-    }
-
-    // ── Post-processing ───────────────────────────────────────────────────────
-
-    /**
-     * Strip trailing sentences that are support-redirect or pleasantry cop-outs.
-     * LLMs occasionally ignore prompt rules, so we enforce this in code too.
-     */
-    private static function strip_copout(string $text): string {
-        $phrases = [
-            'تماس بگیرید',
-            'ارتباط برقرار',
-            'در خدمتم',
-            'در خدمت شما',
-            'موفق باشید',
-            'موفقیت شما',
-            'امیدوارم',
-            'امیدوار هستم',
-            'اگر سوال',
-            'اگر مشکل',
-            'اگر ابهام',
-            'اگر نیاز',
-            'در صورت نیاز',
-            'در صورت بروز',
-            'در صورت وجود',
-        ];
-
-        // Split by sentence-ending punctuation or newline, strip cop-out tail segments.
-        $segments = preg_split('/(?<=[.؟!\n])\s*/u', $text, -1, PREG_SPLIT_NO_EMPTY);
-
-        while (! empty($segments)) {
-            $last = trim((string) end($segments));
-            $is_copout = false;
-            foreach ($phrases as $p) {
-                if ($last !== '' && mb_stripos($last, $p) !== false) {
-                    $is_copout = true;
-                    break;
-                }
-            }
-            if ($is_copout) {
-                array_pop($segments);
-            } else {
-                break;
-            }
-        }
-
-        return trim(implode(' ', $segments));
     }
 
     // ── Config ────────────────────────────────────────────────────────────────
