@@ -491,10 +491,7 @@ export function AdminSettingsPage() {
   useEffect(() => {
     adminApi.categories().then(setCats).catch(() => {});
     adminApi.savedAnswers().then(setAnswers).catch(() => {});
-    adminApi.settings().then((s) => {
-      setSettings(s);
-      applyBrandColor(s.brandColor);
-    }).catch(() => {});
+    adminApi.settings().then(setSettings).catch(() => {});
   }, []);
 
   async function saveSettings() {
