@@ -4,7 +4,7 @@ import { PageContainer }       from '../components/PageContainer';
 import { Field, Input, Select } from '../components/FormControls';
 import { Button }              from '../components/Button';
 import { Label }               from '../components/Label';
-import { BookOpen, Check }     from '../icons';
+import { BookOpen, Check, ExternalLink, GapGptLogo } from '../icons';
 import { PageHeader }          from '../components/PageHeader';
 import { adminApi, type Settings } from '../api/admin';
 import { applyBrandColor }     from '../utils/color';
@@ -64,6 +64,14 @@ const AI_PROVIDERS: AiProvider[] = [
   { id: 'gapcode', name: 'GapGPT',  description: 'سرویس هوش مصنوعی داخلی با پشتیبانی از زبان فارسی',     badge: 'گپ',  badgeColor: '#7C3AED', modelGroups: GAPCODE_MODEL_GROUPS, tokenUrl: 'https://gapgpt.app/platform-v2/tokens' },
 ];
 
+function ProviderLogo({ provider }: { provider: AiProvider }) {
+  if (provider.id === 'gapcode') return <GapGptLogo size={48} />;
+  return (
+    <div className="size-12 rounded-xl grid place-items-center text-white text-[13px] font-bold shrink-0"
+         style={{ background: provider.badgeColor }}>{provider.badge}</div>
+  );
+}
+
 type TestState = 'idle' | 'loading' | 'ok' | 'fail';
 
 function AiProviderCard({ provider, config, onChange }: {
@@ -100,8 +108,9 @@ function AiProviderCard({ provider, config, onChange }: {
           <span className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${config.enabled ? 'right-0.5' : 'right-[22px]'}`} />
         </button>
         <div className="flex items-center gap-3 flex-1 min-w-0" dir="rtl">
-          <div className="size-12 rounded-xl grid place-items-center text-white text-[13px] font-bold shrink-0"
-               style={{ background: provider.badgeColor }}>{provider.badge}</div>
+          <div className="size-12 shrink-0 rounded-xl overflow-hidden grid place-items-center">
+            <ProviderLogo provider={provider} />
+          </div>
           <div className="flex flex-col gap-1 min-w-0">
             <span className="text-[14px] font-bold text-ink-900">{provider.name}</span>
             <span className="text-[12px] text-ink-500 leading-5">{provider.description}</span>
@@ -117,9 +126,10 @@ function AiProviderCard({ provider, config, onChange }: {
               href={provider.tokenUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[12px] text-brand hover:underline text-right"
+              className="self-start inline-flex items-center gap-1.5 h-7 px-3 rounded-lg bg-surface-50 border border-line text-[11px] text-ink-600 hover:border-brand hover:text-brand transition"
             >
-              دریافت کلید API از {provider.name} ←
+              <ExternalLink size={11} />
+              <span>دریافت کلید API از {provider.name}</span>
             </a>
           )}
           <Field label="کلید API">

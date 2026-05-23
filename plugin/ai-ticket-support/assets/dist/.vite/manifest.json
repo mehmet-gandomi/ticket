@@ -4,12 +4,12 @@
     "src": "public/fonts/Ravi/Ravi-VF.ttf"
   },
   "src/main.tsx": {
-    "file": "assets/main-B74R9iy2.js",
+    "file": "assets/main-Cpv1q8ag.js",
     "name": "main",
     "src": "src/main.tsx",
     "isEntry": true,
     "css": [
-      "assets/main-CUzpSVu5.css"
+      "assets/main-Bybt483S.css"
     ],
     "assets": [
       "assets/Ravi-VF-xTtXQV-q.ttf"

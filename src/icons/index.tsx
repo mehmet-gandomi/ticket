@@ -262,6 +262,24 @@ export const TicketOutline = ({ size, ...p }: IconProps) => (
   </svg>
 );
 
+/* === GapGPT brand logo === */
+export const GapGptLogo = ({ size = 48 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="50" fill="#384e6a"/>
+    <path d="M50 9 C65 9 91 36 91 50 C91 64 65 91 50 91 C35 91 9 64 9 50 C9 36 35 9 50 9Z" fill="#7ec8a0"/>
+    <circle cx="50" cy="50" r="17" fill="#384e6a"/>
+  </svg>
+);
+
+/* === External link icon === */
+export const ExternalLink = ({ size, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+);
+
 /* === Bot illustration (empty / "not found" state) === */
 export const BotLaughing = ({ size, ...p }: IconProps) => (
   <svg width="192" height="192" viewBox="0 0 192 192" fill="none">
