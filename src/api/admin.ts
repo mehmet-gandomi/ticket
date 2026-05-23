@@ -127,4 +127,8 @@ export const adminApi = {
   saveSettings(payload: Settings): Promise<Settings> {
     return api.post('/admin/settings', payload);
   },
+
+  testProvider(provider: string, apiKey: string, model: string): Promise<{ success: boolean; message: string }> {
+    return api.post('/admin/test-provider', { provider, apiKey, model });
+  },
 };

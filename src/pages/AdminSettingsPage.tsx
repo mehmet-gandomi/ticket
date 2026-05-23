@@ -4,13 +4,10 @@ import { PageContainer }       from '../components/PageContainer';
 import { Field, Input, Select } from '../components/FormControls';
 import { Button }              from '../components/Button';
 import { Label }               from '../components/Label';
-import { BookOpen, ListIcon }  from '../icons';
+import { BookOpen, Check }     from '../icons';
 import { PageHeader }          from '../components/PageHeader';
-import {
-  adminApi,
-  type Settings,
-} from '../api/admin';
-import { applyBrandColor } from '../utils/color';
+import { adminApi, type Settings } from '../api/admin';
+import { applyBrandColor }     from '../utils/color';
 
 // ── Toggle ────────────────────────────────────────────────────────────────────
 
@@ -31,7 +28,7 @@ function Toggle({ checked, onChange, label, hint }: {
   );
 }
 
-// ── AI providers config ───────────────────────────────────────────────────────
+// ── AI providers ──────────────────────────────────────────────────────────────
 
 interface ModelGroup { label: string; models: string[] }
 interface AiProvider { id: string; name: string; description: string; badge: string; badgeColor: string; modelGroups: ModelGroup[] }
@@ -67,13 +64,36 @@ const AI_PROVIDERS: AiProvider[] = [
   { id: 'gapcode', name: 'گپ‌کد',   description: 'سرویس هوش مصنوعی داخلی با پشتیبانی از زبان فارسی',     badge: 'گپ',  badgeColor: '#7C3AED', modelGroups: GAPCODE_MODEL_GROUPS },
 ];
 
+type TestState = 'idle' | 'loading' | 'ok' | 'fail';
+
 function AiProviderCard({ provider, config, onChange }: {
   provider: AiProvider;
   config: { enabled: boolean; apiKey: string; model: string };
   onChange: (c: { enabled: boolean; apiKey: string; model: string }) => void;
 }) {
+  const [testState, setTestState] = useState<TestState>('idle');
+  const [testMsg, setTestMsg]     = useState('');
+
+  // reset test result whenever the API key changes
+  useEffect(() => { setTestState('idle'); setTestMsg(''); }, [config.apiKey]);
+
+  async function runTest() {
+    setTestState('loading');
+    setTestMsg('');
+    try {
+      const res = await adminApi.testProvider(provider.id, config.apiKey, config.model);
+      setTestState(res.success ? 'ok' : 'fail');
+      setTestMsg(res.message);
+    } catch {
+      setTestState('fail');
+      setTestMsg('خطا در ارتباط با سرور');
+    }
+  }
+
   return (
-    <div className={`rounded-2xl border bg-white p-5 flex flex-col gap-5 transition ${config.enabled ? 'border-brand shadow-[0_2px_18px_rgba(0,104,255,0.06)]' : 'border-line'}`}>
+    <div className={`rounded-2xl border bg-white p-5 flex flex-col gap-4 transition ${config.enabled ? 'border-brand shadow-[0_2px_18px_rgba(0,104,255,0.06)]' : 'border-line'}`}>
+
+      {/* Header: toggle + provider identity */}
       <div className="flex items-start justify-between gap-3">
         <button type="button" onClick={() => onChange({ ...config, enabled: !config.enabled })}
           className={`relative w-11 h-6 rounded-full transition shrink-0 mt-0.5 ${config.enabled ? 'bg-brand' : 'bg-line'}`}>
@@ -88,8 +108,10 @@ function AiProviderCard({ provider, config, onChange }: {
           </div>
         </div>
       </div>
+
+      {/* Expanded config + connection test */}
       {config.enabled && (
-        <div className="flex flex-col gap-3 pt-4 border-t border-line">
+        <div className="flex flex-col gap-3 pt-3 border-t border-line">
           <Field label="کلید API">
             <Input dir="ltr" placeholder="sk-..." value={config.apiKey}
               onChange={(e) => onChange({ ...config, apiKey: e.target.value })}
@@ -106,6 +128,27 @@ function AiProviderCard({ provider, config, onChange }: {
               )}
             </Select>
           </Field>
+
+          {/* Connection test row */}
+          <div className="flex items-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={runTest}
+              disabled={!config.apiKey.trim() || testState === 'loading'}
+              className="h-8 px-4 rounded-lg border border-line text-[12px] text-ink-700 hover:border-brand hover:text-brand transition disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            >
+              {testState === 'loading' ? 'در حال تست...' : 'تست اتصال'}
+            </button>
+            {testState === 'ok' && (
+              <span className="flex items-center gap-1.5 text-[12px] text-emerald-600">
+                <Check size={14} />
+                {testMsg}
+              </span>
+            )}
+            {testState === 'fail' && (
+              <span className="text-[12px] text-danger">{testMsg}</span>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -135,11 +178,19 @@ export function AdminSettingsPage() {
     }
   }
 
-  const providers = settings.providers ?? {};
-  const activeCount = Object.values(providers).filter((c) => c.enabled).length;
+  const providers    = settings.providers ?? {};
+  const activeCount  = Object.values(providers).filter((c) => c.enabled).length;
+  const aiError      = settings.aiEnabled && activeCount === 0;
 
+  // Enabling a provider disables all others (only one active at a time)
   function updateProvider(id: string, c: { enabled: boolean; apiKey: string; model: string }) {
-    setSettings((s) => ({ ...s, providers: { ...s.providers, [id]: c } }));
+    setSettings((s) => {
+      const base = { ...s.providers, [id]: c };
+      const next = c.enabled
+        ? Object.fromEntries(Object.entries(base).map(([k, v]) => [k, k === id ? v : { ...v, enabled: false }]))
+        : base;
+      return { ...s, providers: next };
+    });
   }
 
   return (
@@ -158,16 +209,23 @@ export function AdminSettingsPage() {
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
-        {/* Right column — brand + AI toggle */}
-        <div className="flex flex-col gap-6 lg:w-72 shrink-0">
+        {/* ── Right column: brand + AI toggle ───────────────────────────── */}
+        <div className="flex flex-col gap-6 flex-1 min-w-0">
           <h3 className="text-[15px] font-bold text-ink-900">شخصی سازی</h3>
 
-          <Toggle
-            checked={settings.aiEnabled}
-            onChange={(v) => setSettings((s) => ({ ...s, aiEnabled: v }))}
-            label="پاسخ هوشمند"
-            hint="قابلیت پاسخ‌دهی هوشمند بر اساس پایگاه دانش فعال می‌شود"
-          />
+          <div className="flex flex-col gap-1.5">
+            <Toggle
+              checked={settings.aiEnabled}
+              onChange={(v) => setSettings((s) => ({ ...s, aiEnabled: v }))}
+              label="پاسخ هوشمند"
+              hint="قابلیت پاسخ‌دهی هوشمند بر اساس پایگاه دانش فعال می‌شود"
+            />
+            {aiError && (
+              <p className="text-[12px] text-danger text-right leading-5 mr-14">
+                برای فعال‌سازی پاسخ هوشمند باید حداقل یک ارائه‌دهنده هوش مصنوعی را از ستون مقابل فعال کنید.
+              </p>
+            )}
+          </div>
 
           {settings.aiEnabled && (
             <div className="flex flex-col gap-4 rounded-2xl border border-brand-soft bg-brand-tint/40 p-4">
@@ -230,13 +288,13 @@ export function AdminSettingsPage() {
         <div className="hidden lg:block w-px bg-line" />
         <div className="h-px bg-line lg:hidden" />
 
-        {/* Left column — AI providers */}
+        {/* ── Left column: AI providers ──────────────────────────────────── */}
         <div className="flex flex-col gap-4 flex-1 min-w-0">
           <div className="flex items-center gap-3">
             <h3 className="text-[15px] font-bold text-ink-900">یکپارچه‌سازی هوش مصنوعی</h3>
             {activeCount > 0 && <Label color="primary" size="sm">{activeCount} فعال</Label>}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-3">
             {AI_PROVIDERS.map((p) => (
               <AiProviderCard
                 key={p.id}

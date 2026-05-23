@@ -35,6 +35,12 @@ final class SettingsController extends AbstractController {
                 // providers, aiTopK, aiMaxBodyChars read from raw JSON body
              ]],
         ]);
+
+        register_rest_route(self::NAMESPACE, '/admin/test-provider', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'test_provider'],
+            'permission_callback' => $admin,
+        ]);
     }
 
     public function show(): WP_REST_Response {
@@ -63,6 +69,34 @@ final class SettingsController extends AbstractController {
 
         update_option(self::OPTION_KEY, $settings);
         return $this->ok($settings);
+    }
+
+    public function test_provider(WP_REST_Request $req): WP_REST_Response {
+        $json     = $req->get_json_params() ?? [];
+        $provider = sanitize_key($json['provider'] ?? '');
+        $api_key  = sanitize_text_field($json['apiKey']  ?? '');
+        $model    = sanitize_text_field($json['model']   ?? '');
+
+        if (empty($api_key)) {
+            return $this->ok(['success' => false, 'message' => 'کلید API وارد نشده است']);
+        }
+
+        if ($provider !== 'gapcode') {
+            return $this->ok(['success' => false, 'message' => 'تست مستقیم برای این ارائه‌دهنده پشتیبانی نمی‌شود']);
+        }
+
+        $client = new \ATS\GapGptClient($api_key);
+        $result = $client->respond(
+            $model ?: 'gapgpt-qwen-3.5',
+            'You are a helpful assistant.',
+            'Reply with exactly one word: OK'
+        );
+
+        if ($result !== null) {
+            return $this->ok(['success' => true,  'message' => 'اتصال با موفقیت برقرار شد']);
+        }
+
+        return $this->ok(['success' => false, 'message' => 'اتصال ناموفق — کلید API را بررسی کنید']);
     }
 
     private function sanitize_providers(array $providers): array {
