@@ -97,6 +97,17 @@ final class TicketsController extends AbstractController {
                 ],
             ],
         ]);
+
+        register_rest_route(self::NAMESPACE, '/tickets/(?P<id>\d+)/route-to-support', [
+            [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'route_to_support'],
+                'permission_callback' => [$this, 'require_logged_in'],
+                'args'                => [
+                    'id' => ['type' => 'integer'],
+                ],
+            ],
+        ]);
     }
 
     public function index(WP_REST_Request $req): WP_REST_Response {
@@ -148,15 +159,8 @@ final class TicketsController extends AbstractController {
         $ticket = $db->get_ticket($ticket_id);
 
         // Run AI suggestion (synchronous — prompt is small thanks to category filter)
-        $settings   = (array) get_option('ats_settings', []);
-        $ai_enabled = ! empty($settings['aiEnabled']);
         $suggestion = (new AiService())->suggest($ticket, $body);
         $db->save_ai_suggestion($ticket_id, $suggestion);
-
-        // If AI was active but couldn't answer, leave a routing notice for the user.
-        if ($ai_enabled && $suggestion === null) {
-            $db->create_message($ticket_id, 0, 'system', 'سوال شما به کارشناس ارجاع داده شد و به زودی پاسخ خواهید گرفت.');
-        }
 
         // Re-fetch so ai_status / ai_suggestion columns are fresh
         $ticket    = $db->get_ticket($ticket_id);
@@ -256,6 +260,31 @@ final class TicketsController extends AbstractController {
         $db->resolve_ticket_with_ai($id, $ticket['ai_suggestion']);
         $ticket = $db->get_ticket($id);
         return $this->ok($this->format_ticket($ticket));
+    }
+
+    public function route_to_support(WP_REST_Request $req): WP_REST_Response|WP_Error {
+        $db      = Database::instance();
+        $id      = (int) $req->get_param('id');
+        $user_id = get_current_user_id();
+
+        $ticket = $db->get_ticket($id);
+        if ($ticket === null) {
+            return $this->not_found('Ticket not found.');
+        }
+        if ((int) $ticket['user_id'] !== $user_id) {
+            return $this->forbidden();
+        }
+        if (in_array($ticket['status'], ['closed', 'ai_resolved'], true)) {
+            return $this->error('ticket_closed', 'This ticket is closed.', 422);
+        }
+
+        $db->create_message($id, 0, 'system', 'سوال شما به کارشناس ارجاع داده شد و به زودی پاسخ خواهید گرفت.');
+        $db->update_ticket_status($id, 'unreviewed');
+
+        $messages = $db->get_messages($id);
+        return $this->ok([
+            'messages' => array_map([$this, 'format_message'], $messages),
+        ]);
     }
 
     public function upload_attachment(WP_REST_Request $req): WP_REST_Response|WP_Error {

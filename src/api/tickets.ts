@@ -84,6 +84,10 @@ export const ticketsApi = {
     return api.post(`/tickets/${id}/ai-resolve`, {});
   },
 
+  routeToSupport(id: string): Promise<{ messages: Message[] }> {
+    return api.post(`/tickets/${id}/route-to-support`, {});
+  },
+
   uploadAttachment(ticketId: string, file: File, messageId?: string): Promise<Attachment> {
     const form = new FormData();
     form.append('file', file);

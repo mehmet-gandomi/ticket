@@ -16,8 +16,9 @@ export function TicketAiShowPage() {
   const [ticket, setTicket]       = useState<Ticket | null>(null);
   const [firstMsg, setFirstMsg]   = useState<Message | null>(null);
   const [loading, setLoading]     = useState(true);
-  const [resolving, setResolving] = useState(false);
-  const [error, setError]         = useState<string | null>(null);
+  const [resolving, setResolving]   = useState(false);
+  const [routing, setRouting]       = useState(false);
+  const [error, setError]           = useState<string | null>(null);
 
   async function handleResolve() {
     if (!id || resolving) return;
@@ -27,6 +28,17 @@ export function TicketAiShowPage() {
       navigate('/tickets');
     } catch {
       setResolving(false);
+    }
+  }
+
+  async function handleRouteToSupport() {
+    if (!id || routing) return;
+    setRouting(true);
+    try {
+      await ticketsApi.routeToSupport(id);
+      navigate(`/tickets/${id}`);
+    } catch {
+      navigate(`/tickets/${id}`);
     }
   }
 
@@ -143,9 +155,10 @@ export function TicketAiShowPage() {
               variant="danger"
               size="md"
               leadingIcon={<Close size={16} />}
-              onClick={() => navigate(`/tickets/${ticket.id}`)}
+              onClick={handleRouteToSupport}
+              disabled={routing}
             >
-              مشکل حل نشد، ادامه با پشتیبان
+              {routing ? 'در حال ارجاع...' : 'مشکل حل نشد، ادامه با پشتیبان'}
             </Button>
           </div>
         </section>
