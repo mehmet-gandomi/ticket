@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { useNavigate }         from 'react-router-dom';
 import { PageContainer }       from '../components/PageContainer';
 import { Field, Input, Select } from '../components/FormControls';
@@ -430,6 +430,61 @@ function PersonalizationTab({ settings, onChange, cats, onAddCat, onEditCat, onD
   );
 }
 
+const COLLAPSED_H = 84; // px — ~3 lines at leading-7 + 13px font
+
+function AnswerCard({ answer, onEdit, onDelete }: {
+  answer: SavedAnswer;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const [expanded, setExpanded]     = useState(false);
+  const [needsToggle, setNeedsToggle] = useState(false);
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (expanded) return;
+    const el = bodyRef.current;
+    if (!el) return;
+    setNeedsToggle(el.scrollHeight > COLLAPSED_H + 2);
+  }, [answer.body, expanded]);
+
+  return (
+    <div className="rounded-2xl border border-line bg-white px-5 py-4 hover:border-brand transition">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 flex flex-col gap-2 min-w-0">
+          <div className="flex items-center gap-3">
+            <span className="text-[13px] font-bold text-ink-900">{answer.title}</span>
+            {answer.categoryTitle && <Label color="primary">{answer.categoryTitle}</Label>}
+          </div>
+          <div className="relative">
+            <div
+              ref={bodyRef}
+              style={!expanded ? { maxHeight: COLLAPSED_H, overflow: 'hidden' } : undefined}
+              className="text-[13px] text-ink-500 leading-7 text-right [&_p]:mb-1 [&_ul]:list-disc [&_ul]:pr-5 [&_ol]:list-decimal [&_ol]:pr-5 [&_strong]:font-semibold [&_a]:text-brand [&_a]:underline"
+              dangerouslySetInnerHTML={{ __html: answer.body }}
+            />
+            {!expanded && needsToggle && (
+              <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+            )}
+          </div>
+          {needsToggle && (
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              className="text-[12px] text-brand hover:underline text-right self-start"
+            >
+              {expanded ? 'نمایش کمتر' : 'نمایش بیشتر'}
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button onClick={onEdit} className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition"><Edit size={14} /></button>
+          <button onClick={onDelete} className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-danger hover:bg-red-50 transition"><Trash size={14} /></button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AnswersTab({ answers, cats, onAdd, onEdit, onDelete }: {
   answers: SavedAnswer[]; cats: Category[];
   onAdd: () => void;
@@ -453,21 +508,12 @@ function AnswersTab({ answers, cats, onAdd, onEdit, onDelete }: {
       </div>
       <div className="flex flex-col gap-3">
         {visible.map((a) => (
-          <div key={a.id} className="rounded-2xl border border-line bg-white px-5 py-4 hover:border-brand transition">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <span className="text-[13px] font-bold text-ink-900">{a.title}</span>
-                  {a.categoryTitle && <Label color="primary">{a.categoryTitle}</Label>}
-                </div>
-                <p className="text-[13px] text-ink-500 leading-7 text-right">{a.body}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => onEdit(a)} className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-brand hover:bg-brand-tint transition"><Edit size={14} /></button>
-                <button onClick={() => onDelete(a.id)} className="size-8 grid place-items-center rounded-lg text-ink-500 hover:text-danger hover:bg-red-50 transition"><Trash size={14} /></button>
-              </div>
-            </div>
-          </div>
+          <AnswerCard
+            key={a.id}
+            answer={a}
+            onEdit={() => onEdit(a)}
+            onDelete={() => onDelete(a.id)}
+          />
         ))}
       </div>
     </div>
