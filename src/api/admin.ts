@@ -45,6 +45,7 @@ export interface SavedAnswer {
 
 export interface Settings {
   aiEnabled: boolean;
+  aiMode: 'kb_only' | 'ai_enhanced';
   brandColor: string;
   providers: Record<string, { enabled: boolean; apiKey: string; model: string }>;
   aiTopK: number;

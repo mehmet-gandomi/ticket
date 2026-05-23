@@ -148,8 +148,15 @@ final class TicketsController extends AbstractController {
         $ticket = $db->get_ticket($ticket_id);
 
         // Run AI suggestion (synchronous — prompt is small thanks to category filter)
+        $settings   = (array) get_option('ats_settings', []);
+        $ai_enabled = ! empty($settings['aiEnabled']);
         $suggestion = (new AiService())->suggest($ticket, $body);
         $db->save_ai_suggestion($ticket_id, $suggestion);
+
+        // If AI was active but couldn't answer, leave a routing notice for the user.
+        if ($ai_enabled && $suggestion === null) {
+            $db->create_message($ticket_id, 0, 'system', 'سوال شما به کارشناس ارجاع داده شد و به زودی پاسخ خواهید گرفت.');
+        }
 
         // Re-fetch so ai_status / ai_suggestion columns are fresh
         $ticket    = $db->get_ticket($ticket_id);

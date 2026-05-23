@@ -180,7 +180,7 @@ function AiProviderCard({ provider, config, onChange }: {
 export function AdminSettingsPage() {
   const nav = useNavigate();
   const [settings, setSettings] = useState<Settings>({
-    aiEnabled: false, brandColor: '#0068ff', providers: {}, aiTopK: 4, aiMaxBodyChars: 400,
+    aiEnabled: false, aiMode: 'kb_only', brandColor: '#0068ff', providers: {}, aiTopK: 4, aiMaxBodyChars: 400,
   });
   const [saving, setSaving]               = useState(false);
   const [noProviderModal, setNoProviderModal] = useState(false);
@@ -258,6 +258,30 @@ export function AdminSettingsPage() {
                   هر درخواست به هوش مصنوعی هزینه دارد. مقادیر بزرگ‌تر پاسخ‌های دقیق‌تر اما هزینه‌ی بیشتری ایجاد می‌کنند.
                 </p>
               </div>
+              {/* AI mode selector */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[13px] font-bold text-ink-900 text-right">حالت پاسخ‌دهی</span>
+                {([
+                  { value: 'kb_only',      label: 'فقط پایگاه دانش',            hint: 'اگر جواب در پایگاه دانش نباشد، سوال به کارشناس ارجاع می‌شود' },
+                  { value: 'ai_enhanced',  label: 'پایگاه دانش + دانش هوش مصنوعی', hint: 'اگر پایگاه دانش کافی نبود، هوش مصنوعی از دانش خودش کمک می‌گیرد' },
+                ] as const).map((opt) => (
+                  <label key={opt.value} className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="aiMode"
+                      value={opt.value}
+                      checked={(settings.aiMode ?? 'kb_only') === opt.value}
+                      onChange={() => setSettings((s) => ({ ...s, aiMode: opt.value }))}
+                      className="mt-0.5 accent-brand shrink-0"
+                    />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] text-ink-900">{opt.label}</span>
+                      <span className="text-[11px] text-ink-400 leading-5">{opt.hint}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
               <Field
                 label="تعداد پاسخ‌های ارسالی به هوش مصنوعی (TOP K)"
                 hint="سیستم بهترین N پاسخ را به هوش مصنوعی می‌فرستد. عدد بزرگ‌تر = هزینه بالاتر."

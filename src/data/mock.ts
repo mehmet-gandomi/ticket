@@ -55,7 +55,7 @@ export const tickets: TicketSummary[] = [
 
 export interface ChatMessage {
   id: string;
-  author: 'user' | 'support';
+  author: 'user' | 'support' | 'system';
   authorName: string;
   body: string;
   date: string;

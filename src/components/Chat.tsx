@@ -12,6 +12,14 @@ function getExt(name: string): string {
 }
 
 export function ChatBubble({ msg }: { msg: ChatMessage }) {
+  if (msg.author === 'system') {
+    return (
+      <div className="self-center flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-50 border border-line text-[11px] text-ink-400 my-1">
+        {msg.body}
+      </div>
+    );
+  }
+
   const isUser = msg.author === 'user';
   return (
     <div className={`flex flex-col gap-1 w-[88%] sm:max-w-[65%] sm:w-auto ${isUser ? 'self-start items-start' : 'self-end items-end'}`}>

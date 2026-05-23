@@ -16,6 +16,7 @@ final class SettingsController extends AbstractController {
 
     private const DEFAULTS = [
         'aiEnabled'      => false,
+        'aiMode'         => 'kb_only',
         'brandColor'     => '#0068ff',
         'providers'      => [],
         'aiTopK'         => 4,
@@ -59,8 +60,13 @@ final class SettingsController extends AbstractController {
         $json      = $req->get_json_params() ?? [];
         $providers = isset($json['providers']) && is_array($json['providers']) ? $json['providers'] : [];
 
+        $ai_mode = in_array($json['aiMode'] ?? '', ['kb_only', 'ai_enhanced'], true)
+            ? $json['aiMode']
+            : 'kb_only';
+
         $settings = [
             'aiEnabled'      => (bool) $req->get_param('aiEnabled'),
+            'aiMode'         => $ai_mode,
             'brandColor'     => sanitize_hex_color($req->get_param('brandColor')) ?: '#0068ff',
             'providers'      => $this->sanitize_providers($providers),
             'aiTopK'         => max(1, min(10,   (int) ($json['aiTopK']         ?? 4))),

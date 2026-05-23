@@ -30,7 +30,7 @@ export interface Attachment {
 export interface Message {
   id: string;
   ticketId: string;
-  authorType: 'user' | 'support';
+  authorType: 'user' | 'support' | 'system';
   authorName: string;
   body: string;
   createdAt: string;
