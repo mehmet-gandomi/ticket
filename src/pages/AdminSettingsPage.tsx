@@ -162,7 +162,8 @@ export function AdminSettingsPage() {
   const [settings, setSettings] = useState<Settings>({
     aiEnabled: false, brandColor: '#0068ff', providers: {}, aiTopK: 4, aiMaxBodyChars: 400,
   });
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving]               = useState(false);
+  const [noProviderModal, setNoProviderModal] = useState(false);
 
   useEffect(() => {
     adminApi.settings().then(setSettings).catch(() => {});
@@ -178,9 +179,16 @@ export function AdminSettingsPage() {
     }
   }
 
-  const providers    = settings.providers ?? {};
-  const activeCount  = Object.values(providers).filter((c) => c.enabled).length;
-  const aiError      = settings.aiEnabled && activeCount === 0;
+  const providers   = settings.providers ?? {};
+  const activeCount = Object.values(providers).filter((c) => c.enabled).length;
+
+  function handleAiToggle(v: boolean) {
+    if (v && activeCount === 0) {
+      setNoProviderModal(true);
+      return; // don't activate — no provider ready
+    }
+    setSettings((s) => ({ ...s, aiEnabled: v }));
+  }
 
   // Enabling a provider disables all others (only one active at a time)
   function updateProvider(id: string, c: { enabled: boolean; apiKey: string; model: string }) {
@@ -213,19 +221,12 @@ export function AdminSettingsPage() {
         <div className="flex flex-col gap-6 flex-1 min-w-0">
           <h3 className="text-[15px] font-bold text-ink-900">شخصی سازی</h3>
 
-          <div className="flex flex-col gap-1.5">
-            <Toggle
-              checked={settings.aiEnabled}
-              onChange={(v) => setSettings((s) => ({ ...s, aiEnabled: v }))}
-              label="پاسخ هوشمند"
-              hint="قابلیت پاسخ‌دهی هوشمند بر اساس پایگاه دانش فعال می‌شود"
-            />
-            {aiError && (
-              <p className="text-[12px] text-danger text-right leading-5 mr-14">
-                برای فعال‌سازی پاسخ هوشمند باید حداقل یک ارائه‌دهنده هوش مصنوعی را از ستون مقابل فعال کنید.
-              </p>
-            )}
-          </div>
+          <Toggle
+            checked={settings.aiEnabled}
+            onChange={handleAiToggle}
+            label="پاسخ هوشمند"
+            hint="قابلیت پاسخ‌دهی هوشمند بر اساس پایگاه دانش فعال می‌شود"
+          />
 
           {settings.aiEnabled && (
             <div className="flex flex-col gap-4 rounded-2xl border border-brand-soft bg-brand-tint/40 p-4">
@@ -307,6 +308,28 @@ export function AdminSettingsPage() {
         </div>
 
       </div>
+      {/* No-provider modal */}
+      {noProviderModal && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-4"
+          onClick={() => setNoProviderModal(false)}
+        >
+          <div
+            dir="rtl"
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl border border-line p-6 max-w-sm w-full flex flex-col gap-4 shadow-xl"
+          >
+            <div className="flex flex-col gap-1.5">
+              <h2 className="text-[16px] font-bold text-ink-900">هوش مصنوعی فعال نیست</h2>
+              <p className="text-[13px] text-ink-500 leading-7">
+                برای فعال‌سازی پاسخ هوشمند، ابتدا باید حداقل یک ارائه‌دهنده هوش مصنوعی را از ستون مقابل
+                فعال کرده و کلید API آن را وارد کنید.
+              </p>
+            </div>
+            <Button variant="primary" onClick={() => setNoProviderModal(false)}>متوجه شدم</Button>
+          </div>
+        </div>
+      )}
     </PageContainer>
   );
 }
