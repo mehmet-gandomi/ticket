@@ -210,14 +210,16 @@ export function AdminSettingsPage() {
     setSettings((s) => ({ ...s, aiEnabled: v }));
   }
 
-  // Enabling a provider disables all others (only one active at a time)
+  // Enabling a provider disables all others (only one active at a time).
+  // Disabling the last active provider also turns off پاسخ هوشمند.
   function updateProvider(id: string, c: { enabled: boolean; apiKey: string; model: string }) {
     setSettings((s) => {
       const base = { ...s.providers, [id]: c };
       const next = c.enabled
         ? Object.fromEntries(Object.entries(base).map(([k, v]) => [k, k === id ? v : { ...v, enabled: false }]))
         : base;
-      return { ...s, providers: next };
+      const anyActive = Object.values(next).some((v) => v.enabled);
+      return { ...s, providers: next, aiEnabled: anyActive ? s.aiEnabled : false };
     });
   }
 
