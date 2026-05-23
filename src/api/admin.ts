@@ -47,6 +47,8 @@ export interface Settings {
   aiEnabled: boolean;
   brandColor: string;
   providers: Record<string, { enabled: boolean; apiKey: string; model: string }>;
+  aiTopK: number;
+  aiMaxBodyChars: number;
 }
 
 export const adminStateMap: Record<AdminState, { color: 'default'|'primary'|'success'|'warning'|'danger'|'violet'; label: string }> = {

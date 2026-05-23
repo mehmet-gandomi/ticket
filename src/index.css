@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Brand color as space-separated RGB so Tailwind opacity utilities work.
+     JavaScript reads settings.brandColor and updates these at runtime. */
+  --brand:      0 104 255;   /* #0068FF */
+  --brand-dark: 0 95 232;    /* #005FE8 */
+  --brand-tint: 230 240 255; /* #E6F0FF */
+  --brand-soft: 176 208 255; /* #B0D0FF */
+}
+
 
 @font-face {
   font-family: 'Ravi';

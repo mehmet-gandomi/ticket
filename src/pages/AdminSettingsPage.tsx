@@ -14,6 +14,7 @@ import {
   type SavedAnswer,
   type Settings,
 } from '../api/admin';
+import { applyBrandColor } from '../utils/color';
 
 // ── Generic helpers ───────────────────────────────────────────────────────────
 
@@ -357,14 +358,66 @@ function PersonalizationTab({ settings, onChange, cats, onAddCat, onEditCat, onD
   return (
     <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
       <div className="flex-1 flex flex-col gap-6">
-        <Toggle checked={settings.aiEnabled} onChange={(v) => onChange({ ...settings, aiEnabled: v })}
-          label="پاسخ هوشمند" hint="قابلیت پاسخ دهی هوشمند وجود داشته باشد" />
-        <Field label="رنگ برند" hint="کد رنگ برند خودتان را وارد کنید.">
+        <Toggle
+          checked={settings.aiEnabled}
+          onChange={(v) => onChange({ ...settings, aiEnabled: v })}
+          label="پاسخ هوشمند"
+          hint="قابلیت پاسخ‌دهی هوشمند بر اساس پایگاه دانش فعال می‌شود"
+        />
+
+        {settings.aiEnabled && (
+          <div className="flex flex-col gap-4 rounded-2xl border border-brand-soft bg-brand-tint/40 p-4">
+            <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+              <span className="text-amber-500 text-[16px] shrink-0 mt-px">⚠</span>
+              <p className="text-[12px] text-amber-800 leading-6 text-right">
+                هر درخواست به هوش مصنوعی هزینه دارد. مقادیر بزرگ‌تر پاسخ‌های دقیق‌تر اما هزینه‌ی بیشتری ایجاد می‌کنند.
+              </p>
+            </div>
+
+            <Field
+              label="تعداد پاسخ‌های ارسالی به هوش مصنوعی (TOP K)"
+              hint="سیستم هر تیکت را با پایگاه دانش مقایسه می‌کند و بهترین N پاسخ را به هوش مصنوعی می‌فرستد. عدد بزرگ‌تر = متن بیشتر = هزینه بالاتر."
+            >
+              <Input
+                type="number"
+                dir="ltr"
+                className="text-left"
+                value={String(settings.aiTopK ?? 4)}
+                onChange={(e) => onChange({ ...settings, aiTopK: Math.max(1, Math.min(10, Number(e.target.value))) })}
+              />
+            </Field>
+
+            <Field
+              label="حداکثر طول هر پاسخ — کاراکتر (MAX BODY)"
+              hint="بدنه‌ی هر پاسخ آماده تا این تعداد کاراکتر کوتاه می‌شود پیش از ارسال به هوش مصنوعی. عدد کوچک‌تر = توکن کمتر = هزینه پایین‌تر."
+            >
+              <Input
+                type="number"
+                dir="ltr"
+                className="text-left"
+                value={String(settings.aiMaxBodyChars ?? 400)}
+                onChange={(e) => onChange({ ...settings, aiMaxBodyChars: Math.max(100, Math.min(2000, Number(e.target.value))) })}
+              />
+            </Field>
+          </div>
+        )}
+
+        <Field label="رنگ برند" hint="کد رنگ HEX برند خودتان را وارد کنید — رنگ‌های دکمه‌ها و عناصر اصلی همین رنگ می‌شوند.">
           <div className="relative">
-            <Input value={settings.brandColor} onChange={(e) => onChange({ ...settings, brandColor: e.target.value })}
-              placeholder="#3B3214" dir="ltr" className="pl-12 text-left" />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 size-6 rounded-full border border-line"
-              style={{ background: settings.brandColor }} />
+            <Input
+              value={settings.brandColor}
+              onChange={(e) => {
+                onChange({ ...settings, brandColor: e.target.value });
+                applyBrandColor(e.target.value);
+              }}
+              placeholder="#0068ff"
+              dir="ltr"
+              className="pl-12 text-left"
+            />
+            <span
+              className="absolute left-3 top-1/2 -translate-y-1/2 size-6 rounded-full border border-line"
+              style={{ background: settings.brandColor }}
+            />
           </div>
         </Field>
       </div>
@@ -428,7 +481,7 @@ export function AdminSettingsPage() {
   const [tab, setTab]         = useState<'personal' | 'answers' | 'ai'>('personal');
   const [cats, setCats]       = useState<Category[]>([]);
   const [answers, setAnswers] = useState<SavedAnswer[]>([]);
-  const [settings, setSettings] = useState<Settings>({ aiEnabled: false, brandColor: '#3B3214', providers: {} });
+  const [settings, setSettings] = useState<Settings>({ aiEnabled: false, brandColor: '#0068ff', providers: {}, aiTopK: 4, aiMaxBodyChars: 400 });
   const [catModal, setCatModal]   = useState(false);
   const [editCat, setEditCat]     = useState<Category | null>(null);
   const [ansModal, setAnsModal]   = useState(false);
@@ -438,7 +491,10 @@ export function AdminSettingsPage() {
   useEffect(() => {
     adminApi.categories().then(setCats).catch(() => {});
     adminApi.savedAnswers().then(setAnswers).catch(() => {});
-    adminApi.settings().then(setSettings).catch(() => {});
+    adminApi.settings().then((s) => {
+      setSettings(s);
+      applyBrandColor(s.brandColor);
+    }).catch(() => {});
   }, []);
 
   async function saveSettings() {

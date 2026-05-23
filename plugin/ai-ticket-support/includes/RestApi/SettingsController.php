@@ -15,9 +15,11 @@ final class SettingsController extends AbstractController {
     private const OPTION_KEY = 'ats_settings';
 
     private const DEFAULTS = [
-        'aiEnabled'   => false,
-        'brandColor'  => '#3B3214',
-        'providers'   => [],
+        'aiEnabled'      => false,
+        'brandColor'     => '#0068ff',
+        'providers'      => [],
+        'aiTopK'         => 4,
+        'aiMaxBodyChars' => 400,
     ];
 
     public function register_routes(): void {
@@ -28,9 +30,9 @@ final class SettingsController extends AbstractController {
             ['methods' => 'POST', 'callback' => [$this, 'store'], 'permission_callback' => $admin,
              'args' => [
                 'aiEnabled'  => ['type' => 'boolean', 'default' => false],
-                'brandColor' => ['type' => 'string',  'default' => '#3B3214',
+                'brandColor' => ['type' => 'string',  'default' => '#0068ff',
                                  'sanitize_callback' => 'sanitize_hex_color'],
-                // providers is a JSON object (not array) — read from raw JSON body instead
+                // providers, aiTopK, aiMaxBodyChars read from raw JSON body
              ]],
         ]);
     }
@@ -52,9 +54,11 @@ final class SettingsController extends AbstractController {
         $providers = isset($json['providers']) && is_array($json['providers']) ? $json['providers'] : [];
 
         $settings = [
-            'aiEnabled'  => (bool) $req->get_param('aiEnabled'),
-            'brandColor' => sanitize_hex_color($req->get_param('brandColor')) ?: '#3B3214',
-            'providers'  => $this->sanitize_providers($providers),
+            'aiEnabled'      => (bool) $req->get_param('aiEnabled'),
+            'brandColor'     => sanitize_hex_color($req->get_param('brandColor')) ?: '#0068ff',
+            'providers'      => $this->sanitize_providers($providers),
+            'aiTopK'         => max(1, min(10,   (int) ($json['aiTopK']         ?? 4))),
+            'aiMaxBodyChars' => max(100, min(2000, (int) ($json['aiMaxBodyChars'] ?? 400))),
         ];
 
         update_option(self::OPTION_KEY, $settings);

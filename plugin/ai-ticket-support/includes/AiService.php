@@ -102,7 +102,9 @@ SYS;
 
         usort($scored, fn($a, $b) => $b['score'] <=> $a['score']);
 
-        return array_column(array_slice($scored, 0, self::TOP_K), 'answer');
+        $top_k = (int) (((array) get_option('ats_settings', []))['aiTopK'] ?? self::TOP_K);
+        $top_k = max(1, min(10, $top_k));
+        return array_column(array_slice($scored, 0, $top_k), 'answer');
     }
 
     private function score(array $words, array $answer): int {
@@ -145,8 +147,10 @@ SYS;
         foreach ($answers as $i => $a) {
             $body = $this->html_to_text((string) $a['body']);
             $body = preg_replace('/\s+/', ' ', trim($body));
-            if (mb_strlen($body) > self::MAX_BODY_CHARS) {
-                $body = mb_substr($body, 0, self::MAX_BODY_CHARS) . '…';
+            $max_chars = (int) (((array) get_option('ats_settings', []))['aiMaxBodyChars'] ?? self::MAX_BODY_CHARS);
+            $max_chars = max(100, min(2000, $max_chars));
+            if (mb_strlen($body) > $max_chars) {
+                $body = mb_substr($body, 0, $max_chars) . '…';
             }
             $n    = $i + 1;
             $kb  .= "--- مورد {$n} ---\nعنوان: {$a['title']}\nمحتوا: {$body}\n\n";

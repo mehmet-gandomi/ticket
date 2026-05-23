@@ -25,11 +25,11 @@ export default {
           100: '#F6F6F7',
         },
         brand: {
-          DEFAULT: '#0068FF',
-          dark: '#005FE8',
-          tint: '#E6F0FF',
-          soft: '#B0D0FF',
-          ring: '#257CFF',
+          DEFAULT: 'rgb(var(--brand) / <alpha-value>)',
+          dark:    'rgb(var(--brand-dark) / <alpha-value>)',
+          tint:    'rgb(var(--brand-tint) / <alpha-value>)',
+          soft:    'rgb(var(--brand-soft) / <alpha-value>)',
+          ring:    '#257CFF',
         },
         success: {
           DEFAULT: '#02927A',
@@ -43,7 +43,7 @@ export default {
         '3xl': '24px',
       },
       boxShadow: {
-        focus: '0 0 0 4px rgba(0,104,255,0.15)',
+        focus: '0 0 0 4px rgb(var(--brand) / 0.15)',
       },
     },
   },
