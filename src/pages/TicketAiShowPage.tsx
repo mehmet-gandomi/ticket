@@ -5,7 +5,7 @@ import { PageHeader }     from '../components/PageHeader';
 import { Button }         from '../components/Button';
 import { Like, Dislike, Check, Close } from '../icons';
 import { ticketsApi, type Ticket, type Message } from '../api/tickets';
-import { toShamsi }       from './TicketListPage';
+import { toShamsi }       from '../utils/date';
 import { getConfig }      from '../config';
 
 export function TicketAiShowPage() {

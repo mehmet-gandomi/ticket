@@ -11,6 +11,7 @@ import { AttachmentsUploader } from '../components/AttachmentsUploader';
 import { getConfig }          from '../config';
 import { ticketsApi, type Ticket, type Message } from '../api/tickets';
 import { adminApi, type AdminState, adminStateMap } from '../api/admin';
+import { toShamsi, relativeTime } from '../utils/date';
 
 
 export function TicketChatPage() {
@@ -116,6 +117,7 @@ export function TicketChatPage() {
               <option value="reviewing">درحال بررسی</option>
               <option value="pending">در انتظار پاسخ</option>
               <option value="answered">پاسخ داده شده</option>
+              <option value="ai_resolved">پاسخ هوشمند</option>
               <option value="closed">بسته شده</option>
               <option value="spam">اسپم</option>
             </Select>
@@ -126,9 +128,9 @@ export function TicketChatPage() {
       <section className="rounded-3xl border border-line bg-white p-4 sm:p-6 flex flex-col gap-4">
         <ChatHeaderBar
           id={ticket.id}
-          date={ticket.createdAt.slice(0, 10)}
+          date={toShamsi(ticket.createdAt)}
           time={ticket.createdAt.slice(11, 16)}
-          ago=""
+          ago={relativeTime(ticket.updatedAt)}
           status="پاسخ پشتیبان"
         />
 
@@ -139,7 +141,7 @@ export function TicketChatPage() {
               author:      m.authorType,
               authorName:  m.authorName,
               body:        m.body,
-              date:        m.createdAt.slice(0, 10),
+              date:        toShamsi(m.createdAt),
               time:        m.createdAt.slice(11, 16),
               attachments: m.attachments,
             }} />

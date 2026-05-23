@@ -8,7 +8,7 @@ import { Button }             from '../components/Button';
 import { Pagination }         from '../components/Pagination';
 import { Search, Setting, Trash, Close } from '../icons';
 import { adminApi, type AdminState, type AdminTicket } from '../api/admin';
-import { toShamsi, relativeTime } from './TicketListPage';
+import { toShamsi, relativeTime } from '../utils/date';
 
 function DeleteConfirmModal({ ticketId, onClose, onConfirm }: {
   ticketId: string;
