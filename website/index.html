@@ -7,13 +7,21 @@
   <meta name="description" content="پلاگین وردپرس برای مدیریت تیکت‌های پشتیبانی با کمک هوش مصنوعی و پایگاه دانش.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Ravi';
+      src: url('fonts/Ravi-VF.ttf') format('truetype');
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+          fontFamily: { sans: ['Ravi', 'sans-serif'] },
           colors: {
             brand: '#0068ff',
             'brand-dark': '#0052cc',
@@ -24,7 +32,7 @@
     }
   </script>
   <style>
-    * { font-family: 'Vazirmatn', sans-serif; }
+    * { font-family: 'Ravi', sans-serif; }
     .hero-bg { background: linear-gradient(150deg, #060d1f 0%, #0b1a3d 60%, #071224 100%); }
     .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
     .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,104,255,.08); }
