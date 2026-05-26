@@ -74,14 +74,14 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           </button>
           <Link to={homeRoute} onClick={onClose} className="flex items-center gap-2">
             <span className="text-brand"><TicketStar size={28} /></span>
-            <span className="text-[14px] font-bold">AI Ticket</span>
+            <span className="text-[14px] font-bold">WP AI Support</span>
           </Link>
         </div>
 
         <Link to={homeRoute} onClick={onClose} className="hidden lg:flex items-center gap-2 pb-5 mb-1 border-b border-line">
           <span className="text-brand"><TicketStar size={36} /></span>
           <div>
-            <div className="text-[15px] font-bold leading-tight">AI Ticket</div>
+            <div className="text-[15px] font-bold leading-tight">WP AI Support</div>
             <div className="text-[11px] text-ink-500">
               {mode === 'admin' ? 'پنل مدیریت' : 'پنل کاربر'}
             </div>
@@ -100,7 +100,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const homeRoute = '/tickets';
 
   return (
-    <div className="min-h-screen flex bg-surface-50 text-ink-900" dir="rtl">
+    <div className="min-h-screen flex bg-surface-50 text-ink-900 overflow-x-hidden" dir="rtl">
       <div className="lg:hidden fixed top-0 right-0 left-0 z-30 h-14 bg-white border-b border-line flex items-center justify-between px-4 shrink-0">
         <button
           onClick={() => setSidebarOpen(true)}
@@ -110,7 +110,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </button>
         <Link to={homeRoute} className="flex items-center gap-2">
           <span className="text-brand"><TicketStar size={28} /></span>
-          <span className="text-[14px] font-bold">{mode === 'admin' ? 'AI Ticket Admin' : 'AI Ticket'}</span>
+          <span className="text-[14px] font-bold">WP AI Support</span>
         </Link>
       </div>
 
