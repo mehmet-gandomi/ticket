@@ -16,7 +16,7 @@
       font-style: normal;
       font-display: swap;
     }
-    html, body { overflow-x: hidden; max-width: 100%; }
+    html { overflow-x: clip; }
     * { font-family: 'Ravi', sans-serif; }
     .hero-bg { background: linear-gradient(150deg, #060d1f 0%, #0b1a3d 60%, #071224 100%); }
     .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
@@ -235,8 +235,116 @@
     </div>
   </section>
 
+  <!-- ── Screenshots ──────────────────────────────────────────────────────── -->
+  <section class="py-28 bg-white" id="screenshots">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8">
+      <div class="text-center mb-14">
+        <h2 class="text-[32px] sm:text-[42px] font-black text-gray-900 mb-4">نگاهی به پلاگین</h2>
+        <p class="text-[15px] text-gray-500">رابط کاربری ساده، سریع و حرفه‌ای — برای مدیر و کاربر</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex items-center justify-center gap-2 mb-10" id="gallery-tabs">
+        <button onclick="showTab('admin')" id="tab-admin"
+          class="tab-btn active h-9 px-5 rounded-lg text-[13px] font-medium transition">
+          پنل مدیریت
+        </button>
+        <button onclick="showTab('user')" id="tab-user"
+          class="tab-btn h-9 px-5 rounded-lg text-[13px] font-medium transition">
+          تجربه کاربر
+        </button>
+        <button onclick="showTab('mobile')" id="tab-mobile"
+          class="tab-btn h-9 px-5 rounded-lg text-[13px] font-medium transition">
+          موبایل
+        </button>
+      </div>
+
+      <!-- Admin tab -->
+      <div id="gallery-admin" class="gallery-panel">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <img src="assets/images/helpdesk-admin-tickets.webp" alt="صف تیکت‌های مدیر"
+              class="w-full h-auto block" loading="lazy">
+          </div>
+          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <img src="assets/images/helpdesk-admin-tickets-id.webp" alt="جزئیات تیکت"
+              class="w-full h-auto block" loading="lazy">
+          </div>
+          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <img src="assets/images/helpdesk-admin-knowledge-answers.webp" alt="پایگاه دانش — پاسخ‌ها"
+              class="w-full h-auto block" loading="lazy">
+          </div>
+          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <img src="assets/images/helpdesk-admin-knowledge-category.webp" alt="پایگاه دانش — دسته‌بندی‌ها"
+              class="w-full h-auto block" loading="lazy">
+          </div>
+          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow md:col-span-2">
+            <img src="assets/images/helpdesk-admin-settings.webp" alt="تنظیمات"
+              class="w-full h-auto block" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <!-- User tab -->
+      <div id="gallery-user" class="gallery-panel hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <img src="assets/images/user-new-ticket.webp" alt="ارسال تیکت جدید"
+              class="w-full h-auto block" loading="lazy">
+          </div>
+          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <img src="assets/images/user-ai-generating.webp" alt="هوش مصنوعی در حال پاسخ‌دهی"
+              class="w-full h-auto block" loading="lazy">
+          </div>
+          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow md:col-span-2">
+            <img src="assets/images/user-ai-answer.webp" alt="پاسخ هوشمند هوش مصنوعی"
+              class="w-full h-auto block" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile tab -->
+      <div id="gallery-mobile" class="gallery-panel hidden">
+        <div class="flex flex-col sm:flex-row items-start justify-center gap-8">
+          <div class="w-full sm:w-auto sm:max-w-[260px] mx-auto">
+            <div class="relative rounded-[2.5rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden bg-gray-800">
+              <div class="h-6 bg-gray-800 flex items-center justify-center">
+                <div class="w-20 h-3 rounded-full bg-gray-700"></div>
+              </div>
+              <img src="assets/images/responsive-1.webp" alt="نمای موبایل پنل مدیر"
+                class="w-full h-auto block" loading="lazy">
+            </div>
+          </div>
+          <div class="w-full sm:w-auto sm:max-w-[260px] mx-auto">
+            <div class="relative rounded-[2.5rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden bg-gray-800">
+              <div class="h-6 bg-gray-800 flex items-center justify-center">
+                <div class="w-20 h-3 rounded-full bg-gray-700"></div>
+              </div>
+              <img src="assets/images/responsive-2.webp" alt="نمای موبایل پنل کاربر"
+                class="w-full h-auto block" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .tab-btn { color: #6b7280; background: #f9fafb; }
+    .tab-btn:hover { background: #f3f4f6; color: #111827; }
+    .tab-btn.active { background: #0068ff; color: #fff; }
+  </style>
+  <script>
+    function showTab(name) {
+      document.querySelectorAll('.gallery-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('gallery-' + name).classList.remove('hidden');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+  </script>
+
   <!-- ── Video ──────────────────────────────────────────────────────────────── -->
-  <section class="py-28 bg-white" id="demo">
+  <section class="py-28 bg-gray-50" id="demo">
     <div class="max-w-6xl mx-auto px-5 sm:px-8">
       <div class="text-center mb-14">
         <h2 class="text-[32px] sm:text-[42px] font-black text-gray-900 mb-4">ببینید چگونه کار می‌کند</h2>
