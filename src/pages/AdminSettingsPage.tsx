@@ -342,7 +342,7 @@ export function AdminSettingsPage() {
             {activeCount > 0 && <Label color="primary" size="sm">{activeCount} فعال</Label>}
           </div>
           <div className="flex flex-col gap-3">
-            {AI_PROVIDERS.map((p) => (
+            {AI_PROVIDERS.filter((p) => p.id === 'gapcode').map((p) => (
               <AiProviderCard
                 key={p.id}
                 provider={p}
