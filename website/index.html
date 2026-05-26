@@ -16,6 +16,7 @@
       font-style: normal;
       font-display: swap;
     }
+    html, body { overflow-x: hidden; max-width: 100%; }
     * { font-family: 'Ravi', sans-serif; }
     .hero-bg { background: linear-gradient(150deg, #060d1f 0%, #0b1a3d 60%, #071224 100%); }
     .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
@@ -26,7 +27,7 @@
 <body class="bg-white text-gray-900 antialiased">
 
   <!-- ── Nav ───────────────────────────────────────────────────────────────── -->
-  <nav class="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
     <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
         <div class="size-8 rounded-lg bg-brand grid place-items-center">
