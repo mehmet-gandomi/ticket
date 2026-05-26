@@ -1,5 +1,7 @@
 node_modules
 dist
+# Allow the built plugin assets so WordPress can serve them
+!plugin/**/assets/dist
 .DS_Store
 *.local
 .env*

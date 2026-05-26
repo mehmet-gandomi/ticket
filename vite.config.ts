@@ -1,6 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  base: './',
+  build: {
+    outDir:   resolve(__dirname, 'plugin/ai-ticket-support/assets/dist'),
+    manifest: true,
+    rollupOptions: {
+      input: resolve(__dirname, 'src/main.tsx'),
+    },
+  },
 });

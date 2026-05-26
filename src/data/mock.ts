@@ -55,11 +55,12 @@ export const tickets: TicketSummary[] = [
 
 export interface ChatMessage {
   id: string;
-  author: 'user' | 'support';
+  author: 'user' | 'support' | 'system';
   authorName: string;
   body: string;
   date: string;
   time: string;
+  attachments?: { id: string; url: string; filename: string; size: number }[];
 }
 
 export const sampleConversation: ChatMessage[] = [

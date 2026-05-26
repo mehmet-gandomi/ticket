@@ -196,6 +196,13 @@ export const Record = ({ size, ...p }: IconProps) => (
   </svg>
 );
 
+export const BookOpen = ({ size, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+  </svg>
+);
+
 export const Setting = ({ size, ...p }: IconProps) => (
   <svg {...base(size)} {...p}>
     <circle cx="12" cy="12" r="3" />
@@ -252,6 +259,24 @@ export const TicketOutline = ({ size, ...p }: IconProps) => (
   <svg {...base(size)} {...p}>
     <path d="M22 11.6V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v3.6a1.5 1.5 0 0 0 1.5 1.5 2.4 2.4 0 0 1 0 4.8A1.5 1.5 0 0 0 2 19.4V20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-.6a1.5 1.5 0 0 0-1.5-1.5 2.4 2.4 0 0 1 0-4.8A1.5 1.5 0 0 0 22 11.6z" />
     <path d="M9 7v14" strokeDasharray="2 3" />
+  </svg>
+);
+
+/* === GapGPT brand logo === */
+export const GapGptLogo = ({ size = 48 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="50" fill="#384e6a"/>
+    <path d="M50 9 C65 9 91 36 91 50 C91 64 65 91 50 91 C35 91 9 64 9 50 C9 36 35 9 50 9Z" fill="#7ec8a0"/>
+    <circle cx="50" cy="50" r="17" fill="#384e6a"/>
+  </svg>
+);
+
+/* === External link icon === */
+export const ExternalLink = ({ size, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
   </svg>
 );
 

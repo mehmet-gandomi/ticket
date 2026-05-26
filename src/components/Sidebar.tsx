@@ -3,33 +3,29 @@ import { NavLink, Link } from 'react-router-dom';
 import {
   ListIcon,
   Plus,
-  AlignRight,
-  Monitor,
-  Like,
   Close,
   Setting,
   TicketStar,
   Menu,
+  BookOpen,
 } from '../icons';
+import { getConfig } from '../config';
 import type { ReactNode } from 'react';
 
-const userItems = [
-  { to: '/tickets', label: 'لیست تیکت‌ها', icon: <ListIcon size={18} /> },
-  { to: '/tickets/new', label: 'تیکت جدید', icon: <Plus size={18} /> },
-  { to: '/tickets/55fr5671', label: 'گفتگو', icon: <AlignRight size={18} /> },
-  { to: '/tickets/loading', label: 'در حال تولید', icon: <Monitor size={18} /> },
-  { to: '/tickets/ai-show', label: 'پاسخ هوشمند', icon: <Like size={18} /> },
-  { to: '/tickets/not-found', label: 'پاسخ نیامد', icon: <Close size={18} /> },
-];
-const adminItems = [
-  { to: '/admin/tickets', label: 'صف تیکت‌ها', icon: <ListIcon size={18} /> },
-  { to: '/admin/settings', label: 'تنظیمات', icon: <Setting size={18} /> },
+const USER_NAV = [
+  { to: '/tickets',     label: 'لیست تیکت‌ها', icon: <ListIcon size={18} /> },
+  { to: '/tickets/new', label: 'تیکت جدید',    icon: <Plus    size={18} /> },
 ];
 
-function Section({ title, items, onClose }: { title: string; items: typeof userItems; onClose?: () => void }) {
+const ADMIN_NAV = [
+  { to: '/tickets',   label: 'صف تیکت‌ها',  icon: <ListIcon  size={18} /> },
+  { to: '/knowledge', label: 'پایگاه دانش', icon: <BookOpen  size={18} /> },
+  { to: '/settings',  label: 'تنظیمات',     icon: <Setting   size={18} /> },
+];
+
+function NavItems({ items, onClose }: { items: typeof USER_NAV; onClose?: () => void }) {
   return (
     <>
-      <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wider text-ink-400">{title}</div>
       {items.map((it) => (
         <NavLink
           key={it.to}
@@ -51,13 +47,14 @@ function Section({ title, items, onClose }: { title: string; items: typeof userI
 }
 
 function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { mode } = getConfig();
+  const nav       = mode === 'admin' ? ADMIN_NAV : USER_NAV;
+  const homeRoute = '/tickets';
+
   return (
     <>
       {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-ink-900/40 lg:hidden"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 z-40 bg-ink-900/40 lg:hidden" onClick={onClose} />
       )}
 
       <aside
@@ -75,22 +72,23 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           >
             <Close size={18} />
           </button>
-          <Link to="/tickets" onClick={onClose} className="flex items-center gap-2">
+          <Link to={homeRoute} onClick={onClose} className="flex items-center gap-2">
             <span className="text-brand"><TicketStar size={28} /></span>
             <span className="text-[14px] font-bold">AI Ticket</span>
           </Link>
         </div>
 
-        <Link to="/tickets" onClick={onClose} className="hidden lg:flex items-center gap-2 pb-5 mb-1 border-b border-line">
+        <Link to={homeRoute} onClick={onClose} className="hidden lg:flex items-center gap-2 pb-5 mb-1 border-b border-line">
           <span className="text-brand"><TicketStar size={36} /></span>
           <div>
             <div className="text-[15px] font-bold leading-tight">AI Ticket</div>
-            <div className="text-[11px] text-ink-500">پنل کاربر و ادمین</div>
+            <div className="text-[11px] text-ink-500">
+              {mode === 'admin' ? 'پنل مدیریت' : 'پنل کاربر'}
+            </div>
           </div>
         </Link>
 
-        <Section title="کاربر" items={userItems} onClose={onClose} />
-        <Section title="ادمین" items={adminItems} onClose={onClose} />
+        <NavItems items={nav} onClose={onClose} />
       </aside>
     </>
   );
@@ -98,6 +96,8 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
 
 export function Layout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { mode } = getConfig();
+  const homeRoute = '/tickets';
 
   return (
     <div className="min-h-screen flex bg-surface-50 text-ink-900" dir="rtl">
@@ -108,9 +108,9 @@ export function Layout({ children }: { children: ReactNode }) {
         >
           <Menu size={20} />
         </button>
-        <Link to="/tickets" className="flex items-center gap-2">
+        <Link to={homeRoute} className="flex items-center gap-2">
           <span className="text-brand"><TicketStar size={28} /></span>
-          <span className="text-[14px] font-bold">AI Ticket</span>
+          <span className="text-[14px] font-bold">{mode === 'admin' ? 'AI Ticket Admin' : 'AI Ticket'}</span>
         </Link>
       </div>
 

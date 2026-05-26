@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Close } from '../icons';
 
 interface AttachedFile {
@@ -42,10 +42,19 @@ function FileChip({ name, size, onRemove }: { name: string; size: number; onRemo
   );
 }
 
-export function AttachmentsUploader({ defaultFiles = [] }: { defaultFiles?: ExistingFile[] }) {
+export function AttachmentsUploader({ defaultFiles = [], onFilesChange }: {
+  defaultFiles?: ExistingFile[];
+  onFilesChange?: (files: File[]) => void;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [existing, setExisting] = useState<ExistingFile[]>(defaultFiles);
   const [files, setFiles] = useState<AttachedFile[]>([]);
+
+  // Sync to parent whenever the file list changes (avoids calling setState
+  // inside another setState updater, which React prohibits)
+  useEffect(() => {
+    onFilesChange?.(files.map((f) => f.file));
+  }, [files]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleAdd(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(e.target.files ?? []);
@@ -55,6 +64,10 @@ export function AttachmentsUploader({ defaultFiles = [] }: { defaultFiles?: Exis
     }));
     setFiles((prev) => [...prev, ...next]);
     e.target.value = '';
+  }
+
+  function removeFile(id: string) {
+    setFiles((prev) => prev.filter((x) => x.id !== id));
   }
 
   const hasFiles = existing.length > 0 || files.length > 0;
@@ -107,7 +120,7 @@ export function AttachmentsUploader({ defaultFiles = [] }: { defaultFiles?: Exis
               key={id}
               name={file.name}
               size={file.size}
-              onRemove={() => setFiles((prev) => prev.filter((x) => x.id !== id))}
+              onRemove={() => removeFile(id)}
             />
           ))}
         </div>
