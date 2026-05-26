@@ -34,6 +34,52 @@ function Modal({ children, onClose, title, wide }: {
   );
 }
 
+// ── Delete confirm modal ──────────────────────────────────────────────────────
+
+function DeleteConfirmModal({ title, description, onClose, onConfirm }: {
+  title: string;
+  description: string;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+}) {
+  const [deleting, setDeleting] = useState(false);
+
+  async function confirm() {
+    setDeleting(true);
+    try { await onConfirm(); } finally { setDeleting(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-ink-900/40 p-4" onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} dir="rtl"
+        className="bg-white rounded-3xl border border-line w-full max-w-[420px] flex flex-col">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4">
+          <h2 className="text-[16px] font-bold text-ink-900">{title}</h2>
+          <button onClick={onClose} className="size-9 grid place-items-center rounded-lg text-ink-500 hover:bg-surface-50"><Close size={18} /></button>
+        </div>
+        <div className="h-px bg-line" />
+        <div className="flex flex-col gap-5 p-6">
+          <div className="flex items-start gap-4">
+            <span className="size-11 rounded-2xl bg-red-50 grid place-items-center text-danger shrink-0">
+              <Trash size={20} />
+            </span>
+            <div className="flex flex-col gap-1 text-right">
+              <p className="text-[14px] font-bold text-ink-900">آیا مطمئن هستید؟</p>
+              <p className="text-[13px] text-ink-500 leading-6">{description}</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="danger" size="md" onClick={confirm} disabled={deleting}>
+              {deleting ? 'در حال حذف...' : 'بله، حذف شود'}
+            </Button>
+            <Button variant="secondary" size="md" onClick={onClose}>انصراف</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Category modals + tab ─────────────────────────────────────────────────────
 
 function CategoryModal({ onClose, onSave }: {
@@ -332,8 +378,10 @@ export function AdminKnowledgePage() {
   const [answers, setAnswers] = useState<SavedAnswer[]>([]);
   const [catModal, setCatModal]   = useState(false);
   const [editCat, setEditCat]     = useState<Category | null>(null);
+  const [deleteCat, setDeleteCat] = useState<Category | null>(null);
   const [ansModal, setAnsModal]   = useState(false);
   const [editAns, setEditAns]     = useState<SavedAnswer | null>(null);
+  const [deleteAns, setDeleteAns] = useState<SavedAnswer | null>(null);
 
   useEffect(() => {
     adminApi.categories().then(setCats).catch(() => {});
@@ -399,7 +447,7 @@ export function AdminKnowledgePage() {
           cats={cats}
           onAdd={() => setCatModal(true)}
           onEdit={(c) => setEditCat(c)}
-          onDelete={handleDeleteCat}
+          onDelete={(id) => setDeleteCat(cats.find((c) => c.id === id) ?? null)}
         />
       )}
       {tab === 'answers' && (
@@ -408,7 +456,7 @@ export function AdminKnowledgePage() {
           cats={cats}
           onAdd={() => setAnsModal(true)}
           onEdit={(a) => setEditAns(a)}
-          onDelete={handleDeleteAns}
+          onDelete={(id) => setDeleteAns(answers.find((a) => a.id === id) ?? null)}
         />
       )}
 
@@ -431,6 +479,22 @@ export function AdminKnowledgePage() {
           cats={cats}
           onClose={() => setEditAns(null)}
           onSave={(title, body, catId) => handleEditAns(editAns.id, title, body, catId)}
+        />
+      )}
+      {deleteCat && (
+        <DeleteConfirmModal
+          title="حذف دسته بندی"
+          description={`دسته بندی «${deleteCat.title}» حذف می‌شود. پاسخ‌های آماده مرتبط بدون دسته بندی باقی می‌مانند.`}
+          onClose={() => setDeleteCat(null)}
+          onConfirm={async () => { await handleDeleteCat(deleteCat.id); setDeleteCat(null); }}
+        />
+      )}
+      {deleteAns && (
+        <DeleteConfirmModal
+          title="حذف پاسخ آماده"
+          description={`پاسخ آماده «${deleteAns.title}» به طور کامل حذف می‌شود و قابل بازگشت نیست.`}
+          onClose={() => setDeleteAns(null)}
+          onConfirm={async () => { await handleDeleteAns(deleteAns.id); setDeleteAns(null); }}
         />
       )}
     </PageContainer>

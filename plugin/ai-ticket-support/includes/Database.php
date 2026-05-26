@@ -335,7 +335,7 @@ final class Database {
 
     public function get_categories(): array {
         return $this->db->get_results(
-            "SELECT c.*, (SELECT COUNT(*) FROM {$this->db->prefix}ats_tickets t WHERE t.category_id = c.id) AS ticket_count
+            "SELECT c.*, (SELECT COUNT(*) FROM {$this->db->prefix}ats_saved_answers sa WHERE sa.category_id = c.id) AS answer_count
              FROM {$this->db->prefix}ats_categories c
              ORDER BY c.title ASC",
             ARRAY_A

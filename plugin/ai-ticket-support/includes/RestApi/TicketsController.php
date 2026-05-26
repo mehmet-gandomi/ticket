@@ -348,7 +348,7 @@ final class TicketsController extends AbstractController {
             'id'          => (string) $c['id'],
             'title'       => $c['title'],
             'description' => $c['description'],
-            'count'       => (int) $c['ticket_count'],
+            'count'       => (int) ($c['answer_count'] ?? 0),
         ], $cats));
     }
 
