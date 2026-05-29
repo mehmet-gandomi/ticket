@@ -235,112 +235,193 @@
     </div>
   </section>
 
-  <!-- ── Screenshots ──────────────────────────────────────────────────────── -->
-  <section class="py-28 bg-white" id="screenshots">
+  <!-- ── Screenshots carousel ─────────────────────────────────────────────── -->
+  <section class="py-28 bg-white overflow-hidden" id="screenshots">
     <div class="max-w-6xl mx-auto px-5 sm:px-8">
       <div class="text-center mb-14">
         <h2 class="text-[32px] sm:text-[42px] font-black text-gray-900 mb-4">نگاهی به پلاگین</h2>
         <p class="text-[15px] text-gray-500">رابط کاربری ساده، سریع و حرفه‌ای — برای مدیر و کاربر</p>
       </div>
+    </div>
 
-      <!-- Tabs -->
-      <div class="flex items-center justify-center gap-2 mb-10" id="gallery-tabs">
-        <button onclick="showTab('admin')" id="tab-admin"
-          class="tab-btn active h-9 px-5 rounded-lg text-[13px] font-medium transition">
-          پنل مدیریت
-        </button>
-        <button onclick="showTab('user')" id="tab-user"
-          class="tab-btn h-9 px-5 rounded-lg text-[13px] font-medium transition">
-          تجربه کاربر
-        </button>
-        <button onclick="showTab('mobile')" id="tab-mobile"
-          class="tab-btn h-9 px-5 rounded-lg text-[13px] font-medium transition">
-          موبایل
-        </button>
+    <!-- Carousel track (full-width, not constrained) -->
+    <div class="relative max-w-5xl mx-auto px-5 sm:px-8">
+
+      <!-- Slides -->
+      <div id="car-track" class="relative overflow-hidden rounded-2xl border border-gray-100 shadow-md bg-gray-50 cursor-pointer select-none"
+           style="aspect-ratio:16/9">
+        <!-- slides injected by JS -->
       </div>
 
-      <!-- Admin tab -->
-      <div id="gallery-admin" class="gallery-panel">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <img src="assets/images/helpdesk-admin-tickets.webp" alt="صف تیکت‌های مدیر"
-              class="w-full h-auto block" loading="lazy">
-          </div>
-          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <img src="assets/images/helpdesk-admin-tickets-id.webp" alt="جزئیات تیکت"
-              class="w-full h-auto block" loading="lazy">
-          </div>
-          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <img src="assets/images/helpdesk-admin-knowledge-answers.webp" alt="پایگاه دانش — پاسخ‌ها"
-              class="w-full h-auto block" loading="lazy">
-          </div>
-          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <img src="assets/images/helpdesk-admin-knowledge-category.webp" alt="پایگاه دانش — دسته‌بندی‌ها"
-              class="w-full h-auto block" loading="lazy">
-          </div>
-          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow md:col-span-2">
-            <img src="assets/images/helpdesk-admin-settings.webp" alt="تنظیمات"
-              class="w-full h-auto block" loading="lazy">
-          </div>
-        </div>
-      </div>
+      <!-- Prev / Next -->
+      <button id="car-prev" aria-label="قبلی"
+        class="absolute top-1/2 -translate-y-1/2 right-0 -mr-4 sm:-mr-6 size-11 rounded-full bg-white border border-gray-200 shadow-md grid place-items-center text-gray-600 hover:text-brand hover:border-brand transition z-10">
+        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+      <button id="car-next" aria-label="بعدی"
+        class="absolute top-1/2 -translate-y-1/2 left-0 -ml-4 sm:-ml-6 size-11 rounded-full bg-white border border-gray-200 shadow-md grid place-items-center text-gray-600 hover:text-brand hover:border-brand transition z-10">
+        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
 
-      <!-- User tab -->
-      <div id="gallery-user" class="gallery-panel hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <img src="assets/images/user-new-ticket.webp" alt="ارسال تیکت جدید"
-              class="w-full h-auto block" loading="lazy">
-          </div>
-          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <img src="assets/images/user-ai-generating.webp" alt="هوش مصنوعی در حال پاسخ‌دهی"
-              class="w-full h-auto block" loading="lazy">
-          </div>
-          <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow md:col-span-2">
-            <img src="assets/images/user-ai-answer.webp" alt="پاسخ هوشمند هوش مصنوعی"
-              class="w-full h-auto block" loading="lazy">
-          </div>
-        </div>
-      </div>
-
-      <!-- Mobile tab -->
-      <div id="gallery-mobile" class="gallery-panel hidden">
-        <div class="flex flex-col sm:flex-row items-start justify-center gap-8">
-          <div class="w-full sm:w-auto sm:max-w-[260px] mx-auto">
-            <div class="relative rounded-[2.5rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden bg-gray-800">
-              <div class="h-6 bg-gray-800 flex items-center justify-center">
-                <div class="w-20 h-3 rounded-full bg-gray-700"></div>
-              </div>
-              <img src="assets/images/responsive-1.webp" alt="نمای موبایل پنل مدیر"
-                class="w-full h-auto block" loading="lazy">
-            </div>
-          </div>
-          <div class="w-full sm:w-auto sm:max-w-[260px] mx-auto">
-            <div class="relative rounded-[2.5rem] border-[8px] border-gray-800 shadow-2xl overflow-hidden bg-gray-800">
-              <div class="h-6 bg-gray-800 flex items-center justify-center">
-                <div class="w-20 h-3 rounded-full bg-gray-700"></div>
-              </div>
-              <img src="assets/images/responsive-2.webp" alt="نمای موبایل پنل کاربر"
-                class="w-full h-auto block" loading="lazy">
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Dots -->
+      <div id="car-dots" class="flex items-center justify-center gap-1.5 mt-5"></div>
     </div>
   </section>
 
-  <style>
-    .tab-btn { color: #6b7280; background: #f9fafb; }
-    .tab-btn:hover { background: #f3f4f6; color: #111827; }
-    .tab-btn.active { background: #0068ff; color: #fff; }
-  </style>
+  <!-- Lightbox -->
+  <div id="lb" class="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <button id="lb-close" aria-label="بستن"
+      class="absolute top-4 left-4 size-10 rounded-full bg-white/10 hover:bg-white/20 grid place-items-center text-white transition">
+      <svg class="size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <button id="lb-prev" aria-label="قبلی"
+      class="absolute right-4 top-1/2 -translate-y-1/2 size-11 rounded-full bg-white/10 hover:bg-white/20 grid place-items-center text-white transition">
+      <svg class="size-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+    <button id="lb-next" aria-label="بعدی"
+      class="absolute left-4 top-1/2 -translate-y-1/2 size-11 rounded-full bg-white/10 hover:bg-white/20 grid place-items-center text-white transition">
+      <svg class="size-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <img id="lb-img" src="" alt="" class="max-h-[90vh] max-w-full rounded-xl shadow-2xl object-contain transition-opacity duration-200">
+    <div id="lb-counter" class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-[12px]"></div>
+  </div>
+
   <script>
-    function showTab(name) {
-      document.querySelectorAll('.gallery-panel').forEach(p => p.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('gallery-' + name).classList.remove('hidden');
-      document.getElementById('tab-' + name).classList.add('active');
-    }
+    (function () {
+      const SLIDES = [
+        { src: 'assets/images/admin-list.png',          alt: 'لیست تیکت‌های مدیر' },
+        { src: 'assets/images/admin-knowledge-1.png',   alt: 'پایگاه دانش — دسته‌بندی‌ها' },
+        { src: 'assets/images/admin-knowledge-2.png',   alt: 'پایگاه دانش — پاسخ‌ها' },
+        { src: 'assets/images/admin-add-knowledge.png', alt: 'افزودن پاسخ آماده' },
+        { src: 'assets/images/admin-settings.png',      alt: 'تنظیمات پلاگین' },
+        { src: 'assets/images/user-new-ticket.png',     alt: 'ارسال تیکت جدید' },
+        { src: 'assets/images/ai-loading.png',          alt: 'هوش مصنوعی در حال پاسخ‌دهی' },
+        { src: 'assets/images/user-ai-answer.png',      alt: 'پاسخ هوشمند هوش مصنوعی' },
+        { src: 'assets/images/user-list-ticket.png',    alt: 'لیست تیکت‌های کاربر' },
+        { src: 'assets/images/usersite-chat.png',       alt: 'گفتگو در پنل کاربر' },
+      ];
+
+      const track   = document.getElementById('car-track');
+      const dotsEl  = document.getElementById('car-dots');
+      const lb      = document.getElementById('lb');
+      const lbImg   = document.getElementById('lb-img');
+      const lbCtr   = document.getElementById('lb-counter');
+      let current   = 0;
+      let lbIndex   = 0;
+
+      /* ── Build carousel slides ── */
+      SLIDES.forEach((s, i) => {
+        const div = document.createElement('div');
+        div.className = 'absolute inset-0 transition-opacity duration-500 ' + (i === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none');
+        div.dataset.index = i;
+
+        const img = document.createElement('img');
+        img.alt = s.alt;
+        img.className = 'w-full h-full object-contain';
+        if (i === 0) {
+          img.src = s.src;
+        } else {
+          img.dataset.src = s.src;
+          img.loading = 'lazy';
+        }
+        img.addEventListener('click', () => openLb(i));
+
+        div.appendChild(img);
+        track.appendChild(div);
+      });
+
+      /* ── Dots ── */
+      SLIDES.forEach((_, i) => {
+        const d = document.createElement('button');
+        d.className = 'size-2 rounded-full transition-all duration-300 ' + (i === 0 ? 'bg-brand w-5' : 'bg-gray-300');
+        d.addEventListener('click', () => goTo(i));
+        dotsEl.appendChild(d);
+      });
+
+      function slides()  { return track.querySelectorAll('[data-index]'); }
+      function dots()    { return dotsEl.querySelectorAll('button'); }
+
+      function lazyLoad(i) {
+        const img = slides()[i].querySelector('img');
+        if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
+      }
+
+      function goTo(n) {
+        slides()[current].classList.replace('opacity-100', 'opacity-0');
+        slides()[current].classList.add('pointer-events-none');
+        dots()[current].className = 'size-2 rounded-full transition-all duration-300 bg-gray-300';
+
+        current = (n + SLIDES.length) % SLIDES.length;
+        lazyLoad(current);
+        lazyLoad((current + 1) % SLIDES.length); // preload next
+
+        slides()[current].classList.replace('opacity-0', 'opacity-100');
+        slides()[current].classList.remove('pointer-events-none');
+        dots()[current].className = 'size-2 rounded-full transition-all duration-300 bg-brand w-5';
+      }
+
+      document.getElementById('car-prev').addEventListener('click', () => goTo(current - 1));
+      document.getElementById('car-next').addEventListener('click', () => goTo(current + 1));
+
+      /* ── Touch / swipe ── */
+      let tx = 0;
+      track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+      track.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - tx;
+        if (Math.abs(dx) > 40) goTo(dx > 0 ? current - 1 : current + 1);
+      }, { passive: true });
+
+      /* ── Lightbox ── */
+      function openLb(i) {
+        lbIndex = i;
+        lbImg.style.opacity = '0';
+        lb.classList.remove('opacity-0', 'pointer-events-none');
+        document.body.style.overflow = 'hidden';
+        showLbSlide();
+      }
+
+      function showLbSlide() {
+        lbImg.style.opacity = '0';
+        setTimeout(() => {
+          lbImg.src = SLIDES[lbIndex].src;
+          lbImg.alt = SLIDES[lbIndex].alt;
+          lbImg.onload = () => { lbImg.style.opacity = '1'; };
+          lbCtr.textContent = (lbIndex + 1) + ' / ' + SLIDES.length;
+        }, 150);
+      }
+
+      function closeLb() {
+        lb.classList.add('opacity-0', 'pointer-events-none');
+        document.body.style.overflow = '';
+      }
+
+      document.getElementById('lb-close').addEventListener('click', closeLb);
+      lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+      document.getElementById('lb-prev').addEventListener('click', () => { lbIndex = (lbIndex - 1 + SLIDES.length) % SLIDES.length; showLbSlide(); });
+      document.getElementById('lb-next').addEventListener('click', () => { lbIndex = (lbIndex + 1) % SLIDES.length; showLbSlide(); });
+
+      document.addEventListener('keydown', e => {
+        if (lb.classList.contains('opacity-0')) return;
+        if (e.key === 'Escape')      closeLb();
+        if (e.key === 'ArrowRight')  { lbIndex = (lbIndex - 1 + SLIDES.length) % SLIDES.length; showLbSlide(); }
+        if (e.key === 'ArrowLeft')   { lbIndex = (lbIndex + 1) % SLIDES.length; showLbSlide(); }
+      });
+
+      /* ── Auto-advance ── */
+      let timer = setInterval(() => goTo(current + 1), 4000);
+      track.addEventListener('mouseenter', () => clearInterval(timer));
+      track.addEventListener('mouseleave', () => { timer = setInterval(() => goTo(current + 1), 4000); });
+    })();
   </script>
 
   <!-- ── Video ──────────────────────────────────────────────────────────────── -->
